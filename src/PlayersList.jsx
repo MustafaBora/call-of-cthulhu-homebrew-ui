@@ -1,13 +1,19 @@
 import { useEffect, useState } from "react";
-import NewPlayerForm from "./NewPlayerForm";
 
-function PlayersList() {
+function getInitials(text) {
+  if (!text) return "?";
+  return text
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join("");
+}
+
+function PlayersList({ onEditPlayer, onNewPlayer }) {
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [isCreating, setIsCreating] = useState(false);
-  const [editingPlayer, setEditingPlayer] = useState(null);
-
 
   useEffect(() => {
     const fetchPlayers = async () => {
@@ -26,7 +32,7 @@ function PlayersList() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         });
 
@@ -47,169 +53,112 @@ function PlayersList() {
     fetchPlayers();
   }, []);
 
-  if (loading) return <div style={styles.page}>Yükleniyor...</div>;
-  if (error) return <div style={styles.page}>Hata: {error}</div>;
-  if (isCreating) {
-    return (
-      <div style={styles.page}>
-        <NewPlayerForm
-          mode="create"
-          onCancel={() => setIsCreating(false)}
-          onCreated={(newPlayer) => {
-            setPlayers((prev) => [...prev, newPlayer]);
-            setIsCreating(false);
-          }}
-        />
-      </div>
-    );
+  if (loading) {
+    return <div style={styles.page}>Yükleniyor...</div>;
   }
 
-  if (editingPlayer) {
-    return (
-      <div style={styles.page}>
-        <NewPlayerForm
-          mode="edit"
-          initialPlayer={editingPlayer}
-          onCancel={() => setEditingPlayer(null)}
-          onCreated={(updated) => {
-            setPlayers((prev) =>
-              prev.map((p) => (p.id === updated.id ? updated : p))
-            );
-            setEditingPlayer(null);
-          }}
-        />
-      </div>
-    );
+  if (error) {
+    return <div style={styles.page}>Hata: {error}</div>;
   }
 
   return (
-  <div style={styles.page}>
-    <div style={styles.headerRow}>
-      <h2 style={styles.title}>Oyuncu Listesi</h2>
-      <button style={styles.newButton} onClick={() => setIsCreating(true)}>
-        Yeni Player
-      </button>
-    </div>
+    <div style={styles.page}>
+      <div style={styles.cardWrapper}>
+        {/* BAŞLIK + YENİ OYUNCU BUTONU */}
+        <div style={styles.headerRow}>
+          <h2 style={styles.title}>Oyuncu Listesi</h2>
+          {onNewPlayer && (
+            <button
+              type="button"
+              style={styles.newPlayerButton}
+              onClick={onNewPlayer}
+            >
+              + Yeni Oyuncu
+            </button>
+          )}
+        </div>
 
-
-    <div style={styles.grid}>
-        {players.map((p) => {
-          // Player objesindeki tüm alanları otomatik al
-          // Gerekiyorsa bazılarını filtreleyebilirsin (ör: id, password vs.)
-          const entries = Object.entries(p).filter(([key]) =>
-            !["password", "hashedPassword"].includes(key)
-          );
-
-          return (
+        <div style={styles.grid}>
+          {players.map((p) => (
             <div key={p.id} style={styles.card}>
-              <h3 style={styles.cardTitle}>
-                Player #{p.id} {p.username ? `- ${p.username}` : ""}
-              </h3>
-
-              <div style={styles.attributesGrid}>
-                {entries.map(([key, value]) => (
-                  <div key={key} style={styles.attrItem}>
-                    <div style={styles.attrKey}>{formatKey(key)}</div>
-                    <div style={styles.attrValue}>
-                      {value === null || value === undefined ? "—" : String(value)}
+              {/* Üst kısım: avatar + isimler */}
+              <div style={styles.cardHeader}>
+                <div style={styles.avatarWrapper}>
+                  {p.avatar ? (
+                    <img
+                      src={`data:image/*;base64,${p.avatar}`}
+                      alt={p.name || p.player || "Avatar"}
+                      style={styles.avatarImg}
+                    />
+                  ) : (
+                    <div style={styles.avatarFallback}>
+                      {getInitials(p.name || p.player)}
                     </div>
-                  </div>
-                ))}
-              </div>
-              <li key={p.id} style={styles.listItem}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div>
-                  <strong>ID:</strong> {p.id} <br />
-                  <strong>Name:</strong> {p.name || "-"} <br />
-                  <strong>Player:</strong> {p.player || "-"}
+                  )}
                 </div>
+                <div style={styles.headerText}>
+                  <div style={styles.nameLine}>
+                    {p.name || "İsimsiz karakter"}
+                  </div>
+                  <div style={styles.subLine}>
+                    <span style={styles.playerName}>
+                      {p.player || "Oyuncu adı yok"}
+                    </span>
+                    {p.occupation && (
+                      <>
+                        <span style={styles.dot}>•</span>
+                        <span style={styles.occupation}>{p.occupation}</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Küçük statlar */}
+              <div style={styles.statsRow}>
+                <span>APP: {p.APP}</span>
+                <span>POW: {p.POW}</span>
+                <span>DEX: {p.DEX}</span>
+              </div>
+
+              {/* Alt kısım: butonlar */}
+              <div style={styles.cardFooter}>
                 <button
+                  type="button"
                   style={styles.editButton}
-                  onClick={() => setEditingPlayer(p)}
+                  onClick={() => onEditPlayer && onEditPlayer(p)}
                 >
                   Düzenle
                 </button>
               </div>
-            </li>
 
+              <a
+                href={`http://localhost:8080/players/${p.id}/sheet.html`}
+                target="_blank"
+                rel="noreferrer"
+                style={styles.printButton}
+              >
+                Çıktı (HTML)
+              </a>
             </div>
-          );
-        })}
+          ))}
+        </div>
       </div>
     </div>
   );
-}
-
-// key'leri daha okunur hale getirmek için ufak helper
-function formatKey(key) {
-  // örn: "remainingXP" → "Remaining XP"
-  //      "app" → "APP"
-  //      "firearmsHandgun" → "Firearms Handgun"
-  if (!key) return "";
-
-  // tamamen büyük harf ise (APP, STR vs.) olduğu gibi bırak
-  if (key === key.toUpperCase()) return key;
-
-  // camelCase'i boşluklu hale getir
-  const withSpaces = key.replace(/([a-z])([A-Z])/g, "$1 $2");
-
-  // İlk harfini büyüt
-  return withSpaces.charAt(0).toUpperCase() + withSpaces.slice(1);
 }
 
 const styles = {
   page: {
     minHeight: "100vh",
     padding: "2rem",
-    background: "#0f172a",
-    color: "#e5e7eb",
+    background: "#facc15", // sarımsı arka plan
     fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+    color: "#111827",
   },
-  title: {
-    textAlign: "center",
-    marginBottom: "1.5rem",
-  },
-  // Dış grid: her player için bir kart, 3 sütunlu layout (responsive)
-  grid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-    gap: "1rem",
-  },
-  card: {
-    background: "#020617",
-    padding: "1rem",
-    borderRadius: "0.75rem",
-    border: "1px solid #1f2937",
-    boxShadow: "0 6px 16px rgba(0,0,0,0.4)",
-  },
-  cardTitle: {
-    margin: "0 0 0.75rem 0",
-    fontSize: "1.1rem",
-    fontWeight: 600,
-    borderBottom: "1px solid #1f2937",
-    paddingBottom: "0.5rem",
-  },
-  // Kart içi grid: 3 sütunlu attribute layout
-  attributesGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(3, minmax(0, 1fr))", // 🔥 her kartta 3 kolon
-    gap: "0.5rem 1rem",
-    marginTop: "0.75rem",
-  },
-  attrItem: {
-    padding: "0.3rem 0.4rem",
-    borderRadius: "0.5rem",
-    background: "#020617",
-    border: "1px solid #111827",
-  },
-  attrKey: {
-    fontSize: "0.7rem",
-    color: "#9ca3af",
-    marginBottom: "0.1rem",
-  },
-  attrValue: {
-    fontSize: "0.85rem",
-    fontWeight: 600,
+  cardWrapper: {
+    maxWidth: "1200px",
+    margin: "0 auto",
   },
   headerRow: {
     display: "flex",
@@ -217,36 +166,130 @@ const styles = {
     alignItems: "center",
     marginBottom: "1.5rem",
   },
-  newButton: {
+  title: {
+    margin: 0,
+    fontSize: "1.75rem",
+    fontWeight: 700,
+  },
+  newPlayerButton: {
     padding: "0.5rem 0.9rem",
     borderRadius: "0.5rem",
-    border: "none",
-    background: "#22c55e",
-    color: "#022c22",
+    border: "1px solid #92400e",
+    background: "#fbbf24",
+    color: "#451a03",
+    fontWeight: 700,
+    fontSize: "0.9rem",
+    cursor: "pointer",
+    boxShadow: "0 4px 10px rgba(0,0,0,0.25)",
+  },
+  grid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+    gap: "1rem",
+  },
+  card: {
+    background: "#fefce8",
+    borderRadius: "0.9rem",
+    border: "1px solid #eab308",
+    padding: "0.9rem 1rem",
+    boxShadow: "0 10px 20px rgba(0,0,0,0.15)",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
+    gap: "0.75rem",
+  },
+  cardHeader: {
+    display: "flex",
+    alignItems: "center",
+    gap: "0.75rem",
+  },
+  avatarWrapper: {
+    width: "56px",
+    height: "56px",
+    borderRadius: "999px",
+    overflow: "hidden",
+    border: "2px solid #f97316",
+    background: "linear-gradient(135deg, #f97316, #e11d48)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+  },
+  avatarImg: {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+  },
+  avatarFallback: {
+    fontSize: "1.1rem",
+    fontWeight: 700,
+    color: "#fefce8",
+  },
+  headerText: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.1rem",
+    overflow: "hidden",
+  },
+  nameLine: {
+    fontWeight: 700,
+    fontSize: "1rem",
+    whiteSpace: "nowrap",
+    textOverflow: "ellipsis",
+    overflow: "hidden",
+  },
+  subLine: {
+    fontSize: "0.8rem",
+    color: "#4b5563",
+    display: "flex",
+    alignItems: "center",
+    gap: "0.25rem",
+    flexWrap: "wrap",
+  },
+  playerName: {
+    fontWeight: 500,
+  },
+  dot: {
+    fontSize: "0.7rem",
+  },
+  occupation: {
+    fontStyle: "italic",
+  },
+  statsRow: {
+    display: "flex",
+    justifyContent: "space-between",
+    fontSize: "0.8rem",
+    color: "#4b5563",
+  },
+  cardFooter: {
+    display: "flex",
+    justifyContent: "flex-end",
+    marginTop: "0.25rem",
+  },
+  editButton: {
+    padding: "0.45rem 0.9rem",
+    borderRadius: "0.35rem",
+    border: "1px solid #7c2d12",
+    background: "linear-gradient(135deg, #f97316, #db2777)",
+    color: "#111827",
     fontWeight: 600,
+    fontSize: "0.85rem",
     cursor: "pointer",
+    boxShadow: "0 4px 10px rgba(0,0,0,0.25)",
   },
-  editButton: {
-    padding: "0.3rem 0.7rem",
+  printButton: {
+    display: "inline-block",
+    marginTop: "0.5rem",
+    padding: "0.4rem 0.7rem",
     borderRadius: "0.4rem",
-    border: "none",
-    background: "#3b82f6",
-    color: "#e5e7eb",
-    cursor: "pointer",
+    border: "1px solid #78350f",
+    background: "#fbbf24",
+    color: "#451a03",
     fontSize: "0.8rem",
-    fontWeight: 500,
-  },
-  editButton: {
-    padding: "0.3rem 0.7rem",
-    borderRadius: "0.4rem",
-    border: "none",
-    background: "#3b82f6",
-    color: "#e5e7eb",
+    fontWeight: 600,
+    textDecoration: "none",
     cursor: "pointer",
-    fontSize: "0.8rem",
-    fontWeight: 500,
   },
-
 };
 
 export default PlayersList;

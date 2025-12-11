@@ -1,5 +1,6 @@
 import { useState } from "react";
 import PlayersList from "./PlayersList";
+import NewPlayerForm from "./NewPlayerForm";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
@@ -9,9 +10,59 @@ function LoginPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
 
+  // login sonrası görünüm
+  const [mode, setMode] = useState("list"); // "list" | "new" | "edit"
+  const [editingPlayer, setEditingPlayer] = useState(null);
+
+  // 🔹 LOGIN OLDUKTAN SONRA GÖRÜNEN KISIM
   if (isLoggedIn) {
-    return <PlayersList />;   // ✅ login olduysa direkt listeyi göster
+    return (
+      <>
+        {mode === "list" && (
+          <PlayersList
+            onEditPlayer={(p) => {
+              setEditingPlayer(p);
+              setMode("edit");
+            }}
+            onNewPlayer={() => setMode("new")}
+          />
+        )}
+
+        {mode === "new" && (
+          <NewPlayerForm
+            mode="create"
+            initialPlayer={null}
+            onCancel={() => setMode("list")}
+            onCreated={() => {
+              // create sonrası listeye dön
+              setMode("list");
+            }}
+          />
+        )}
+
+        {mode === "edit" && editingPlayer && (
+          <NewPlayerForm
+            mode="edit"
+            initialPlayer={editingPlayer}
+            onCancel={() => {
+              setEditingPlayer(null);
+              setMode("list");
+            }}
+            onCreated={(_, { stay } = {}) => {
+              if (!stay) {
+                // "Kaydet ve Geri Dön" ise listeye dön
+                setEditingPlayer(null);
+                setMode("list");
+              }
+              // "Kaydet ve Sayfada Kal" ise form üzerinde kalmaya devam,
+              // istersen burada state güncellemesi de yapabilirsin
+            }}
+          />
+        )}
+      </>
+    );
   }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -30,18 +81,15 @@ function LoginPage() {
       });
 
       if (!response.ok) {
-        // 400 / 401 / 500 vs
-        throw new Error("Giriş başarısız. Kullanıcı adı veya şifre yanlış olabilir.");
+        throw new Error(
+          "Giriş başarısız. Kullanıcı adı veya şifre yanlış olabilir."
+        );
       }
 
       const data = await response.json();
-      // data = { token: "...", username: "aaa" }
-
-      // Token'ı localStorage'a kaydet
       localStorage.setItem("token", data.token);
       localStorage.setItem("username", data.username);
 
-      alert("Hoş geldin " + data.username + "!");
       setIsLoggedIn(true);
     } catch (err) {
       console.error(err);
@@ -63,8 +111,7 @@ function LoginPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          // DTO’ya göre ayarla:
-          username: email.split("@")[0], // basit bir şey, istersen ayrı input da açarız
+          username: email.split("@")[0],
           email: email,
           password: password,
         }),
@@ -74,8 +121,7 @@ function LoginPage() {
         throw new Error("Kayıt başarısız. Bilgileri kontrol edin.");
       }
 
-      alert("Kayıt başarılı! Şimdi giriş yapabilirsin.");
-      setIsRegistering(false); // formu tekrar login moduna al
+      setIsRegistering(false);
     } catch (err) {
       console.error(err);
       setError(err.message || "Bir hata oluştu.");
@@ -84,13 +130,86 @@ function LoginPage() {
     }
   };
 
+  const styles = {
+    page: {
+      minHeight: "100vh",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      background: "#0f172a",
+      fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+    },
+    card: {
+      background: "#020617",
+      padding: "2rem 2.5rem",
+      borderRadius: "1rem",
+      boxShadow: "0 20px 40px rgba(0,0,0,0.5)",
+      width: "100%",
+      maxWidth: "400px",
+      color: "#e5e7eb",
+      border: "1px solid #1e293b",
+    },
+    title: {
+      margin: 0,
+      marginBottom: "0.25rem",
+      fontSize: "1.5rem",
+      textAlign: "center",
+    },
+    subtitle: {
+      margin: 0,
+      marginBottom: "1.5rem",
+      fontSize: "0.9rem",
+      color: "#9ca3af",
+      textAlign: "center",
+    },
+    form: {
+      display: "flex",
+      flexDirection: "column",
+      gap: "0.75rem",
+    },
+    label: {
+      fontSize: "0.85rem",
+      display: "flex",
+      flexDirection: "column",
+      gap: "0.35rem",
+    },
+    input: {
+      padding: "0.55rem 0.7rem",
+      borderRadius: "0.5rem",
+      border: "1px solid #374151",
+      background: "#020617",
+      color: "#e5e7eb",
+      outline: "none",
+    },
+    error: {
+      fontSize: "0.8rem",
+      color: "#fecaca",
+      background: "#7f1d1d",
+      padding: "0.5rem 0.7rem",
+      borderRadius: "0.5rem",
+      marginTop: "0.25rem",
+    },
+    button: {
+      marginTop: "0.75rem",
+      padding: "0.6rem 0.7rem",
+      borderRadius: "0.5rem",
+      border: "none",
+      background: "#22c55e",
+      color: "#022c22",
+      fontWeight: 600,
+      cursor: "pointer",
+    },
+  };
+
   return (
     <div style={styles.page}>
       <div style={styles.card}>
-        <h2 style={styles.title}>D100 Login</h2>
-        <p style={styles.subtitle}>Devam etmek için giriş yap</p>
-
         <h2 style={styles.title}>D100 {isRegistering ? "Register" : "Login"}</h2>
+        <p style={styles.subtitle}>
+          {isRegistering
+            ? "Hesap oluşturmak için bilgilerini gir"
+            : "Devam etmek için giriş yap"}
+        </p>
 
         <form
           onSubmit={isRegistering ? handleRegister : handleSubmit}
@@ -122,13 +241,21 @@ function LoginPage() {
 
           <button type="submit" style={styles.button} disabled={isSubmitting}>
             {isSubmitting
-              ? (isRegistering ? "Kayıt olunuyor..." : "Giriş yapılıyor...")
-              : (isRegistering ? "Kayıt ol" : "Giriş yap")}
+              ? isRegistering
+                ? "Kayıt olunuyor..."
+                : "Giriş yapılıyor..."
+              : isRegistering
+              ? "Kayıt ol"
+              : "Giriş yap"}
           </button>
 
           <button
             type="button"
-            style={{ ...styles.button, marginTop: "0.5rem", background: "#0ea5e9" }}
+            style={{
+              ...styles.button,
+              marginTop: "0.5rem",
+              background: "#0ea5e9",
+            }}
             onClick={() => {
               setError("");
               setIsRegistering(!isRegistering);
@@ -139,81 +266,9 @@ function LoginPage() {
               : "Hesabın yok mu? Kayıt ol"}
           </button>
         </form>
-
       </div>
     </div>
   );
 }
-
-const styles = {
-  page: {
-    minHeight: "100vh",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    background: "#0f172a",
-    fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-  },
-  card: {
-    background: "#020617",
-    padding: "2rem 2.5rem",
-    borderRadius: "1rem",
-    boxShadow: "0 20px 40px rgba(0,0,0,0.5)",
-    width: "100%",
-    maxWidth: "400px",
-    color: "#e5e7eb",
-    border: "1px solid #1e293b",
-  },
-  title: {
-    margin: 0,
-    marginBottom: "0.25rem",
-    fontSize: "1.5rem",
-    textAlign: "center",
-  },
-  subtitle: {
-    margin: 0,
-    marginBottom: "1.5rem",
-    fontSize: "0.9rem",
-    color: "#9ca3af",
-    textAlign: "center",
-  },
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "0.75rem",
-  },
-  label: {
-    fontSize: "0.85rem",
-    display: "flex",
-    flexDirection: "column",
-    gap: "0.35rem",
-  },
-  input: {
-    padding: "0.55rem 0.7rem",
-    borderRadius: "0.5rem",
-    border: "1px solid #374151",
-    background: "#020617",
-    color: "#e5e7eb",
-    outline: "none",
-  },
-  error: {
-    fontSize: "0.8rem",
-    color: "#fecaca",
-    background: "#7f1d1d",
-    padding: "0.5rem 0.7rem",
-    borderRadius: "0.5rem",
-    marginTop: "0.25rem",
-  },
-  button: {
-    marginTop: "0.75rem",
-    padding: "0.6rem 0.7rem",
-    borderRadius: "0.5rem",
-    border: "none",
-    background: "#22c55e",
-    color: "#022c22",
-    fontWeight: 600,
-    cursor: "pointer",
-  },
-};
 
 export default LoginPage;
