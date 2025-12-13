@@ -1,8 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-// Backend'deki BASE/MULT ile uyumlu skill tabloları (field isimleri entity ile aynı)
+// BASE / MULT – NewPlayerForm ile aynı
 const BASE = {
-  // meta’ya dokunmuyoruz ama burada tutmuyoruz
   APP: 30,
   BONUS: 0,
   BRV: 45,
@@ -146,9 +145,7 @@ const MULT = {
 
 const XP_KEYS = Object.keys(BASE);
 
-// Form alanları
 const FIELD_DEFS = [
-  // Üst meta alanlar
   { key: "player", label: "Player (Oyuncu)", type: "text" },
   { key: "name", label: "Character Name", type: "text" },
   { key: "occupation", label: "Occupation", type: "text" },
@@ -156,7 +153,6 @@ const FIELD_DEFS = [
   { key: "sex", label: "Sex", type: "text" },
   { key: "birthPlace", label: "Birth Place", type: "text" },
 
-  // Ana özellikler
   { key: "APP", label: "APP", type: "number" },
   { key: "BONUS", label: "BONUS", type: "number" },
   { key: "BRV", label: "BRV", type: "number" },
@@ -172,7 +168,6 @@ const FIELD_DEFS = [
   { key: "SIZ", label: "SIZ", type: "number" },
   { key: "STR", label: "STR", type: "number" },
 
-  // Skills
   { key: "Accounting", label: "Accounting", type: "number" },
   { key: "Anthropology", label: "Anthropology", type: "number" },
   { key: "Appraise", label: "Appraise", type: "number" },
@@ -228,7 +223,6 @@ const FIELD_DEFS = [
   { key: "Track", label: "Track", type: "number" },
 ];
 
-// XP maliyet fonksiyonları (backend’deki mantığa benzer)
 const FIRST_THRESHOLD = 50;
 const SECOND_THRESHOLD = 75;
 
@@ -247,7 +241,6 @@ function getCostFromBase(skill, value) {
     current = base;
   }
 
-  // Parça 1: base → 50
   if (current <= FIRST_THRESHOLD) {
     const end = Math.min(target, FIRST_THRESHOLD);
     const diff = end - current;
@@ -257,7 +250,6 @@ function getCostFromBase(skill, value) {
     }
   }
 
-  // Parça 2: 50 → 75
   if (current > FIRST_THRESHOLD && current < SECOND_THRESHOLD) {
     const end = Math.min(target, SECOND_THRESHOLD);
     const diff = end - current;
@@ -267,7 +259,6 @@ function getCostFromBase(skill, value) {
     }
   }
 
-  // Parça 3: 75 → target
   if (current < target) {
     const diff = target - current;
     if (diff > 0) {
@@ -291,11 +282,9 @@ function applyDerived(values) {
   const v = (k) => Number(values[k]) || 0;
   const updated = { ...values };
 
-  // HP & MP
   updated.HP = Math.floor((v("CON") + v("SIZ")) / 10);
   updated.MP = Math.floor(v("POW") / 5);
 
-  // BUILD & damageBonus (backend’deki mantık)
   const sum = v("SIZ") + v("STR");
   if (sum > 164) {
     updated.BUILD = 2;
@@ -317,7 +306,6 @@ function applyDerived(values) {
     updated.damageBonus = "0";
   }
 
-  // MOVE – basit CoC mantığı
   const dex = v("DEX");
   const siz = v("SIZ");
   const str = v("STR");
@@ -326,7 +314,6 @@ function applyDerived(values) {
   else if (dex < siz && dex < str) move = 7;
   updated.MOVE = move;
 
-  // XP hesapları
   const usedXP = computeUsedXP(updated);
   const totalXP = v("totalXP");
   updated.usedXP = usedXP;
@@ -342,41 +329,19 @@ function clampStat(num) {
   return n;
 }
 
-function NewPlayerForm({ onCancel, onCreated }) {
-  const initialForm = (() => {
-    const obj = {
-      player: "",
-      name: "",
-      occupation: "",
-      age: 25,
-      sex: "",
-      birthPlace: "",
-      totalXP: 1500,
-      usedXP: 0,
-      remainingXP: 1500,
-      BUILD: 0,
-      damageBonus: "0",
-      MP: 0,
-      HP: 0,
-      MOVE: 8,
-      avatar: "",
-    };
-
-    // BASE değerleriyle başlat
-    for (const def of FIELD_DEFS) {
-      if (def.type === "number") {
-        obj[def.key] = BASE[def.key] ?? 0;
-      } else {
-        obj[def.key] = "";
-      }
-    }
-
-    return applyDerived(obj);
-  })();
-
-  const [form, setForm] = useState(initialForm);
+function EditPlayerForm({ player, onCancel, onUpdated }) {
+  const [form, setForm] = useState(() =>
+    applyDerived({
+      ...player,
+      avatar: player.avatar || "",
+    })
+  );
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    setForm(applyDerived({ ...player, avatar: player.avatar || "" }));
+  }, [player]);
 
   const handleNumericChange = (name, rawValue) => {
     const clamped = clampStat(rawValue);
@@ -387,10 +352,7 @@ function NewPlayerForm({ onCancel, onCreated }) {
   };
 
   const handleTextChange = (name, value) => {
-    setForm((prev) => {
-      const updated = { ...prev, [name]: value };
-      return applyDerived(updated);
-    });
+    setForm((prev) => applyDerived({ ...prev, [name]: value }));
   };
 
   const handleAvatarChange = (e) => {
@@ -415,8 +377,7 @@ function NewPlayerForm({ onCancel, onCreated }) {
     setForm((prev) => {
       const current = Number(prev[field]) || 0;
       const next = clampStat(current + delta);
-      const updated = { ...prev, [field]: next };
-      return applyDerived(updated);
+      return applyDerived({ ...prev, [field]: next });
     });
   };
 
@@ -426,53 +387,59 @@ function NewPlayerForm({ onCancel, onCreated }) {
     setIsSubmitting(true);
 
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
+        const token = localStorage.getItem("token");
+        if (!token) {
         setError("Token bulunamadı. Lütfen tekrar giriş yap.");
         setIsSubmitting(false);
         return;
-      }
-
-      const payload = { ...form };
-      // totalXP kullanıcı tarafından değişmez, form state’ten gider
-      // sayıya dönüştür
-      Object.keys(payload).forEach((key) => {
-        if (typeof payload[key] === "number") return;
-        if (FIELD_DEFS.find((d) => d.key === key && d.type === "number")) {
-          payload[key] = clampStat(payload[key]);
         }
-      });
 
-      const response = await fetch("http://localhost:8080/players", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
+        const payload = { ...form };
 
-      if (!response.ok) {
-        throw new Error("Player oluşturulamadı.");
-      }
+        // Sayısal alanları clamp’le
+        Object.keys(payload).forEach((k) => {
+        if (FIELD_DEFS.find((d) => d.key === k && d.type === "number")) {
+            let n = Number(payload[k]) || 0;
+            if (n < 0) n = 0;
+            if (n > 90) n = 90;
+            payload[k] = n;
+        }
+        });
+        console.log("Gönderilen payload:", payload);
+        // 🔴 ÖNEMLİ KISIM: BURASI POST DEĞİL PUT OLMALI
+        const response = await fetch(
+        `http://localhost:8080/players/${player.id}`,
+        {
+            method: "PUT",
+            headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(payload),
+        }
+        );
 
-      const created = await response.json();
-      if (onCreated) onCreated(created);
+        if (!response.ok) {
+        throw new Error("Player güncellenemedi.");
+        }
 
-      if (!stayOnPage && onCancel) {
+        const updated = await response.json();
+        onUpdated && onUpdated(updated);
+
+        if (!stayOnPage && onCancel) {
         onCancel();
-      }
+        }
     } catch (err) {
-      console.error(err);
-      setError(err.message || "Bir hata oluştu.");
+        console.error(err);
+        setError(err.message || "Bir hata oluştu.");
     } finally {
-      setIsSubmitting(false);
+        setIsSubmitting(false);
     }
-  };
+    };
+
 
   return (
     <div className="sheet-page" style={styles.page}>
-      {/* Üst bar: Avatar + Genel Bilgiler */}
       <div style={styles.topRow}>
         <div style={styles.avatarBlock}>
           <div style={styles.avatarPreviewWrapper}>
@@ -501,7 +468,7 @@ function NewPlayerForm({ onCancel, onCreated }) {
               Player
               <input
                 type="text"
-                value={form.player}
+                value={form.player || ""}
                 onChange={(e) => handleTextChange("player", e.target.value)}
                 style={styles.input}
               />
@@ -510,7 +477,7 @@ function NewPlayerForm({ onCancel, onCreated }) {
               Character Name
               <input
                 type="text"
-                value={form.name}
+                value={form.name || ""}
                 onChange={(e) => handleTextChange("name", e.target.value)}
                 style={styles.input}
               />
@@ -519,8 +486,10 @@ function NewPlayerForm({ onCancel, onCreated }) {
               Occupation
               <input
                 type="text"
-                value={form.occupation}
-                onChange={(e) => handleTextChange("occupation", e.target.value)}
+                value={form.occupation || ""}
+                onChange={(e) =>
+                  handleTextChange("occupation", e.target.value)
+                }
                 style={styles.input}
               />
             </label>
@@ -533,7 +502,7 @@ function NewPlayerForm({ onCancel, onCreated }) {
                 type="number"
                 min={0}
                 max={120}
-                value={form.age}
+                value={form.age || 0}
                 onChange={(e) => handleNumericChange("age", e.target.value)}
                 style={styles.input}
               />
@@ -542,7 +511,7 @@ function NewPlayerForm({ onCancel, onCreated }) {
               Sex
               <input
                 type="text"
-                value={form.sex}
+                value={form.sex || ""}
                 onChange={(e) => handleTextChange("sex", e.target.value)}
                 style={styles.input}
               />
@@ -551,7 +520,7 @@ function NewPlayerForm({ onCancel, onCreated }) {
               Birth Place
               <input
                 type="text"
-                value={form.birthPlace}
+                value={form.birthPlace || ""}
                 onChange={(e) =>
                   handleTextChange("birthPlace", e.target.value)
                 }
@@ -565,7 +534,7 @@ function NewPlayerForm({ onCancel, onCreated }) {
               <span>Total XP</span>
               <input
                 type="number"
-                value={form.totalXP}
+                value={form.totalXP || 0}
                 readOnly
                 style={{ ...styles.input, backgroundColor: "#fef9c3" }}
               />
@@ -574,7 +543,7 @@ function NewPlayerForm({ onCancel, onCreated }) {
               <span>Used XP</span>
               <input
                 type="number"
-                value={form.usedXP}
+                value={form.usedXP || 0}
                 readOnly
                 style={{ ...styles.input, backgroundColor: "#fee2e2" }}
               />
@@ -583,7 +552,7 @@ function NewPlayerForm({ onCancel, onCreated }) {
               <span>Remaining XP</span>
               <input
                 type="number"
-                value={form.remainingXP}
+                value={form.remainingXP || 0}
                 readOnly
                 style={{ ...styles.input, backgroundColor: "#dcfce7" }}
               />
@@ -593,7 +562,7 @@ function NewPlayerForm({ onCancel, onCreated }) {
               <span>HP</span>
               <input
                 type="number"
-                value={form.HP}
+                value={form.HP || 0}
                 readOnly
                 style={styles.inputReadOnly}
               />
@@ -602,7 +571,7 @@ function NewPlayerForm({ onCancel, onCreated }) {
               <span>MP</span>
               <input
                 type="number"
-                value={form.MP}
+                value={form.MP || 0}
                 readOnly
                 style={styles.inputReadOnly}
               />
@@ -611,7 +580,7 @@ function NewPlayerForm({ onCancel, onCreated }) {
               <span>MOVE</span>
               <input
                 type="number"
-                value={form.MOVE}
+                value={form.MOVE || 0}
                 readOnly
                 style={styles.inputReadOnly}
               />
@@ -620,7 +589,7 @@ function NewPlayerForm({ onCancel, onCreated }) {
               <span>BUILD</span>
               <input
                 type="number"
-                value={form.BUILD}
+                value={form.BUILD ?? 0}
                 readOnly
                 style={styles.inputReadOnly}
               />
@@ -629,7 +598,7 @@ function NewPlayerForm({ onCancel, onCreated }) {
               <span>DB</span>
               <input
                 type="text"
-                value={form.damageBonus}
+                value={form.damageBonus || "0"}
                 readOnly
                 style={styles.inputReadOnly}
               />
@@ -638,7 +607,6 @@ function NewPlayerForm({ onCancel, onCreated }) {
         </div>
       </div>
 
-      {/* Ana grid */}
       <form
         onSubmit={(e) => handleSubmit(e, false)}
         style={styles.form}
@@ -648,8 +616,8 @@ function NewPlayerForm({ onCancel, onCreated }) {
             const value = form[def.key] ?? "";
             const base = BASE[def.key];
             const mult = MULT[def.key];
-
             const isNumber = def.type === "number";
+
             const labelExtra =
               isNumber && mult
                 ? ` (Base: ${base ?? 0}, x${mult})`
@@ -660,12 +628,10 @@ function NewPlayerForm({ onCancel, onCreated }) {
             return (
               <div key={def.key} style={styles.field}>
                 <div style={styles.fieldHeader}>
-                 <span style={styles.labelText}>
-                  {def.label}
-                  {labelExtra && (
-                    <span className="no-print"> {labelExtra}</span>
-                  )}
-                </span>
+                  <span style={styles.labelText}>
+                    {def.label}
+                    {labelExtra}
+                  </span>
                   {isNumber && (
                     <div className="xp-buttons" style={styles.stepButtons}>
                       <button
@@ -705,45 +671,40 @@ function NewPlayerForm({ onCancel, onCreated }) {
 
         {error && <div style={styles.error}>{error}</div>}
 
-        {/* Alt buton barı – sticky ve print’te gizlenebilir */}
         <div className="update-buttons no-print" style={styles.buttonsBar}>
-          <button
+            <button
             type="button"
             style={{ ...styles.button, background: "#9ca3af" }}
             onClick={onCancel}
             disabled={isSubmitting}
-          >
+            >
             Geri dön
-          </button>
-          <button
-            type="submit"
-            style={{ ...styles.button, background: "#fbbf24" }}
-            disabled={isSubmitting}
-            onClick={(e) => handleSubmit(e, false)}
-          >
+            </button>
+
+            <button
+                type="submit"
+                style={{ ...styles.button, background: "#fbbf24" }}
+                disabled={isSubmitting}
+                onClick={(e) => handleSubmit(e, false)}
+            >
             Kaydet ve geri dön
-          </button>
-          <button
+            </button>
+
+            <button
             type="button"
             style={{ ...styles.button, background: "#22c55e" }}
             disabled={isSubmitting}
             onClick={(e) => handleSubmit(e, true)}
-          >
+            >
             Kaydet ve sayfada kal
-          </button>
-          <button
-            type="button"
-            style={{ ...styles.button, background: "#0ea5e9" }}
-            onClick={() => window.print()}
-          >
-            Yazdır
-          </button>
+            </button>
         </div>
       </form>
     </div>
   );
 }
 
+// Styles – NewPlayerForm ile aynı
 const styles = {
   page: {
     minHeight: "100vh",
@@ -916,4 +877,4 @@ const styles = {
   },
 };
 
-export default NewPlayerForm;
+export default EditPlayerForm;

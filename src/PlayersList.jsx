@@ -184,8 +184,15 @@ const styles = {
   },
   grid: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-    gap: "1rem",
+    gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+    gap: "0.5rem 0.75rem",
+    maxHeight: "60vh",
+    overflowY: "auto",
+    padding: "0.5rem",
+    background: "#fefce8",
+    borderRadius: "0.75rem",
+    border: "1px solid #eab308",
+    fontSize: "0.75rem", // biraz küçülttük
   },
   card: {
     background: "#fefce8",

@@ -36,3 +36,39 @@
     transform: rotate(360deg);
   }
 }
+
+@media print {
+  button,
+  .no-print,
+  .update-buttons,
+  .xp-buttons {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+    -webkit-print-color-adjust: exact;
+  }
+
+  button,
+  .no-print,
+  .update-buttons,
+  .xp-buttons {
+    display: none !important;
+  }
+
+  .sheet-page {
+    box-shadow: none !important;
+    border: none !important;
+    background: white !important;
+    padding: 0 !important;
+  }
+
+  .sheet-grid {
+    max-height: none !important;
+    overflow: visible !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important; /* 4 sütun */
+    font-size: 10px !important; /* daha sık */
+    gap: 4px 6px !important;
+  }
+}
