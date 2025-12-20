@@ -779,6 +779,7 @@ const styles = {
   },
   topRow: {
     display: "flex",
+    flexDirection: "row-reverse",
     gap: "1.5rem",
     marginBottom: "1rem",
   },
