@@ -130,6 +130,17 @@ function PlayersList({ onEditPlayer, onNewPlayer }) {
                 >
                   Düzenle
                 </button>
+                <button
+                  type="button"
+                  style={styles.characterSheetButton}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    localStorage.setItem('characterData', JSON.stringify(p));
+                    window.open('/CoCCharacter.html', '_blank');
+                  }}
+                >
+                  CharacterSheet
+                </button>
               </div>
 
               <a
@@ -270,7 +281,7 @@ const styles = {
   },
   cardFooter: {
     display: "flex",
-    justifyContent: "flex-end",
+    justifyContent: "space-between",
     marginTop: "0.25rem",
   },
   editButton: {
@@ -278,6 +289,17 @@ const styles = {
     borderRadius: "0.35rem",
     border: "1px solid #7c2d12",
     background: "linear-gradient(135deg, #f97316, #db2777)",
+    color: "#111827",
+    fontWeight: 600,
+    fontSize: "0.85rem",
+    cursor: "pointer",
+    boxShadow: "0 4px 10px rgba(0,0,0,0.25)",
+  },
+  characterSheetButton: {
+    padding: "0.45rem 0.9rem",
+    borderRadius: "0.35rem",
+    border: "1px solid #7c2d12",
+    background: "linear-gradient(135deg, #16a34a, #15803d)",
     color: "#111827",
     fontWeight: 600,
     fontSize: "0.85rem",

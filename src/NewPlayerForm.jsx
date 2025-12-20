@@ -149,7 +149,7 @@ const XP_KEYS = Object.keys(BASE);
 // Form alanları
 const FIELD_DEFS = [
   // Üst meta alanlar
-  { key: "player", label: "Player (Oyuncu)", type: "text" },
+  { key: "player", label: "Player Yeni (Oyuncu)", type: "text" },
   { key: "name", label: "Character Name", type: "text" },
   { key: "occupation", label: "Occupation", type: "text" },
   { key: "age", label: "Age", type: "number" },

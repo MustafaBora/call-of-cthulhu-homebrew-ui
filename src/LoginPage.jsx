@@ -1,6 +1,7 @@
 import { useState } from "react";
 import PlayersList from "./PlayersList";
 import NewPlayerForm from "./NewPlayerForm";
+import EditPlayerForm from "./EditPlayerForm";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
@@ -41,14 +42,13 @@ function LoginPage() {
         )}
 
         {mode === "edit" && editingPlayer && (
-          <NewPlayerForm
-            mode="edit"
-            initialPlayer={editingPlayer}
+          <EditPlayerForm
+            player={editingPlayer}
             onCancel={() => {
               setEditingPlayer(null);
               setMode("list");
             }}
-            onCreated={(_, { stay } = {}) => {
+            onUpdated={(_, { stay } = {}) => {
               if (!stay) {
                 // "Kaydet ve Geri Dön" ise listeye dön
                 setEditingPlayer(null);
