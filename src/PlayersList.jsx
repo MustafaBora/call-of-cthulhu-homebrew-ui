@@ -10,7 +10,7 @@ function getInitials(text) {
     .join("");
 }
 
-function PlayersList({ onEditPlayer, onNewPlayer }) {
+function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -140,6 +140,13 @@ function PlayersList({ onEditPlayer, onNewPlayer }) {
                   }}
                 >
                   CharacterSheet
+                </button>
+                <button
+                  type="button"
+                  style={styles.editCharacterButton}
+                  onClick={() => onCharacterForm && onCharacterForm(p)}
+                >
+                  Edit
                 </button>
               </div>
 
@@ -300,6 +307,17 @@ const styles = {
     borderRadius: "0.35rem",
     border: "1px solid #7c2d12",
     background: "linear-gradient(135deg, #16a34a, #15803d)",
+    color: "#111827",
+    fontWeight: 600,
+    fontSize: "0.85rem",
+    cursor: "pointer",
+    boxShadow: "0 4px 10px rgba(0,0,0,0.25)",
+  },
+  editCharacterButton: {
+    padding: "0.45rem 0.9rem",
+    borderRadius: "0.35rem",
+    border: "1px solid #7c2d12",
+    background: "linear-gradient(135deg, #3b82f6, #1d4ed8)",
     color: "#111827",
     fontWeight: 600,
     fontSize: "0.85rem",

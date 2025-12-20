@@ -2,6 +2,7 @@ import { useState } from "react";
 import PlayersList from "./PlayersList";
 import NewPlayerForm from "./NewPlayerForm";
 import EditPlayerForm from "./EditPlayerForm";
+import CocCharacterForm from "./CocCharacterForm";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
@@ -12,7 +13,7 @@ function LoginPage() {
   const [isRegistering, setIsRegistering] = useState(false);
 
   // login sonrası görünüm
-  const [mode, setMode] = useState("list"); // "list" | "new" | "edit"
+  const [mode, setMode] = useState("list"); // "list" | "new" | "edit" | "characterForm"
   const [editingPlayer, setEditingPlayer] = useState(null);
 
   // 🔹 LOGIN OLDUKTAN SONRA GÖRÜNEN KISIM
@@ -26,6 +27,10 @@ function LoginPage() {
               setMode("edit");
             }}
             onNewPlayer={() => setMode("new")}
+            onCharacterForm={(p) => {
+              setEditingPlayer(p);
+              setMode("characterForm");
+            }}
           />
         )}
 
@@ -56,6 +61,16 @@ function LoginPage() {
               }
               // "Kaydet ve Sayfada Kal" ise form üzerinde kalmaya devam,
               // istersen burada state güncellemesi de yapabilirsin
+            }}
+          />
+        )}
+
+        {mode === "characterForm" && editingPlayer && (
+          <CocCharacterForm
+            player={editingPlayer}
+            onCancel={() => {
+              setEditingPlayer(null);
+              setMode("list");
             }}
           />
         )}
