@@ -1,7 +1,6 @@
 import { useState } from "react";
 import PlayersList from "./PlayersList";
-import NewPlayerForm from "./NewPlayerForm";
-import EditPlayerForm from "./EditPlayerForm";
+import PlayerForm from "./PlayerForm";
 import CocCharacterForm from "./CocCharacterForm";
 
 function LoginPage() {
@@ -35,9 +34,9 @@ function LoginPage() {
         )}
 
         {mode === "new" && (
-          <NewPlayerForm
+          <PlayerForm
             mode="create"
-            initialPlayer={null}
+            player={null}
             onCancel={() => setMode("list")}
             onCreated={() => {
               // create sonrası listeye dön
@@ -47,7 +46,8 @@ function LoginPage() {
         )}
 
         {mode === "edit" && editingPlayer && (
-          <EditPlayerForm
+          <PlayerForm
+            mode="edit"
             player={editingPlayer}
             onCancel={() => {
               setEditingPlayer(null);
