@@ -139,6 +139,11 @@
       position:relative;
       z-index:2;
     }
+    .mid-right{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--gap);
+    }
     .box{
       border: 2px solid var(--line);
       padding: 8px;
@@ -213,26 +218,26 @@
     }
     .vital-row{
       display:grid;
-      grid-template-columns: 90px 1fr;
-      gap: 8px;
-      align-items:center;
-      font-size: 13px;
+      grid-template-columns: 1fr;
+      gap: 4px;
+      align-items:start;
+      font-size: 11px;
     }
     .vital-row .vname{
       font-family: var(--sans);
       font-weight:700;
       text-transform:uppercase;
-      font-size: 12px;
+      font-size: 10px;
       letter-spacing:.3px;
     }
     .vital-pair{
       display:grid;
       grid-template-columns: 1fr 1fr;
-      gap: 6px;
+      gap: 3px;
       align-items:end;
     }
     .mini-label{
-      font-size: 9px;
+      font-size: 7px;
       color:#555;
       font-family: var(--sans);
       margin-bottom:1px;
@@ -497,38 +502,40 @@
         </div>
       </div>
 
-      <div class="box vitals">
-        <h3>Vitals</h3>
+      <div class="mid-right">
+        <div class="box">
+          <div class="vital-row">
+            <div class="vname">Hit Points</div>
+            <div class="vital-pair">
+              <div class="pair"><div class="mini-label">Maximum</div><div class="cell"></div></div>
+              <div class="pair"><div class="mini-label">Current</div><div class="cell"></div></div>
+            </div>
+          </div>
 
-        <div class="vital-row">
-          <div class="vname">Hit Points</div>
-          <div class="vital-pair">
-            <div class="pair"><div class="mini-label">Maximum</div><div class="cell"></div></div>
-            <div class="pair"><div class="mini-label">Current</div><div class="cell"></div></div>
+          <div class="vital-row">
+            <div class="vname">Magic Points</div>
+            <div class="vital-pair">
+              <div class="pair"><div class="mini-label">Maximum</div><div class="cell"></div></div>
+              <div class="pair"><div class="mini-label">Current</div><div class="cell"></div></div>
+            </div>
           </div>
         </div>
 
-        <div class="vital-row">
-          <div class="vname">Magic Points</div>
-          <div class="vital-pair">
-            <div class="pair"><div class="mini-label">Maximum</div><div class="cell"></div></div>
-            <div class="pair"><div class="mini-label">Current</div><div class="cell"></div></div>
+        <div class="box">
+          <div class="vital-row">
+            <div class="vname">Luck</div>
+            <div class="vital-pair">
+              <div class="pair"><div class="mini-label">Starting</div><div class="cell"></div></div>
+              <div class="pair"><div class="mini-label">Current</div><div class="cell"></div></div>
+            </div>
           </div>
-        </div>
 
-        <div class="vital-row">
-          <div class="vname">Luck</div>
-          <div class="vital-pair">
-            <div class="pair"><div class="mini-label">Starting</div><div class="cell"></div></div>
-            <div class="pair"><div class="mini-label">Current</div><div class="cell"></div></div>
-          </div>
-        </div>
-
-        <div class="vital-row">
-          <div class="vname">Sanity</div>
-          <div class="vital-pair">
-            <div class="pair"><div class="mini-label">Starting</div><div class="cell"></div></div>
-            <div class="pair"><div class="mini-label">Current</div><div class="cell"></div></div>
+          <div class="vital-row">
+            <div class="vname">Sanity</div>
+            <div class="vital-pair">
+              <div class="pair"><div class="mini-label">Starting</div><div class="cell"></div></div>
+              <div class="pair"><div class="mini-label">Current</div><div class="cell"></div></div>
+            </div>
           </div>
         </div>
       </div>
