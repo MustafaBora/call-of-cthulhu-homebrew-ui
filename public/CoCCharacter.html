@@ -86,7 +86,7 @@
     /* Top row layout */
     .top{
       display:grid;
-      grid-template-columns: 1.5fr 1fr;
+      grid-template-columns: 1fr 1fr;
       gap: var(--gap);
       position:relative;
       z-index:2;
@@ -106,6 +106,40 @@
       align-items:end;
       font-size: 13px;
     }
+    
+    .top-left{
+      display:grid;
+      gap: 10px;
+    }
+    
+    .top-stats{
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px 14px;
+    }
+    
+    .top-stat-item{
+      display:grid;
+      grid-template-columns: auto 1fr;
+      gap: 6px;
+      align-items:end;
+      font-size: 13px;
+    }
+    
+    .top-stat-item .label{
+      font-family: var(--sans);
+      font-weight:700;
+      font-size: 12px;
+      white-space:nowrap;
+    }
+    
+    .top-stat-item .stat-cells{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+    }
+    
+    .top-stat-item .cell{ height: 16px; }
     .line{
       border-bottom: 1.8px solid var(--line);
       height: 18px;
@@ -410,14 +444,44 @@
 
     <!-- TOP -->
     <section class="top">
-      <div class="fields">
-        <div class="field"><div>Name</div><div class="line" data-field="name"></div></div>
-        <div class="field"><div>Birthplace</div><div class="line"></div></div>
-        <div class="field"><div>Pronoun</div><div class="line"></div></div>
+      <div class="top-left">
+        <div class="fields">
+          <div class="field"><div>Name</div><div class="line" data-field="name"></div></div>
+          <div class="field"><div>Birthplace</div><div class="line"></div></div>
+          <div class="field"><div>Pronoun</div><div class="line"></div></div>
 
-        <div class="field"><div>Occupation</div><div class="line" data-field="occupation"></div></div>
-        <div class="field"><div>Residence</div><div class="line"></div></div>
-        <div class="field"><div>Age</div><div class="line"></div></div>
+          <div class="field"><div>Occupation</div><div class="line" data-field="occupation"></div></div>
+          <div class="field"><div>Residence</div><div class="line"></div></div>
+          <div class="field"><div>Age</div><div class="line"></div></div>
+        </div>
+
+        <div class="top-stats">
+          <div class="top-stat-item">
+            <div class="label">STR</div>
+            <div class="stat-cells"><div class="cell" data-field="STR"></div><div class="cell"></div><div class="cell"></div></div>
+          </div>
+          <div class="top-stat-item">
+            <div class="label">SIZ</div>
+            <div class="stat-cells"><div class="cell" data-field="SIZ"></div><div class="cell"></div><div class="cell"></div></div>
+          </div>
+          <div class="top-stat-item">
+            <div class="label">Hit Points</div>
+            <div class="stat-cells"><div class="cell"></div><div class="cell"></div></div>
+          </div>
+
+          <div class="top-stat-item">
+            <div class="label">CON</div>
+            <div class="stat-cells"><div class="cell" data-field="CON"></div><div class="cell"></div><div class="cell"></div></div>
+          </div>
+          <div class="top-stat-item">
+            <div class="label">POW</div>
+            <div class="stat-cells"><div class="cell" data-field="POW"></div><div class="cell"></div><div class="cell"></div></div>
+          </div>
+          <div class="top-stat-item">
+            <div class="label">Magic Points</div>
+            <div class="stat-cells"><div class="cell"></div><div class="cell"></div></div>
+          </div>
+        </div>
       </div>
 
       <div class="portrait">
@@ -432,20 +496,6 @@
         <div class="char-grid">
           <div class="char-col">
             <!-- left column -->
-            <div class="char-row">
-              <div class="stat"><div class="caps">STR</div></div>
-              <div>
-                <div class="small-labels"><div>Reg</div><div>Half</div><div>Fifth</div></div>
-                <div class="triple"><div class="cell" data-field="STR"></div><div class="cell"></div><div class="cell"></div></div>
-              </div>
-            </div>
-            <div class="char-row">
-              <div class="stat"><div class="caps">CON</div></div>
-              <div>
-                <div class="small-labels"><div>Reg</div><div>Half</div><div>Fifth</div></div>
-                <div class="triple"><div class="cell" data-field="CON"></div><div class="cell"></div><div class="cell"></div></div>
-              </div>
-            </div>
             <div class="char-row">
               <div class="stat"><div class="caps">DEX</div></div>
               <div>
@@ -467,20 +517,6 @@
 
           <div class="char-col">
             <!-- right column -->
-            <div class="char-row">
-              <div class="stat"><div class="caps">SIZ</div></div>
-              <div>
-                <div class="small-labels"><div>Reg</div><div>Half</div><div>Fifth</div></div>
-                <div class="triple"><div class="cell" data-field="SIZ"></div><div class="cell"></div><div class="cell"></div></div>
-              </div>
-            </div>
-            <div class="char-row">
-              <div class="stat"><div class="caps">POW</div></div>
-              <div>
-                <div class="small-labels"><div>Reg</div><div>Half</div><div>Fifth</div></div>
-                <div class="triple"><div class="cell" data-field="POW"></div><div class="cell"></div><div class="cell"></div></div>
-              </div>
-            </div>
             <div class="char-row">
               <div class="stat"><div class="caps">APP</div></div>
               <div>
