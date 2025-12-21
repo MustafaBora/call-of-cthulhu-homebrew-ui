@@ -493,7 +493,36 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
   const title = mode === "create" ? "Yeni Oyuncu Oluştur" : "Oyuncuyu Düzenle";
 
   return (
-    <div className="sheet-page" style={styles.page}>
+    <div style={styles.pageWrapper}>
+      {/* Top Banner */}
+      <div style={styles.topBanner}>
+        <img 
+          src={require('./assets/upper-banner.png')} 
+          alt="banner" 
+          style={styles.bannerImg}
+        />
+      </div>
+
+      {/* Left Vertical Line */}
+      <div style={styles.leftLine}>
+        <img 
+          src={require('./assets/vertical-line.png')} 
+          alt="left decoration" 
+          style={styles.verticalLineImg}
+        />
+      </div>
+
+      {/* Right Vertical Line */}
+      <div style={styles.rightLine}>
+        <img 
+          src={require('./assets/vertical-line.png')} 
+          alt="right decoration" 
+          style={styles.verticalLineImg}
+        />
+      </div>
+
+      {/* Main Content */}
+      <div className="sheet-page" style={styles.page}>
       <div style={styles.topRow}>
         <div style={styles.avatarBlock}>
           <div style={styles.avatarPreviewWrapper}>
@@ -764,13 +793,81 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
           )}
         </div>
       </form>
+      </div>
+
+      {/* Bottom Line */}
+      <div style={styles.bottomLine}>
+        <img 
+          src={require('./assets/bottom-banner.png')} 
+          alt="bottom decoration" 
+          style={styles.bottomLineImg}
+        />
+      </div>
     </div>
   );
 }
 
 const styles = {
-  page: {
+  pageWrapper: {
+    position: "relative",
     minHeight: "100vh",
+    display: "flex",
+    flexDirection: "column",
+  },
+  topBanner: {
+    width: "100%",
+    height: "auto",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: "0.5rem 0",
+    background: "rgba(250, 204, 21, 0.3)",
+  },
+  bannerImg: {
+    width: "100%",
+    maxHeight: "80px",
+    objectFit: "contain",
+  },
+  leftLine: {
+    position: "absolute",
+    left: 0,
+    top: 0,
+    height: "100%",
+    width: "auto",
+    display: "flex",
+    alignItems: "stretch",
+  },
+  rightLine: {
+    position: "absolute",
+    right: 0,
+    top: 0,
+    height: "100%",
+    width: "auto",
+    display: "flex",
+    alignItems: "stretch",
+  },
+  verticalLineImg: {
+    height: "100%",
+    width: "auto",
+    objectFit: "cover",
+  },
+  bottomLine: {
+    width: "100%",
+    height: "auto",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: "0.5rem 0",
+    background: "rgba(250, 204, 21, 0.3)",
+    marginTop: "auto",
+  },
+  bottomLineImg: {
+    width: "100%",
+    maxHeight: "60px",
+    objectFit: "contain",
+  },
+  page: {
+    flex: 1,
     padding: "1.5rem",
     background: "#facc15",
     fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
