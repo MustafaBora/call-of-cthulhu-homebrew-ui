@@ -336,6 +336,8 @@ function getInitialForm(mode, player) {
       player: "",
       name: "",
       occupation: "",
+      pronoun: "",
+      residence: "",
       age: 25,
       sex: "",
       birthPlace: "",
@@ -366,6 +368,86 @@ function getInitialForm(mode, player) {
       avatar: player.avatar || "",
     });
   }
+}
+function StatCell({ label, value, onChange }) {
+  return (
+    <div style={styles.cell}>
+      <div style={styles.statRow}>
+        <div style={styles.statLabel}>{label}</div>
+        <input
+          type="number"
+          min={0}
+          max={90}
+          value={Number(value) || 0}
+          onChange={(e) => onChange(e.target.value)}
+          style={styles.statBox}
+        />
+      </div>
+    </div>
+  );
+}
+
+function ReadSmall({ label, value }) {
+  return (
+    <div style={styles.cell}>
+      <div style={styles.statRow}>
+        <div style={styles.statLabel}>{label}</div>
+        <input readOnly value={value} style={styles.statBox} />
+      </div>
+    </div>
+  );
+}
+
+function ReadCell1({ label, subLabel, value }) {
+  return (
+    <div style={styles.cell}>
+      <div style={styles.vitalLabel}>{label}</div>
+      <div style={styles.vitalOne}>
+        <span style={styles.vitalMini}>{subLabel}</span>
+        <input readOnly value={value} style={styles.vitalBox} />
+      </div>
+    </div>
+  );
+}
+
+function ReadCell2({ label, leftLabel, leftValue, rightLabel, rightValue }) {
+  return (
+    <div style={styles.cell}>
+      <div style={styles.vitalLabel}>{label}</div>
+      <div style={styles.vitalTwo}>
+        <div style={styles.vitalCol}>
+          <span style={styles.vitalMini}>{leftLabel}</span>
+          <input readOnly value={leftValue} style={styles.vitalBox} />
+        </div>
+        <div style={styles.vitalCol}>
+          <span style={styles.vitalMini}>{rightLabel}</span>
+          <input readOnly value={rightValue} style={styles.vitalBox} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ReadCell3({ label, aLabel, aValue, bLabel, bValue, cLabel, cValue }) {
+  return (
+    <div style={styles.cell}>
+      <div style={styles.vitalLabel}>{label}</div>
+      <div style={styles.vitalThree}>
+        <div style={styles.vitalCol}>
+          <span style={styles.vitalMini}>{aLabel}</span>
+          <input readOnly value={aValue} style={styles.vitalBox} />
+        </div>
+        <div style={styles.vitalCol}>
+          <span style={styles.vitalMini}>{bLabel}</span>
+          <input readOnly value={bValue} style={styles.vitalBox} />
+        </div>
+        <div style={styles.vitalCol}>
+          <span style={styles.vitalMini}>{cLabel}</span>
+          <input readOnly value={cValue} style={styles.vitalBox} />
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpdated }) {
@@ -514,11 +596,44 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
           />
         </div>
 
-        {/* Main Content */}
-        <div className="sheet-page" style={styles.page}>
-      <div style={styles.topRow}>
-        <div style={styles.avatarBlock}>
-          <div style={styles.avatarPreviewWrapper}>
+      {/* Main Content */}
+      <div className="sheet-page" style={styles.page}>
+      {/* ===== CoC Header Grid (form hariç üst kısım) ===== */}
+      <div style={styles.headerGrid}>
+        {/* Row 1 */}
+        <div style={styles.cell}>
+          <div style={styles.cellLabel}>Name</div>
+          <input
+            type="text"
+            value={form.name || ""}
+            onChange={(e) => handleTextChange("name", e.target.value)}
+            style={styles.lineInput}
+          />
+        </div>
+
+        <div style={styles.cell}>
+          <div style={styles.cellLabel}>Birthplace</div>
+          <input
+            type="text"
+            value={form.birthPlace || ""}
+            onChange={(e) => handleTextChange("birthPlace", e.target.value)}
+            style={styles.lineInput}
+          />
+        </div>
+
+        <div style={styles.cell}>
+          <div style={styles.cellLabel}>Pronoun</div>
+          <input
+            type="text"
+            value={form.pronoun || ""}
+            onChange={(e) => handleTextChange("pronoun", e.target.value)}
+            style={styles.lineInput}
+          />
+        </div>
+
+        {/* Avatar/Icon column (spans all rows) */}
+        <div style={styles.avatarCol}>
+          <div style={styles.avatarBox}>
             {form.avatar ? (
               <img
                 src={`data:image/*;base64,${form.avatar}`}
@@ -526,9 +641,10 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
                 style={styles.avatarImg}
               />
             ) : (
-              <div style={styles.avatarPlaceholder}>No Avatar</div>
+              <div style={styles.avatarPlaceholder} />
             )}
           </div>
+
           <input
             className="no-print"
             style={styles.avatarInput}
@@ -536,158 +652,77 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
             accept="image/*"
             onChange={handleAvatarChange}
           />
-          <div style={styles.cocIconContainer}>
-            <img 
-              src={require('./assets/coc-icon.png')} 
-              alt="Call of Cthulhu" 
-              style={styles.cocIcon}
-            />
-          </div>
+
+          <img
+            src={require("./assets/coc-icon.png")}
+            alt="Call of Cthulhu"
+            style={styles.cocIcon}
+          />
         </div>
 
-        <div style={styles.metaBlock}>
-          <div style={styles.metaRow}>
-            <label style={styles.label}>
-              Player
-              <input
-                type="text"
-                value={form.player || ""}
-                onChange={(e) => handleTextChange("player", e.target.value)}
-                style={styles.input}
-              />
-            </label>
-            <label style={styles.label}>
-              Character Name
-              <input
-                type="text"
-                value={form.name || ""}
-                onChange={(e) => handleTextChange("name", e.target.value)}
-                style={styles.input}
-              />
-            </label>
-            <label style={styles.label}>
-              Occupation
-              <input
-                type="text"
-                value={form.occupation || ""}
-                onChange={(e) =>
-                  handleTextChange("occupation", e.target.value)
-                }
-                style={styles.input}
-              />
-            </label>
-          </div>
-
-          <div style={styles.metaRow}>
-            <label style={styles.labelSmall}>
-              Age
-              <input
-                type="number"
-                min={0}
-                max={120}
-                value={form.age || 0}
-                onChange={(e) => handleNumericChange("age", e.target.value)}
-                style={styles.input}
-              />
-            </label>
-            <label style={styles.labelSmall}>
-              Sex
-              <input
-                type="text"
-                value={form.sex || ""}
-                onChange={(e) => handleTextChange("sex", e.target.value)}
-                style={styles.input}
-              />
-            </label>
-            <label style={styles.label}>
-              Birth Place
-              <input
-                type="text"
-                value={form.birthPlace || ""}
-                onChange={(e) =>
-                  handleTextChange("birthPlace", e.target.value)
-                }
-                style={styles.input}
-              />
-            </label>
-          </div>
-
-          <div style={styles.metaRowXP}>
-            <div style={styles.metaXPBox}>
-              <span>Total XP</span>
-              <input
-                type="number"
-                value={form.totalXP || 0}
-                readOnly
-                style={{ ...styles.input, backgroundColor: "#fef9c3" }}
-              />
-            </div>
-            <div style={styles.metaXPBox}>
-              <span>Used XP</span>
-              <input
-                type="number"
-                value={form.usedXP || 0}
-                readOnly
-                style={{ ...styles.input, backgroundColor: "#fee2e2" }}
-              />
-            </div>
-            <div style={styles.metaXPBox}>
-              <span>Remaining XP</span>
-              <input
-                type="number"
-                value={form.remainingXP || 0}
-                readOnly
-                style={{ ...styles.input, backgroundColor: "#dcfce7" }}
-              />
-            </div>
-
-            <div style={styles.metaXPBox}>
-              <span>HP</span>
-              <input
-                type="number"
-                value={form.HP || 0}
-                readOnly
-                style={styles.inputReadOnly}
-              />
-            </div>
-            <div style={styles.metaXPBox}>
-              <span>MP</span>
-              <input
-                type="number"
-                value={form.MP || 0}
-                readOnly
-                style={styles.inputReadOnly}
-              />
-            </div>
-            <div style={styles.metaXPBox}>
-              <span>MOVE</span>
-              <input
-                type="number"
-                value={form.MOVE || 0}
-                readOnly
-                style={styles.inputReadOnly}
-              />
-            </div>
-            <div style={styles.metaXPBox}>
-              <span>BUILD</span>
-              <input
-                type="number"
-                value={form.BUILD ?? 0}
-                readOnly
-                style={styles.inputReadOnly}
-              />
-            </div>
-            <div style={styles.metaXPBox}>
-              <span>DB</span>
-              <input
-                type="text"
-                value={form.damageBonus || "0"}
-                readOnly
-                style={styles.inputReadOnly}
-              />
-            </div>
-          </div>
+        {/* Row 2 */}
+        <div style={styles.cell}>
+          <div style={styles.cellLabel}>Occupation</div>
+          <input
+            type="text"
+            value={form.occupation || ""}
+            onChange={(e) => handleTextChange("occupation", e.target.value)}
+            style={styles.lineInput}
+          />
         </div>
+
+        <div style={styles.cell}>
+          <div style={styles.cellLabel}>Residence</div>
+          <input
+            type="text"
+            value={form.residence || ""}
+            onChange={(e) => handleTextChange("residence", e.target.value)}
+            style={styles.lineInput}
+          />
+        </div>
+
+        <div style={styles.cell}>
+          <div style={styles.cellLabel}>Age</div>
+          <input
+            type="number"
+            min={0}
+            max={120}
+            value={form.age || 0}
+            onChange={(e) => handleNumericChange("age", e.target.value)}
+            style={styles.lineInput}
+          />
+        </div>
+
+        {/* Row 3 */}
+        <StatCell label="STR" value={form.STR} onChange={(v) => handleNumericChange("STR", v)} />
+        <StatCell label="SIZ" value={form.SIZ} onChange={(v) => handleNumericChange("SIZ", v)} />
+        <ReadCell2 label="Hit Points" leftLabel="Maximum" leftValue={form.HP ?? 0} rightLabel="Current" rightValue={form.HP ?? 0} />
+
+        {/* Row 4 */}
+        <StatCell label="CON" value={form.CON} onChange={(v) => handleNumericChange("CON", v)} />
+        <StatCell label="POW" value={form.POW} onChange={(v) => handleNumericChange("POW", v)} />
+        <ReadCell2 label="Magic Points" leftLabel="Maximum" leftValue={form.MP ?? 0} rightLabel="Current" rightValue={form.MP ?? 0} />
+
+        {/* Row 5 */}
+        <StatCell label="DEX" value={form.DEX} onChange={(v) => handleNumericChange("DEX", v)} />
+        {/* senin listende burada POW var: aynen koyuyorum */}
+        <StatCell label="POW" value={form.POW} onChange={(v) => handleNumericChange("POW", v)} />
+        <ReadCell1 label="Luck" subLabel="Current" value={form.LUCK ?? 0} />
+
+        {/* Row 6 */}
+        <StatCell label="INT" value={form.INT} onChange={(v) => handleNumericChange("INT", v)} />
+        <StatCell label="APP" value={form.APP} onChange={(v) => handleNumericChange("APP", v)} />
+        <ReadCell1 label="Bonus" subLabel="Current" value={form.BONUS ?? 0} />
+
+        {/* Row 7 */}
+        <StatCell label="PER" value={form.PER} onChange={(v) => handleNumericChange("PER", v)} />
+        <StatCell label="EDU" value={form.EDU} onChange={(v) => handleNumericChange("EDU", v)} />
+        <ReadCell3 label="Sanity" aLabel="Starting" aValue={form.SAN ?? 0} bLabel="Current" bValue={form.SAN ?? 0} cLabel="Insane" cValue={"—"} />
+
+        {/* Row 8 */}
+        <ReadSmall label="Total" value={form.totalXP ?? 0} />
+        <ReadSmall label="Used" value={form.usedXP ?? 0} />
+        <div style={{ ...styles.cell, ...styles.emptyCell }} />
       </div>
 
       <form
@@ -1066,6 +1101,146 @@ const styles = {
     cursor: "pointer",
     color: "#111827",
   },
+    headerGrid: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr 1fr 220px",
+    gridAutoRows: "minmax(56px, auto)",
+    gap: "10px 12px",
+    border: "1px solid #111",
+    borderRadius: "10px",
+    padding: "12px",
+    marginBottom: "12px",
+    alignItems: "stretch",
+  },
+  cell: {
+    border: "1px solid rgba(0,0,0,0.25)",
+    borderRadius: "8px",
+    padding: "8px 10px",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    minWidth: 0,
+    background: "#fff",
+  },
+  emptyCell: {
+    border: "1px solid transparent",
+    background: "transparent",
+  },
+  cellLabel: {
+    fontSize: "12px",
+    marginBottom: "4px",
+    color: "#111",
+  },
+  lineInput: {
+    width: "100%",
+    border: "none",
+    borderBottom: "1px solid #111",
+    outline: "none",
+    padding: "4px 2px",
+    fontSize: "14px",
+    background: "transparent",
+    boxSizing: "border-box",
+  },
+
+  avatarCol: {
+    gridColumn: 4,
+    gridRow: "1 / span 8",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "10px",
+    border: "1px solid rgba(0,0,0,0.25)",
+    borderRadius: "10px",
+    padding: "10px",
+    background: "#fff",
+  },
+  avatarBox: {
+    width: "180px",
+    height: "220px",
+    border: "2px solid #111",
+    borderRadius: "4px",
+    overflow: "hidden",
+    background: "#fff",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  avatarImg: {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+  },
+  avatarPlaceholder: {
+    width: "100%",
+    height: "100%",
+  },
+  avatarInput: {
+    fontSize: "12px",
+  },
+  cocIcon: {
+    width: "160px",
+    height: "auto",
+    objectFit: "contain",
+  },
+
+  statRow: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: "10px",
+  },
+  statLabel: {
+    fontWeight: 800,
+    letterSpacing: "0.5px",
+  },
+  statBox: {
+    width: "80px",
+    height: "28px",
+    border: "1px solid #111",
+    borderRadius: "4px",
+    textAlign: "center",
+    fontSize: "13px",
+    background: "#fff",
+  },
+
+  vitalLabel: {
+    fontWeight: 800,
+    fontSize: "13px",
+    marginBottom: "6px",
+  },
+  vitalMini: {
+    fontSize: "11px",
+    opacity: 0.9,
+  },
+  vitalBox: {
+    height: "28px",
+    border: "1px solid #111",
+    borderRadius: "4px",
+    textAlign: "center",
+    fontSize: "13px",
+    background: "#fff",
+  },
+  vitalCol: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "3px",
+  },
+  vitalOne: {
+    display: "grid",
+    gridTemplateColumns: "1fr",
+    gap: "6px",
+  },
+  vitalTwo: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: "8px",
+  },
+  vitalThree: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr 1fr",
+    gap: "8px",
+  },
+
 };
 
 export default PlayerForm;
