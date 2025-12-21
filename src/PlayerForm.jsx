@@ -543,6 +543,13 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
             accept="image/*"
             onChange={handleAvatarChange}
           />
+          <div style={styles.cocIconContainer}>
+            <img 
+              src={require('./assets/coc-icon.png')} 
+              alt="Call of Cthulhu" 
+              style={styles.cocIcon}
+            />
+          </div>
         </div>
 
         <div style={styles.metaBlock}>
@@ -815,16 +822,18 @@ const styles = {
     flexDirection: "column",
   },
   topBanner: {
-    width: "100%",
+    width: "100vw",
     height: "auto",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
     padding: "0.5rem 0",
-    background: "rgba(250, 204, 21, 0.3)",
+    background: "rgba(255, 255, 255, 0.3)",
+    marginLeft: "calc(-50vw + 50%)",
+    marginRight: "calc(-50vw + 50%)",
   },
   bannerImg: {
-    width: "100%",
+    width: "90%",
     maxHeight: "80px",
     objectFit: "contain",
   },
@@ -852,27 +861,31 @@ const styles = {
     objectFit: "cover",
   },
   bottomLine: {
-    width: "100%",
+    width: "100vw",
     height: "auto",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
     padding: "0.5rem 0",
-    background: "rgba(250, 204, 21, 0.3)",
+    background: "rgba(255, 255, 255, 0.3)",
     marginTop: "auto",
+    marginLeft: "calc(-50vw + 50%)",
+    marginRight: "calc(-50vw + 50%)",
   },
   bottomLineImg: {
-    width: "100%",
+    width: "90%",
     maxHeight: "60px",
     objectFit: "contain",
   },
   page: {
     flex: 1,
-    padding: "1.5rem",
-    background: "#facc15",
+    padding: "1.5rem 4rem",
+    background: "#ffffff",
     fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
     color: "#111827",
     boxSizing: "border-box",
+    margin: "0 auto",
+    maxWidth: "calc(100% - 8rem)",
   },
   topRow: {
     display: "flex",
@@ -909,6 +922,16 @@ const styles = {
   avatarInput: {
     fontSize: "0.8rem",
   },
+  cocIconContainer: {
+    marginTop: "0.5rem",
+    display: "flex",
+    justifyContent: "center",
+  },
+  cocIcon: {
+    width: "100px",
+    height: "auto",
+    objectFit: "contain",
+  },
   metaBlock: {
     flex: 1,
     display: "flex",
@@ -942,12 +965,9 @@ const styles = {
     display: "grid",
     gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
     gap: "0.75rem 1rem",
-    maxHeight: "60vh",
-    overflowY: "auto",
-    paddingRight: "0.5rem",
-    background: "#fefce8",
+    background: "#ffffffff",
     borderRadius: "0.75rem",
-    border: "1px solid #eab308",
+    border: "1px solid #000000ff",
   },
   field: {
     display: "flex",
@@ -980,8 +1000,8 @@ const styles = {
   input: {
     padding: "0.35rem 0.45rem",
     borderRadius: "0.5rem",
-    border: "1px solid #d4a516",
-    background: "#fff7c2",
+    border: "1px solid #000000ff",
+    background: "#ffffffff",
     color: "#111827",
     fontSize: "0.85rem",
     boxSizing: "border-box",
