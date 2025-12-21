@@ -503,26 +503,19 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
         />
       </div>
 
-      {/* Left Vertical Line */}
-      <div style={styles.leftLine}>
-        <img 
-          src={require('./assets/vertical-line.png')} 
-          alt="left decoration" 
-          style={styles.verticalLineImg}
-        />
-      </div>
+      {/* Main Layout Container */}
+      <div style={styles.mainContainer}>
+        {/* Left Vertical Line */}
+        <div style={styles.leftLine}>
+          <img 
+            src={require('./assets/vertical-line.png')} 
+            alt="left decoration" 
+            style={styles.verticalLineImg}
+          />
+        </div>
 
-      {/* Right Vertical Line */}
-      <div style={styles.rightLine}>
-        <img 
-          src={require('./assets/vertical-line.png')} 
-          alt="right decoration" 
-          style={styles.verticalLineImg}
-        />
-      </div>
-
-      {/* Main Content */}
-      <div className="sheet-page" style={styles.page}>
+        {/* Main Content */}
+        <div className="sheet-page" style={styles.page}>
       <div style={styles.topRow}>
         <div style={styles.avatarBlock}>
           <div style={styles.avatarPreviewWrapper}>
@@ -800,9 +793,19 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
           )}
         </div>
       </form>
+        </div>
+
+        {/* Right Vertical Line */}
+        <div style={styles.rightLine}>
+          <img 
+            src={require('./assets/vertical-line.png')} 
+            alt="right decoration" 
+            style={styles.verticalLineImg}
+          />
+        </div>
       </div>
 
-      {/* Bottom Line */}
+      {/* Bottom Banner */}
       <div style={styles.bottomLine}>
         <img 
           src={require('./assets/bottom-banner.png')} 
@@ -816,10 +819,9 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
 
 const styles = {
   pageWrapper: {
-    position: "relative",
-    minHeight: "100vh",
     display: "flex",
     flexDirection: "column",
+    minHeight: "100vh",
   },
   topBanner: {
     width: "100vw",
@@ -831,27 +833,28 @@ const styles = {
     background: "rgba(255, 255, 255, 0.3)",
     marginLeft: "calc(-50vw + 50%)",
     marginRight: "calc(-50vw + 50%)",
+    flexShrink: 0,
   },
   bannerImg: {
     width: "90%",
     maxHeight: "80px",
     objectFit: "contain",
   },
+  mainContainer: {
+    display: "flex",
+    flex: 1,
+    position: "relative",
+    gap: 0,
+  },
   leftLine: {
-    position: "absolute",
-    left: 0,
-    top: 0,
-    height: "100%",
     width: "auto",
+    flexShrink: 0,
     display: "flex",
     alignItems: "stretch",
   },
   rightLine: {
-    position: "absolute",
-    right: 0,
-    top: 0,
-    height: "100%",
     width: "auto",
+    flexShrink: 0,
     display: "flex",
     alignItems: "stretch",
   },
@@ -868,9 +871,9 @@ const styles = {
     alignItems: "center",
     padding: "0.5rem 0",
     background: "rgba(255, 255, 255, 0.3)",
-    marginTop: "auto",
     marginLeft: "calc(-50vw + 50%)",
     marginRight: "calc(-50vw + 50%)",
+    flexShrink: 0,
   },
   bottomLineImg: {
     width: "90%",
@@ -879,13 +882,13 @@ const styles = {
   },
   page: {
     flex: 1,
-    padding: "1.5rem 4rem",
+    padding: "1.5rem",
     background: "#ffffff",
     fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
     color: "#111827",
     boxSizing: "border-box",
-    margin: "0 auto",
-    maxWidth: "calc(100% - 8rem)",
+    display: "flex",
+    flexDirection: "column",
   },
   topRow: {
     display: "flex",
