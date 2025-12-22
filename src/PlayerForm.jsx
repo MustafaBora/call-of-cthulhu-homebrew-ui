@@ -568,11 +568,19 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
         }
 
         @media print {
+          @page { size: A4; margin: 8mm; }
+          .sheet-page { padding: 0.75rem !important; }
+          .sheet-header { gap: 3px 4px !important; }
+          .sheet-header .cell { padding: 2px 3px !important; }
+          .sheet-header input { padding: 2px 3px !important; font-size: 10px !important; }
+          .sheet-grid { gap: 0.5rem 0.9rem !important; }
+          .sheet-grid .field-header { gap: 0.28rem !important; }
+          .sheet-grid .value-row { gap: 3px !important; }
           .xp-buttons { display: none !important; }
           .no-print { display: none !important; }
           .label-extra { display: none !important; }
           .value-row { flex-wrap: wrap !important; max-width: 100% !important; justify-content: flex-start !important; gap: 3px !important; }
-          .value-row input { width: 30px !important; min-width: 24px !important; }
+          .value-row input { width: 28px !important; min-width: 22px !important; }
         }
       `}</style>
 
@@ -582,7 +590,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
       {/* Main Content */}
       <div className="sheet-page" style={styles.page}>
       {/* ===== CoC Header Grid (form hariç üst kısım) ===== */}
-      <div style={styles.headerGrid}>
+      <div className="sheet-header" style={styles.headerGrid}>
         {/* Row 1 */}
         <div style={styles.cell}>
           <div style={styles.cellLabel}>Name</div>
@@ -696,11 +704,11 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
         <StatCell label="PER" value={form.PER} onChange={(v) => handleNumericChange("PER", v)} />
         <StatCell label="EDU" value={form.EDU} onChange={(v) => handleNumericChange("EDU", v)} />
         <StatCell label="Sanity" value={form.SAN ?? 0} readOnly />
-        {/*<div style={{ ...styles.cell, ...styles.emptyCell }} />*/}
+        <ReadSmall label="Used XP" value={form.usedXP ?? 0} />
 
         {/* Row 8 */}
-        <ReadSmall label="Used XP" value={form.usedXP ?? 0} />
-        {/*<div style={{ ...styles.cell, ...styles.emptyCell }} /> */}
+        <div style={{ ...styles.cell, ...styles.emptyCell }} />
+        <div style={{ ...styles.cell, ...styles.emptyCell }} />
       </div>
 
       <form
@@ -957,7 +965,7 @@ const styles = {
   grid: {
     display: "grid",
     gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
-    gap: "0.75rem 1rem",
+    gap: "0.6rem 1rem",
     background: "#ffffffff",
     borderRadius: "0.75rem",
     border: "1px solid #000000ff",
@@ -965,15 +973,15 @@ const styles = {
   field: {
     display: "flex",
     flexDirection: "column",
-    gap: "0.15rem",
-    fontSize: "0.8rem",
+    gap: "0.12rem",
+    fontSize: "0.75rem",
     position: "relative",
   },
   fieldHeader: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    gap: "0.4rem",
+    gap: "0.32rem",
   },
   label: {
     display: "flex",
@@ -993,7 +1001,7 @@ const styles = {
   labelExtra: {
     paddingLeft: "4px",
     color: "#6b7280",
-    fontSize: "0.8rem",
+    fontSize: "0.75rem",
   },
   input: {
     padding: "0.35rem 0.45rem",
@@ -1005,36 +1013,36 @@ const styles = {
     boxSizing: "border-box",
   },
   inputInline: {
-    padding: "0.16rem 0.22rem",
+    padding: "0.13rem 0.18rem",
     borderRadius: "0.28rem",
     border: "1px solid #000000ff",
     background: "#ffffffff",
     color: "#111827",
-    fontSize: "0.78rem",
+    fontSize: "0.76rem",
     boxSizing: "border-box",
     width: "32px",
     minWidth: "28px",
     maxWidth: "40px",
   },
   inputInlineReadOnly: {
-    padding: "0.14rem 0.2rem",
+    padding: "0.11rem 0.16rem",
     borderRadius: "0.28rem",
     border: "1px solid #d1d5db",
     background: "#f3f4f6",
     color: "#6b7280",
-    fontSize: "0.76rem",
+    fontSize: "0.74rem",
     boxSizing: "border-box",
     width: "24px",
     minWidth: "20px",
     maxWidth: "32px",
   },
   inputInlineReadOnlySmall: {
-    padding: "0.12rem 0.18rem",
+    padding: "0.10rem 0.14rem",
     borderRadius: "0.28rem",
     border: "1px solid #e5e7eb",
     background: "#f8fafc",
     color: "#6b7280",
-    fontSize: "0.74rem",
+    fontSize: "0.72rem",
     boxSizing: "border-box",
     width: "20px",
     minWidth: "18px",
@@ -1043,7 +1051,7 @@ const styles = {
   valueRow: {
     display: "flex",
     alignItems: "center",
-    gap: "0.12rem",
+    gap: "0.1rem",
     flex: 1,
     justifyContent: "flex-end",
     minWidth: 0,
@@ -1062,15 +1070,15 @@ const styles = {
   stepButtons: {
     display: "flex",
     flexDirection: "row",
-    gap: "0.25rem",
+    gap: "0.2rem",
   },
   stepButton: {
-    padding: "0.1rem 0.35rem",
+    padding: "0.08rem 0.3rem",
     borderRadius: "0.35rem",
     border: "1px solid #78350f",
     background: "#facc15",
     color: "#451a03",
-    fontSize: "0.65rem",
+    fontSize: "0.62rem",
     cursor: "pointer",
   },
   error: {
