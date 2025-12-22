@@ -560,8 +560,8 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
           .xp-buttons { display: none !important; }
           .no-print { display: none !important; }
           .label-extra { display: none !important; }
-          .value-row { flex-wrap: wrap !important; max-width: 100% !important; justify-content: flex-start !important; gap: 4px !important; }
-          .value-row input { width: 60px !important; min-width: 50px !important; }
+          .value-row { flex-wrap: wrap !important; max-width: 100% !important; justify-content: flex-start !important; gap: 3px !important; }
+          .value-row input { width: 30px !important; min-width: 24px !important; }
         }
       `}</style>
 
@@ -999,50 +999,50 @@ const styles = {
     boxSizing: "border-box",
   },
   inputInline: {
-    padding: "0.18rem 0.26rem",
-    borderRadius: "0.32rem",
+    padding: "0.16rem 0.22rem",
+    borderRadius: "0.28rem",
     border: "1px solid #000000ff",
     background: "#ffffffff",
     color: "#111827",
-    fontSize: "0.8rem",
+    fontSize: "0.78rem",
     boxSizing: "border-box",
-    width: "48px",
-    minWidth: "42px",
-    maxWidth: "60px",
+    width: "32px",
+    minWidth: "28px",
+    maxWidth: "40px",
   },
   inputInlineReadOnly: {
-    padding: "0.16rem 0.24rem",
-    borderRadius: "0.3rem",
+    padding: "0.14rem 0.2rem",
+    borderRadius: "0.28rem",
     border: "1px solid #d1d5db",
     background: "#f3f4f6",
     color: "#6b7280",
-    fontSize: "0.78rem",
+    fontSize: "0.76rem",
     boxSizing: "border-box",
-    width: "40px",
-    minWidth: "34px",
-    maxWidth: "54px",
+    width: "24px",
+    minWidth: "20px",
+    maxWidth: "32px",
   },
   inputInlineReadOnlySmall: {
-    padding: "0.14rem 0.22rem",
-    borderRadius: "0.3rem",
+    padding: "0.12rem 0.18rem",
+    borderRadius: "0.28rem",
     border: "1px solid #e5e7eb",
     background: "#f8fafc",
     color: "#6b7280",
-    fontSize: "0.75rem",
+    fontSize: "0.74rem",
     boxSizing: "border-box",
-    width: "36px",
-    minWidth: "30px",
-    maxWidth: "46px",
+    width: "20px",
+    minWidth: "18px",
+    maxWidth: "28px",
   },
   valueRow: {
     display: "flex",
     alignItems: "center",
-    gap: "0.15rem",
+    gap: "0.12rem",
     flex: 1,
     justifyContent: "flex-end",
     minWidth: 0,
-    flexBasis: "42%",
-    maxWidth: "46%",
+    flexBasis: "40%",
+    maxWidth: "44%",
     flexWrap: "wrap",
   },
   inputReadOnly: {
