@@ -680,34 +680,34 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
         </div>
 
         {/* Row 3 */}
-        <StatCell label="STR" value={form.STR} onChange={(v) => handleNumericChange("STR", v)} />
-        <StatCell label="SIZ" value={form.SIZ} onChange={(v) => handleNumericChange("SIZ", v)} />
+        <StatCell label="Strength" value={form.STR} onChange={(v) => handleNumericChange("STR", v)} />
+        <StatCell label="SIZE" value={form.SIZ} onChange={(v) => handleNumericChange("SIZ", v)} />
         <StatCell label="Hit Points" value={form.HP ?? 0} readOnly />
 
         {/* Row 4 */}
-        <StatCell label="CON" value={form.CON} onChange={(v) => handleNumericChange("CON", v)} />
+        <StatCell label="Condition" value={form.CON} onChange={(v) => handleNumericChange("CON", v)} />
         <StatCell label="POW" value={form.POW} onChange={(v) => handleNumericChange("POW", v)} />
         <StatCell label="Magic Points" value={form.MP ?? 0} readOnly />
 
         {/* Row 5 */}
-        <StatCell label="DEX" value={form.DEX} onChange={(v) => handleNumericChange("DEX", v)} />
-        <StatCell label="BRV" value={form.BRV} onChange={(v) => handleNumericChange("APP", v)} />
+        <StatCell label="Dexterity" value={form.DEX} onChange={(v) => handleNumericChange("DEX", v)} />
+        <StatCell label="Bravery" value={form.BRV} onChange={(v) => handleNumericChange("APP", v)} />
         <StatCell label="Luck" value={form.LUCK ?? 0} readOnly />
 
         {/* Row 6 */}
-        <StatCell label="INT" value={form.INT} onChange={(v) => handleNumericChange("INT", v)} />
-        <StatCell label="APP" value={form.APP} onChange={(v) => handleNumericChange("APP", v)} />
+        <StatCell label="Intellect" value={form.INT} onChange={(v) => handleNumericChange("INT", v)} />
+        <StatCell label="Appeal" value={form.APP} onChange={(v) => handleNumericChange("APP", v)} />
         <StatCell label="Bonus" value={form.BONUS ?? 0} readOnly />
         <ReadSmall label="Total XP" value={form.totalXP ?? 0} />
         
         {/* Row 7 */}
-        <StatCell label="PER" value={form.PER} onChange={(v) => handleNumericChange("PER", v)} />
-        <StatCell label="EDU" value={form.EDU} onChange={(v) => handleNumericChange("EDU", v)} />
+        <StatCell label="Perception" value={form.PER} onChange={(v) => handleNumericChange("PER", v)} />
+        <StatCell label="Education" value={form.EDU} onChange={(v) => handleNumericChange("EDU", v)} />
         <StatCell label="Sanity" value={form.SAN ?? 0} readOnly />
         <ReadSmall label="Used XP" value={form.usedXP ?? 0} />
 
         {/* Row 8 */}
-        <ReadSmall label="REP" value={form.REP ?? 0} />
+        <ReadSmall label="Reputation" value={form.REP ?? 0} />
         <ReadSmall label="BUILD" value={form.BUILD ?? 0} />
         <ReadSmall label="ARMOR" value={form.armor ?? 0} />
         <ReadSmall label="Damage Bonus" value={form.damageBonus ?? "0"} />
