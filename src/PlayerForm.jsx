@@ -713,6 +713,10 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
                 ? ` (Base: ${base})`
                 : "";
 
+            const numericValue = Number(value) || 0;
+            const halfValue = Math.floor(numericValue / 2);
+            const fifthValue = Math.floor(numericValue / 5);
+
             return (
               <div key={def.key} style={styles.field}>
                 <div style={styles.fieldHeader}> 
@@ -735,6 +739,20 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
                     min={def.type === "number" ? 0 : undefined}
                     max={def.type === "number" ? 90 : undefined}
                     style={styles.inputInline}
+                  />
+
+                  <input
+                    readOnly
+                    value={halfValue}
+                    style={styles.inputInlineReadOnly}
+                    aria-label={`${def.label} half value`}
+                  />
+
+                  <input
+                    readOnly
+                    value={fifthValue}
+                    style={styles.inputInlineReadOnlySmall}
+                    aria-label={`${def.label} fifth value`}
                   />
 
                   {isNumber && (
@@ -986,6 +1004,28 @@ const styles = {
     boxSizing: "border-box",
     width: "90px",
     minWidth: "80px",
+  },
+  inputInlineReadOnly: {
+    padding: "0.25rem 0.35rem",
+    borderRadius: "0.4rem",
+    border: "1px solid #d1d5db",
+    background: "#f3f4f6",
+    color: "#6b7280",
+    fontSize: "0.85rem",
+    boxSizing: "border-box",
+    width: "70px",
+    minWidth: "60px",
+  },
+  inputInlineReadOnlySmall: {
+    padding: "0.2rem 0.3rem",
+    borderRadius: "0.35rem",
+    border: "1px solid #e5e7eb",
+    background: "#f8fafc",
+    color: "#6b7280",
+    fontSize: "0.8rem",
+    boxSizing: "border-box",
+    width: "60px",
+    minWidth: "50px",
   },
   inputReadOnly: {
     padding: "0.35rem 0.45rem",
