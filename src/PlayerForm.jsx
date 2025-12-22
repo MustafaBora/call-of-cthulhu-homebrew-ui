@@ -720,59 +720,61 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
             return (
               <div key={def.key} style={styles.field}>
                 <div style={styles.fieldHeader}> 
-                  <span style={styles.labelText}>
+                  <span style={{ ...styles.labelText, flex: 1 }}>
                     {def.label}
                     {labelExtra && (
                       <span className="label-extra" style={styles.labelExtra}>{labelExtra}</span>
                     )}
                   </span>
 
-                  <input
-                    type={def.type}
-                    name={def.key}
-                    value={value}
-                    onChange={(e) =>
-                      def.type === "number"
-                        ? handleNumericChange(def.key, e.target.value)
-                        : handleTextChange(def.key, e.target.value)
-                    }
-                    min={def.type === "number" ? 0 : undefined}
-                    max={def.type === "number" ? 90 : undefined}
-                    style={styles.inputInline}
-                  />
+                  <div style={styles.valueRow}>
+                    <input
+                      type={def.type}
+                      name={def.key}
+                      value={value}
+                      onChange={(e) =>
+                        def.type === "number"
+                          ? handleNumericChange(def.key, e.target.value)
+                          : handleTextChange(def.key, e.target.value)
+                      }
+                      min={def.type === "number" ? 0 : undefined}
+                      max={def.type === "number" ? 90 : undefined}
+                      style={styles.inputInline}
+                    />
 
-                  <input
-                    readOnly
-                    value={halfValue}
-                    style={styles.inputInlineReadOnly}
-                    aria-label={`${def.label} half value`}
-                  />
+                    <input
+                      readOnly
+                      value={halfValue}
+                      style={styles.inputInlineReadOnly}
+                      aria-label={`${def.label} half value`}
+                    />
 
-                  <input
-                    readOnly
-                    value={fifthValue}
-                    style={styles.inputInlineReadOnlySmall}
-                    aria-label={`${def.label} fifth value`}
-                  />
+                    <input
+                      readOnly
+                      value={fifthValue}
+                      style={styles.inputInlineReadOnlySmall}
+                      aria-label={`${def.label} fifth value`}
+                    />
 
-                  {isNumber && (
-                    <div className="xp-buttons" style={styles.stepButtons}>
-                      <button
-                        type="button"
-                        style={styles.stepButton}
-                        onClick={() => handleDelta(def.key, +5)}
-                      >
-                        +5
-                      </button>
-                      <button
-                        type="button"
-                        style={styles.stepButton}
-                        onClick={() => handleDelta(def.key, -5)}
-                      >
-                        -5
-                      </button>
-                    </div>
-                  )}
+                    {isNumber && (
+                      <div className="xp-buttons" style={styles.stepButtons}>
+                        <button
+                          type="button"
+                          style={styles.stepButton}
+                          onClick={() => handleDelta(def.key, +5)}
+                        >
+                          +5
+                        </button>
+                        <button
+                          type="button"
+                          style={styles.stepButton}
+                          onClick={() => handleDelta(def.key, -5)}
+                        >
+                          -5
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             );
@@ -1026,6 +1028,15 @@ const styles = {
     boxSizing: "border-box",
     width: "60px",
     minWidth: "50px",
+  },
+  valueRow: {
+    display: "flex",
+    alignItems: "center",
+    gap: "0.35rem",
+    flex: 1,
+    justifyContent: "flex-end",
+    minWidth: 0,
+    flexBasis: "50%",
   },
   inputReadOnly: {
     padding: "0.35rem 0.45rem",
