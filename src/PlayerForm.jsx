@@ -976,8 +976,8 @@ const styles = {
   },
   stepButtons: {
     display: "flex",
-    flexDirection: "column",
-    gap: "0.15rem",
+    flexDirection: "row",
+    gap: "0.25rem",
   },
   stepButton: {
     padding: "0.1rem 0.35rem",
