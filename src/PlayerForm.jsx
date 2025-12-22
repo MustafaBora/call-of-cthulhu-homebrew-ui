@@ -166,7 +166,7 @@ const FIELD_DEFS = [
   { key: "FirearmsHandgun", label: "Firearms (Handgun)", type: "number" },
   { key: "FirearmsOther", label: "Firearms (Other)", type: "number" },
   { key: "FirearmsOther2", label: "Firearms (Other 2)", type: "number" },
-  { key: "FirearmsRifleShotgun", label: "Firearms (Rifle / Shotgun)", type: "number" },
+  { key: "FirearmsRifleShotgun", label: "Firearms (Shotgun)", type: "number" },
   { key: "FirstAid", label: "First Aid", type: "number" },
   { key: "History", label: "History", type: "number" },
   { key: "Intimidate", label: "Intimidate", type: "number" },
@@ -690,17 +690,17 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
         <StatCell label="INT" value={form.INT} onChange={(v) => handleNumericChange("INT", v)} />
         <StatCell label="APP" value={form.APP} onChange={(v) => handleNumericChange("APP", v)} />
         <StatCell label="Bonus" value={form.BONUS ?? 0} readOnly />
+        <ReadSmall label="Total XP" value={form.totalXP ?? 0} />
         
         {/* Row 7 */}
         <StatCell label="PER" value={form.PER} onChange={(v) => handleNumericChange("PER", v)} />
         <StatCell label="EDU" value={form.EDU} onChange={(v) => handleNumericChange("EDU", v)} />
         <StatCell label="Sanity" value={form.SAN ?? 0} readOnly />
-        <div style={{ ...styles.cell, ...styles.emptyCell }} />
+        {/*<div style={{ ...styles.cell, ...styles.emptyCell }} />*/}
 
         {/* Row 8 */}
-        <ReadSmall label="Total XP" value={form.totalXP ?? 0} />
         <ReadSmall label="Used XP" value={form.usedXP ?? 0} />
-        <div style={{ ...styles.cell, ...styles.emptyCell }} />
+        {/*<div style={{ ...styles.cell, ...styles.emptyCell }} /> */}
       </div>
 
       <form
@@ -1105,7 +1105,7 @@ const styles = {
       display: "grid",
       gridTemplateColumns: "2fr 2fr 2fr 3fr",
       gridAutoRows: "minmax(25px, auto)",
-      gap: "4px 6px",
+      gap: "4px 5px",
       border: "1px solid #111",
       borderRadius: "8px",
       padding: "8px",
@@ -1144,7 +1144,7 @@ const styles = {
 
   avatarCol: {
     gridColumn: 4,
-    gridRow: "1 / span 6",
+    gridRow: "1 / span 5",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
