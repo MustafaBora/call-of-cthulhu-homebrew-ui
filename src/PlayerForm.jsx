@@ -556,6 +556,17 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
   return (
     <div style={styles.pageWrapper}>
       <style>{`
+        /* Hide number spinners but keep numeric input */
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+        input[type="number"] {
+          -moz-appearance: textfield;
+          appearance: textfield;
+        }
+
         @media print {
           .xp-buttons { display: none !important; }
           .no-print { display: none !important; }
