@@ -559,6 +559,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
         @media print {
           .xp-buttons { display: none !important; }
           .no-print { display: none !important; }
+          .label-extra { display: none !important; }
         }
       `}</style>
 
@@ -714,11 +715,28 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
 
             return (
               <div key={def.key} style={styles.field}>
-                <div style={styles.fieldHeader}>
+                <div style={styles.fieldHeader}> 
                   <span style={styles.labelText}>
                     {def.label}
-                    {labelExtra}
+                    {labelExtra && (
+                      <span className="label-extra" style={styles.labelExtra}>{labelExtra}</span>
+                    )}
                   </span>
+
+                  <input
+                    type={def.type}
+                    name={def.key}
+                    value={value}
+                    onChange={(e) =>
+                      def.type === "number"
+                        ? handleNumericChange(def.key, e.target.value)
+                        : handleTextChange(def.key, e.target.value)
+                    }
+                    min={def.type === "number" ? 0 : undefined}
+                    max={def.type === "number" ? 90 : undefined}
+                    style={styles.inputInline}
+                  />
+
                   {isNumber && (
                     <div className="xp-buttons" style={styles.stepButtons}>
                       <button
@@ -738,19 +756,6 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
                     </div>
                   )}
                 </div>
-                <input
-                  type={def.type}
-                  name={def.key}
-                  value={value}
-                  onChange={(e) =>
-                    def.type === "number"
-                      ? handleNumericChange(def.key, e.target.value)
-                      : handleTextChange(def.key, e.target.value)
-                  }
-                  min={def.type === "number" ? 0 : undefined}
-                  max={def.type === "number" ? 90 : undefined}
-                  style={styles.input}
-                />
               </div>
             );
           })}
@@ -939,8 +944,8 @@ const styles = {
   fieldHeader: {
     display: "flex",
     justifyContent: "space-between",
-    alignItems: "flex-start",
-    gap: "0.25rem",
+    alignItems: "center",
+    gap: "0.4rem",
   },
   label: {
     display: "flex",
@@ -957,6 +962,11 @@ const styles = {
   labelText: {
     color: "#4b5563",
   },
+  labelExtra: {
+    paddingLeft: "4px",
+    color: "#6b7280",
+    fontSize: "0.8rem",
+  },
   input: {
     padding: "0.35rem 0.45rem",
     borderRadius: "0.5rem",
@@ -965,6 +975,17 @@ const styles = {
     color: "#111827",
     fontSize: "0.85rem",
     boxSizing: "border-box",
+  },
+  inputInline: {
+    padding: "0.25rem 0.35rem",
+    borderRadius: "0.4rem",
+    border: "1px solid #000000ff",
+    background: "#ffffffff",
+    color: "#111827",
+    fontSize: "0.85rem",
+    boxSizing: "border-box",
+    width: "90px",
+    minWidth: "80px",
   },
   inputReadOnly: {
     padding: "0.35rem 0.45rem",
