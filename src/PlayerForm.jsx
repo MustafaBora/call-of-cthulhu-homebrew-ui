@@ -636,11 +636,6 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
             onChange={handleAvatarChange}
           />
 
-          <img
-            src={require("./assets/coc-icon.png")}
-            alt="Call of Cthulhu"
-            style={styles.cocIcon}
-          />
         </div>
 
         {/* Row 2 */}
@@ -1149,10 +1144,11 @@ const styles = {
 
   avatarCol: {
     gridColumn: 4,
-    gridRow: "1 / span 8",
+    gridRow: "1 / span 6",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
+    alignSelf: "start",
     gap: "6px",
     border: "1px solid rgba(0,0,0,0.18)",
     borderRadius: "8px",
@@ -1160,8 +1156,8 @@ const styles = {
     background: "#fff",
   },
   avatarBox: {
-    width: "260px",
-    height: "340px",
+    width: "182px",
+    height: "238px",
     border: "2px solid #111",
     borderRadius: "4px",
     overflow: "hidden",
@@ -1181,11 +1177,6 @@ const styles = {
   },
   avatarInput: {
     fontSize: "12px",
-  },
-  cocIcon: {
-    width: "220px",
-    height: "auto",
-    objectFit: "contain",
   },
 
   statRow: {
