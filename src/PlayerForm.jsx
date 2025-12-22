@@ -576,25 +576,9 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
 
   return (
     <div style={styles.pageWrapper}>
-      {/* Top Banner */}
-      <div style={styles.topBanner}>
-        <img 
-          src={require('./assets/upper-banner.png')} 
-          alt="banner" 
-          style={styles.bannerImg}
-        />
-      </div>
 
       {/* Main Layout Container */}
       <div style={styles.mainContainer}>
-        {/* Left Vertical Line */}
-        <div style={styles.leftLine}>
-          <img 
-            src={require('./assets/vertical-line.png')} 
-            alt="left decoration" 
-            style={styles.verticalLineImg}
-          />
-        </div>
 
       {/* Main Content */}
       <div className="sheet-page" style={styles.page}>
@@ -830,24 +814,10 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
       </form>
         </div>
 
-        {/* Right Vertical Line */}
-        <div style={styles.rightLine}>
-          <img 
-            src={require('./assets/vertical-line.png')} 
-            alt="right decoration" 
-            style={styles.verticalLineImg}
-          />
-        </div>
+        {/* right vertical line removed */}
       </div>
 
-      {/* Bottom Banner */}
-      <div style={styles.bottomLine}>
-        <img 
-          src={require('./assets/bottom-banner.png')} 
-          alt="bottom decoration" 
-          style={styles.bottomLineImg}
-        />
-      </div>
+      {/* bottom banner removed */}
     </div>
   );
 }
@@ -859,21 +829,10 @@ const styles = {
     minHeight: "100vh",
   },
   topBanner: {
-    width: "100vw",
-    height: "auto",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: "0.5rem 0",
-    background: "rgba(255, 255, 255, 0.3)",
-    marginLeft: "calc(-50vw + 50%)",
-    marginRight: "calc(-50vw + 50%)",
-    flexShrink: 0,
+    display: "none",
   },
   bannerImg: {
-    width: "90%",
-    maxHeight: "80px",
-    objectFit: "contain",
+    display: "none",
   },
   mainContainer: {
     display: "flex",
@@ -885,41 +844,12 @@ const styles = {
     maxWidth: "100%",
     alignItems: "stretch",
   },
-  leftLine: {
-    width: "60px",
-    flexShrink: 0,
-    display: "flex",
-    alignItems: "stretch",
-    justifyContent: "center",
-  },
-  rightLine: {
-    width: "60px",
-    flexShrink: 0,
-    display: "flex",
-    alignItems: "stretch",
-    justifyContent: "center",
-  },
-  verticalLineImg: {
-    height: "100%",
-    width: "auto",
-    objectFit: "cover",
-  },
+  /* vertical decorations removed */
   bottomLine: {
-    width: "100vw",
-    height: "auto",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: "0.5rem 0",
-    background: "rgba(255, 255, 255, 0.3)",
-    marginLeft: "calc(-50vw + 50%)",
-    marginRight: "calc(-50vw + 50%)",
-    flexShrink: 0,
+    display: "none",
   },
   bottomLineImg: {
-    width: "90%",
-    maxHeight: "60px",
-    objectFit: "contain",
+    display: "none",
   },
   page: {
     flex: 1,
@@ -1103,9 +1033,9 @@ const styles = {
   },
     headerGrid: {
     display: "grid",
-    gridTemplateColumns: "1fr 1fr 1fr 220px",
-    gridAutoRows: "minmax(56px, auto)",
-    gap: "10px 12px",
+    gridTemplateColumns: "1fr 1fr 1fr 180px",
+    gridAutoRows: "minmax(30px, auto)",
+    gap: "6px 8px",
     border: "1px solid #111",
     borderRadius: "10px",
     padding: "12px",
@@ -1113,9 +1043,9 @@ const styles = {
     alignItems: "stretch",
   },
   cell: {
-    border: "1px solid rgba(0,0,0,0.25)",
-    borderRadius: "8px",
-    padding: "8px 10px",
+    border: "1px solid rgba(0,0,0,0.18)",
+    borderRadius: "6px",
+    padding: "4px 6px",
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
@@ -1136,27 +1066,27 @@ const styles = {
     border: "none",
     borderBottom: "1px solid #111",
     outline: "none",
-    padding: "4px 2px",
-    fontSize: "14px",
+    padding: "2px 2px",
+    fontSize: "12px",
     background: "transparent",
     boxSizing: "border-box",
   },
 
   avatarCol: {
     gridColumn: 4,
-    gridRow: "1 / span 8",
+    gridRow: "1 / span 6",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    gap: "10px",
-    border: "1px solid rgba(0,0,0,0.25)",
-    borderRadius: "10px",
-    padding: "10px",
+    gap: "6px",
+    border: "1px solid rgba(0,0,0,0.18)",
+    borderRadius: "8px",
+    padding: "8px",
     background: "#fff",
   },
   avatarBox: {
-    width: "180px",
-    height: "220px",
+    width: "140px",
+    height: "180px",
     border: "2px solid #111",
     borderRadius: "4px",
     overflow: "hidden",
@@ -1178,7 +1108,7 @@ const styles = {
     fontSize: "12px",
   },
   cocIcon: {
-    width: "160px",
+    width: "120px",
     height: "auto",
     objectFit: "contain",
   },
@@ -1211,14 +1141,18 @@ const styles = {
   vitalMini: {
     fontSize: "11px",
     opacity: 0.9,
+    marginBottom: "4px",
   },
   vitalBox: {
-    height: "28px",
+    width: "100%",
+    minHeight: "36px",
+    padding: "6px 10px",
     border: "1px solid #111",
-    borderRadius: "4px",
-    textAlign: "center",
+    borderRadius: "10px",
+    textAlign: "left",
     fontSize: "13px",
     background: "#fff",
+    boxSizing: "border-box",
   },
   vitalCol: {
     display: "flex",
@@ -1233,12 +1167,12 @@ const styles = {
   vitalTwo: {
     display: "grid",
     gridTemplateColumns: "1fr 1fr",
-    gap: "8px",
+    gap: "10px",
   },
   vitalThree: {
     display: "grid",
     gridTemplateColumns: "1fr 1fr 1fr",
-    gap: "8px",
+    gap: "10px",
   },
 
 };
