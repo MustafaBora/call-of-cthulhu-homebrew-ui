@@ -673,53 +673,24 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
 
         {/* Row 5 */}
         <StatCell label="DEX" value={form.DEX} onChange={(v) => handleNumericChange("DEX", v)} />
-        {/* senin listende burada POW var: aynen koyuyorum */}
-        <StatCell label="POW" value={form.POW} onChange={(v) => handleNumericChange("POW", v)} />
+        <StatCell label="BRV" value={form.BRV} onChange={(v) => handleNumericChange("APP", v)} />
         <ReadCell1 label="Luck" subLabel="Current" value={form.LUCK ?? 0} />
 
         {/* Row 6 */}
         <StatCell label="INT" value={form.INT} onChange={(v) => handleNumericChange("INT", v)} />
         <StatCell label="APP" value={form.APP} onChange={(v) => handleNumericChange("APP", v)} />
         <ReadCell1 label="Bonus" subLabel="Current" value={form.BONUS ?? 0} />
+        
+        {/* Row 7 */}
+        <StatCell label="PER" value={form.PER} onChange={(v) => handleNumericChange("PER", v)} />
+        <StatCell label="EDU" value={form.EDU} onChange={(v) => handleNumericChange("EDU", v)} />
+        <ReadCell1 label="Sanity" subLabel="Current" value={form.BONUS ?? 0} />
+        <div style={{ ...styles.cell, ...styles.emptyCell }} />
 
-        {/* Row 7 - PER & Total, EDU & Used */}
-        <div style={styles.cell}>
-          <div style={styles.statRow}>
-            <div style={styles.statLabel}>PER</div>
-            <input
-              type="number"
-              min={0}
-              max={90}
-              value={Number(form.PER) || 0}
-              onChange={(e) => handleNumericChange("PER", e.target.value)}
-              style={styles.statBox}
-            />
-          </div>
-          <div style={{ ...styles.statRow, marginTop: "4px" }}>
-            <div style={styles.statLabel}>Total</div>
-            <input readOnly value={form.totalXP ?? 0} style={styles.statBox} />
-          </div>
-        </div>
-
-        <div style={styles.cell}>
-          <div style={styles.statRow}>
-            <div style={styles.statLabel}>EDU</div>
-            <input
-              type="number"
-              min={0}
-              max={90}
-              value={Number(form.EDU) || 0}
-              onChange={(e) => handleNumericChange("EDU", e.target.value)}
-              style={styles.statBox}
-            />
-          </div>
-          <div style={{ ...styles.statRow, marginTop: "4px" }}>
-            <div style={styles.statLabel}>Used</div>
-            <input readOnly value={form.usedXP ?? 0} style={styles.statBox} />
-          </div>
-        </div>
-
-        <ReadCell3 label="Sanity" aLabel="Starting" aValue={form.SAN ?? 0} bLabel="Current" bValue={form.SAN ?? 0} cLabel="Insane" cValue={"—"} />
+        {/* Row 8 */}
+        <ReadSmall label="Total XP" value={form.totalXP ?? 0} />
+        <ReadSmall label="Used XP" value={form.usedXP ?? 0} />
+        <div style={{ ...styles.cell, ...styles.emptyCell }} />
       </div>
 
       <form
