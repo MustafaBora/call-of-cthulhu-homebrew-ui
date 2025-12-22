@@ -146,28 +146,6 @@ const MULT = {
 const XP_KEYS = Object.keys(BASE);
 
 const FIELD_DEFS = [
-  { key: "player", label: "Player (Oyuncu)", type: "text" },
-  { key: "name", label: "Character Name", type: "text" },
-  { key: "occupation", label: "Occupation", type: "text" },
-  { key: "age", label: "Age", type: "number" },
-  { key: "sex", label: "Sex", type: "text" },
-  { key: "birthPlace", label: "Birth Place", type: "text" },
-
-  { key: "APP", label: "APP", type: "number" },
-  { key: "BONUS", label: "BONUS", type: "number" },
-  { key: "BRV", label: "BRV", type: "number" },
-  { key: "CON", label: "CON", type: "number" },
-  { key: "DEX", label: "DEX", type: "number" },
-  { key: "EDU", label: "EDU", type: "number" },
-  { key: "INT", label: "INT", type: "number" },
-  { key: "LUCK", label: "LUCK", type: "number" },
-  { key: "PER", label: "PER", type: "number" },
-  { key: "POW", label: "POW", type: "number" },
-  { key: "REP", label: "REP", type: "number" },
-  { key: "SAN", label: "SAN", type: "number" },
-  { key: "SIZ", label: "SIZ", type: "number" },
-  { key: "STR", label: "STR", type: "number" },
-
   { key: "Accounting", label: "Accounting", type: "number" },
   { key: "Anthropology", label: "Anthropology", type: "number" },
   { key: "Appraise", label: "Appraise", type: "number" },
