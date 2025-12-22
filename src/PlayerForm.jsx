@@ -560,6 +560,8 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
           .xp-buttons { display: none !important; }
           .no-print { display: none !important; }
           .label-extra { display: none !important; }
+          .value-row { flex-wrap: wrap !important; max-width: 100% !important; justify-content: flex-start !important; gap: 4px !important; }
+          .value-row input { width: 60px !important; min-width: 50px !important; }
         }
       `}</style>
 
@@ -727,7 +729,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
                     )}
                   </span>
 
-                  <div style={styles.valueRow}>
+                  <div className="value-row" style={styles.valueRow}>
                     <input
                       type={def.type}
                       name={def.key}
@@ -997,46 +999,51 @@ const styles = {
     boxSizing: "border-box",
   },
   inputInline: {
-    padding: "0.25rem 0.35rem",
-    borderRadius: "0.4rem",
+    padding: "0.18rem 0.26rem",
+    borderRadius: "0.32rem",
     border: "1px solid #000000ff",
     background: "#ffffffff",
     color: "#111827",
-    fontSize: "0.85rem",
+    fontSize: "0.8rem",
     boxSizing: "border-box",
-    width: "90px",
-    minWidth: "80px",
+    width: "48px",
+    minWidth: "42px",
+    maxWidth: "60px",
   },
   inputInlineReadOnly: {
-    padding: "0.25rem 0.35rem",
-    borderRadius: "0.4rem",
+    padding: "0.16rem 0.24rem",
+    borderRadius: "0.3rem",
     border: "1px solid #d1d5db",
     background: "#f3f4f6",
     color: "#6b7280",
-    fontSize: "0.85rem",
+    fontSize: "0.78rem",
     boxSizing: "border-box",
-    width: "70px",
-    minWidth: "60px",
+    width: "40px",
+    minWidth: "34px",
+    maxWidth: "54px",
   },
   inputInlineReadOnlySmall: {
-    padding: "0.2rem 0.3rem",
-    borderRadius: "0.35rem",
+    padding: "0.14rem 0.22rem",
+    borderRadius: "0.3rem",
     border: "1px solid #e5e7eb",
     background: "#f8fafc",
     color: "#6b7280",
-    fontSize: "0.8rem",
+    fontSize: "0.75rem",
     boxSizing: "border-box",
-    width: "60px",
-    minWidth: "50px",
+    width: "36px",
+    minWidth: "30px",
+    maxWidth: "46px",
   },
   valueRow: {
     display: "flex",
     alignItems: "center",
-    gap: "0.35rem",
+    gap: "0.15rem",
     flex: 1,
     justifyContent: "flex-end",
     minWidth: 0,
-    flexBasis: "50%",
+    flexBasis: "42%",
+    maxWidth: "46%",
+    flexWrap: "wrap",
   },
   inputReadOnly: {
     padding: "0.35rem 0.45rem",
