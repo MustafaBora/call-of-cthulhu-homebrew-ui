@@ -554,6 +554,12 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
 
   return (
     <div style={styles.pageWrapper}>
+      <style>{`
+        @media print {
+          .xp-buttons { display: none !important; }
+          .no-print { display: none !important; }
+        }
+      `}</style>
 
       {/* Main Layout Container */}
       <div style={styles.mainContainer}>
