@@ -707,8 +707,10 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
         <ReadSmall label="Used XP" value={form.usedXP ?? 0} />
 
         {/* Row 8 */}
-        <div style={{ ...styles.cell, ...styles.emptyCell }} />
-        <div style={{ ...styles.cell, ...styles.emptyCell }} />
+        <ReadSmall label="REP" value={form.REP ?? 0} />
+        <ReadSmall label="BUILD" value={form.BUILD ?? 0} />
+        <ReadSmall label="ARMOR" value={form.armor ?? 0} />
+        <ReadSmall label="Damage Bonus" value={form.damageBonus ?? "0"} />
       </div>
 
       <form
