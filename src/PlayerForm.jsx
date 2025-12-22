@@ -347,7 +347,11 @@ function getInitialForm(mode, player) {
     });
   }
 }
-function StatCell({ label, value, onChange }) {
+function StatCell({ label, value, onChange, readOnly = false }) {
+  const handleChange = readOnly
+    ? undefined
+    : (e) => onChange && onChange(e.target.value);
+
   return (
     <div style={styles.cell}>
       <div style={styles.statRow}>
@@ -357,7 +361,8 @@ function StatCell({ label, value, onChange }) {
           min={0}
           max={90}
           value={Number(value) || 0}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={handleChange}
+          readOnly={readOnly}
           style={styles.statBox}
         />
       </div>
@@ -380,8 +385,8 @@ function ReadCell1({ label, subLabel, value }) {
   return (
     <div style={styles.cell}>
       <div style={styles.vitalLabel}>{label}</div>
-      <div style={styles.vitalOne}>
-        <span style={styles.vitalMini}>{subLabel}</span>
+      <div style={styles.vitalRow}>
+        {subLabel ? <span style={styles.vitalMini}>{subLabel}</span> : null}
         <input readOnly value={value} style={styles.vitalBox} />
       </div>
     </div>
@@ -392,15 +397,11 @@ function ReadCell2({ label, leftLabel, leftValue, rightLabel, rightValue }) {
   return (
     <div style={styles.cell}>
       <div style={styles.vitalLabel}>{label}</div>
-      <div style={styles.vitalTwo}>
-        <div style={styles.vitalCol}>
-          <span style={styles.vitalMini}>{leftLabel}</span>
-          <input readOnly value={leftValue} style={styles.vitalBox} />
-        </div>
-        <div style={styles.vitalCol}>
-          <span style={styles.vitalMini}>{rightLabel}</span>
-          <input readOnly value={rightValue} style={styles.vitalBox} />
-        </div>
+      <div style={styles.vitalRow}>
+        {leftLabel ? <span style={styles.vitalMini}>{leftLabel}</span> : null}
+        <input readOnly value={leftValue} style={styles.vitalBox} />
+        {rightLabel ? <span style={styles.vitalMini}>{rightLabel}</span> : null}
+        <input readOnly value={rightValue} style={styles.vitalBox} />
       </div>
     </div>
   );
@@ -664,27 +665,27 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
         {/* Row 3 */}
         <StatCell label="STR" value={form.STR} onChange={(v) => handleNumericChange("STR", v)} />
         <StatCell label="SIZ" value={form.SIZ} onChange={(v) => handleNumericChange("SIZ", v)} />
-        <ReadCell2 label="Hit Points" leftLabel="Maximum" leftValue={form.HP ?? 0} rightLabel="Current" rightValue={form.HP ?? 0} />
+        <StatCell label="Hit Points" value={form.HP ?? 0} readOnly />
 
         {/* Row 4 */}
         <StatCell label="CON" value={form.CON} onChange={(v) => handleNumericChange("CON", v)} />
         <StatCell label="POW" value={form.POW} onChange={(v) => handleNumericChange("POW", v)} />
-        <ReadCell2 label="Magic Points" leftLabel="Maximum" leftValue={form.MP ?? 0} rightLabel="Current" rightValue={form.MP ?? 0} />
+        <StatCell label="Magic Points" value={form.MP ?? 0} readOnly />
 
         {/* Row 5 */}
         <StatCell label="DEX" value={form.DEX} onChange={(v) => handleNumericChange("DEX", v)} />
         <StatCell label="BRV" value={form.BRV} onChange={(v) => handleNumericChange("APP", v)} />
-        <ReadCell1 label="Luck" subLabel="Current" value={form.LUCK ?? 0} />
+        <StatCell label="Luck" value={form.LUCK ?? 0} readOnly />
 
         {/* Row 6 */}
         <StatCell label="INT" value={form.INT} onChange={(v) => handleNumericChange("INT", v)} />
         <StatCell label="APP" value={form.APP} onChange={(v) => handleNumericChange("APP", v)} />
-        <ReadCell1 label="Bonus" subLabel="Current" value={form.BONUS ?? 0} />
+        <StatCell label="Bonus" value={form.BONUS ?? 0} readOnly />
         
         {/* Row 7 */}
         <StatCell label="PER" value={form.PER} onChange={(v) => handleNumericChange("PER", v)} />
         <StatCell label="EDU" value={form.EDU} onChange={(v) => handleNumericChange("EDU", v)} />
-        <ReadCell1 label="Sanity" subLabel="Current" value={form.BONUS ?? 0} />
+        <StatCell label="Sanity" value={form.SAN ?? 0} readOnly />
         <div style={{ ...styles.cell, ...styles.emptyCell }} />
 
         {/* Row 8 */}
@@ -1126,12 +1127,20 @@ const styles = {
   vitalMini: {
     fontSize: "9px",
     opacity: 0.9,
-    marginBottom: "2px",
+    marginBottom: 0,
+  },
+  vitalRow: {
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    flexWrap: "nowrap",
+    minWidth: 0,
   },
   vitalBox: {
-    width: "100%",
-    minHeight: "28px",
-    padding: "4px 6px",
+    width: "64px",
+    minWidth: "64px",
+    minHeight: "26px",
+    padding: "3px 5px",
     border: "1px solid #111",
     borderRadius: "6px",
     textAlign: "left",
@@ -1141,23 +1150,32 @@ const styles = {
   },
   vitalCol: {
     display: "flex",
-    flexDirection: "column",
-    gap: "2px",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: "4px",
+    flexWrap: "nowrap",
+    minWidth: 0,
   },
   vitalOne: {
-    display: "grid",
-    gridTemplateColumns: "1fr",
-    gap: "3px",
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: "6px",
+    flexWrap: "nowrap",
   },
   vitalTwo: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
     gap: "6px",
+    flexWrap: "nowrap",
   },
   vitalThree: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr 1fr",
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
     gap: "6px",
+    flexWrap: "nowrap",
   },
 
 };
