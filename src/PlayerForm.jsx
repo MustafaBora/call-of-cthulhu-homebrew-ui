@@ -1154,7 +1154,7 @@ const styles = {
 
   avatarCol: {
     gridColumn: 4,
-    gridRow: "1 / span 5",
+    gridRow: "1 / span 6",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
