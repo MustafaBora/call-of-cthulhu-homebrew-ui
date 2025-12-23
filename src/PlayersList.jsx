@@ -10,6 +10,39 @@ function getInitials(text) {
     .join("");
 }
 
+// Meta alanları ve diğer skill olmayan özellikler
+const IGNORED_KEYS = [
+  "id",
+  "player",
+  "name",
+  "occupation",
+  "age",
+  "sex",
+  "residence",
+  "birthplace",
+  "avatar",
+  "totalXP",
+];
+
+function getTopSkills(playerData, count = 6) {
+  if (!playerData) return [];
+  
+  const entries = Object.entries(playerData).filter(([key, value]) => {
+    // Sadece sayısal değerleri ve ignored listesinde olmayanları al
+    return (
+      !IGNORED_KEYS.includes(key) &&
+      typeof value === "number" &&
+      value > 0
+    );
+  });
+  
+  // Değere göre sırala (büyükten küçüğe)
+  entries.sort((a, b) => b[1] - a[1]);
+  
+  // İlk N tanesini al
+  return entries.slice(0, count);
+}
+
 function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -116,9 +149,11 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
 
               {/* Küçük statlar */}
               <div style={styles.statsRow}>
-                <span>APP: {p.APP}</span>
-                <span>POW: {p.POW}</span>
-                <span>DEX: {p.DEX}</span>
+                {getTopSkills(p, 6).map(([key, value]) => (
+                  <span key={key}>
+                    {key}: {value}
+                  </span>
+                ))}
               </div>
 
               {/* Alt kısım: butonlar */}
@@ -282,8 +317,9 @@ const styles = {
   },
   statsRow: {
     display: "flex",
-    justifyContent: "space-between",
-    fontSize: "0.8rem",
+    flexWrap: "wrap",
+    gap: "0.4rem 0.6rem",
+    fontSize: "0.75rem",
     color: "#4b5563",
   },
   cardFooter: {
