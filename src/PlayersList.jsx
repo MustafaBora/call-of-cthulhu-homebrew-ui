@@ -22,7 +22,17 @@ const IGNORED_KEYS = [
   "birthplace",
   "avatar",
   "totalXP",
+  "usedXP",
+  "remainingXP",
+  "LanguageOwn",
 ];
+
+function formatLabel(key) {
+  // CamelCase'i ayır ve boşluk ekle
+  return key
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')  // küçük+büyük: "gB" -> "g B"
+    .replace(/([A-Z])([A-Z][a-z])/g, '$1 $2'); // büyük+büyük+küçük: "FBr" -> "F Br"
+}
 
 function getTopSkills(playerData, count = 6) {
   if (!playerData) return [];

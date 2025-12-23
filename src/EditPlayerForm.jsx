@@ -287,22 +287,22 @@ function applyDerived(values) {
 
   const sum = v("SIZ") + v("STR");
   if (sum > 164) {
-    updated.BUILD = 2;
+    updated.Build = 2;
     updated.damageBonus = "+1D6";
   } else if (sum > 124 && sum < 165) {
-    updated.BUILD = 1;
+    updated.Build = 1;
     updated.damageBonus = "+1D3";
   } else if (sum > 84 && sum < 125) {
-    updated.BUILD = 0;
+    updated.Build = 0;
     updated.damageBonus = "0";
   } else if (sum > 64 && sum < 85) {
-    updated.BUILD = -1;
+    updated.Build = -1;
     updated.damageBonus = "-1";
   } else if (sum > 2 && sum < 65) {
-    updated.BUILD = -2;
+    updated.Build = -2;
     updated.damageBonus = "-2";
   } else {
-    updated.BUILD = 0;
+    updated.Build = 0;
     updated.damageBonus = "0";
   }
 
@@ -586,10 +586,10 @@ function EditPlayerForm({ player, onCancel, onUpdated }) {
               />
             </div>
             <div style={styles.metaXPBox}>
-              <span>BUILD</span>
+              <span>Build</span>
               <input
                 type="number"
-                value={form.BUILD ?? 0}
+                value={form.Build ?? 0}
                 readOnly
                 style={styles.inputReadOnly}
               />
