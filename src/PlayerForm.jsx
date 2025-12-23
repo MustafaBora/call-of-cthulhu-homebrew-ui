@@ -574,6 +574,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
           .sheet-header .cell { padding: 2px 3px !important; }
           .sheet-header input { padding: 2px 3px !important; font-size: 10px !important; }
           .sheet-grid { gap: 0.5rem 0.9rem !important; }
+          .sheet-grid .field-header > span:first-child { padding-left: 5px !important; }
           .sheet-grid .field-header { gap: 0.28rem !important; }
           .sheet-grid .value-row { gap: 3px !important; }
           .xp-buttons { display: none !important; }
@@ -737,7 +738,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
 
             return (
               <div key={def.key} style={styles.field}>
-                <div style={styles.fieldHeader}> 
+                <div className="field-header" style={styles.fieldHeader}> 
                   <span style={{ ...styles.labelText, flex: 1 }}>
                     {def.label}
                     {labelExtra && (
@@ -983,7 +984,7 @@ const styles = {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    gap: "0.32rem",
+    gap: "0.24rem",
   },
   label: {
     display: "flex",
@@ -1054,12 +1055,13 @@ const styles = {
     display: "flex",
     alignItems: "center",
     gap: "0.1rem",
-    flex: 1,
+    flexShrink: 0,
     justifyContent: "flex-end",
     minWidth: 0,
-    flexBasis: "40%",
-    maxWidth: "44%",
+    flexBasis: "45%",
+    maxWidth: "48%",
     flexWrap: "wrap",
+    marginLeft: "auto",
   },
   inputReadOnly: {
     padding: "0.35rem 0.45rem",
