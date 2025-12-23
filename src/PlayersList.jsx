@@ -10,7 +10,7 @@ function getInitials(text) {
     .join("");
 }
 
-// Meta alanları ve diğer skill olmayan özellikler
+// Meta alanları ve listede göstermeyeceğimiz alanlar
 const IGNORED_KEYS = [
   "id",
   "player",
@@ -28,28 +28,17 @@ const IGNORED_KEYS = [
 ];
 
 function formatLabel(key) {
-  // CamelCase'i ayır ve boşluk ekle
   return key
-    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')  // küçük+büyük: "gB" -> "g B"
-    .replace(/([A-Z])([A-Z][a-z])/g, '$1 $2'); // büyük+büyük+küçük: "FBr" -> "F Br"
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .replace(/([A-Z])([A-Z][a-z])/g, '$1 $2');
 }
 
 function getTopSkills(playerData, count = 6) {
   if (!playerData) return [];
-  
-  const entries = Object.entries(playerData).filter(([key, value]) => {
-    // Sadece sayısal değerleri ve ignored listesinde olmayanları al
-    return (
-      !IGNORED_KEYS.includes(key) &&
-      typeof value === "number" &&
-      value > 0
-    );
-  });
-  
-  // Değere göre sırala (büyükten küçüğe)
+  const entries = Object.entries(playerData).filter(([key, value]) => (
+    !IGNORED_KEYS.includes(key) && typeof value === "number" && value > 0
+  ));
   entries.sort((a, b) => b[1] - a[1]);
-  
-  // İlk N tanesini al
   return entries.slice(0, count);
 }
 
@@ -107,7 +96,6 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
   return (
     <div style={styles.page}>
       <div style={styles.cardWrapper}>
-        {/* BAŞLIK + YENİ OYUNCU BUTONU */}
         <div style={styles.headerRow}>
           <h2 style={styles.title}>Oyuncu Listesi</h2>
           {onNewPlayer && (
@@ -122,10 +110,20 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
         </div>
 
         <div style={styles.grid}>
+          {onNewPlayer && (
+            <button
+              type="button"
+              style={styles.addCard}
+              onClick={onNewPlayer}
+              aria-label="Yeni oyuncu oluştur"
+            >
+              <div style={styles.addCardIcon}>+</div>
+              <div style={styles.addCardText}>Yeni Oyuncu</div>
+            </button>
+          )}
           {players.map((p) => (
             <div key={p.id} style={styles.card}>
-              {/* Üst kısım: avatar + isimler */}
-              <div style={styles.cardHeader}>
+              <div style={styles.cardRow}>
                 <div style={styles.avatarWrapper}>
                   {p.avatar ? (
                     <img
@@ -139,70 +137,73 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
                     </div>
                   )}
                 </div>
-                <div style={styles.headerText}>
-                  <div style={styles.nameLine}>
-                    {p.name || "İsimsiz karakter"}
+                <div style={styles.contentCol}>
+                  <div style={styles.headerText}>
+                    <div style={styles.nameLine}>
+                      {p.name || "İsimsiz karakter"}
+                    </div>
+                    <div style={styles.subLine}>
+                      <span style={styles.playerName}>
+                        {p.player || "Oyuncu adı yok"}
+                      </span>
+                      {p.occupation && (
+                        <>
+                          <span style={styles.dot}>•</span>
+                          <span style={styles.occupation}>{p.occupation}</span>
+                        </>
+                      )}
+                    </div>
                   </div>
-                  <div style={styles.subLine}>
-                    <span style={styles.playerName}>
-                      {p.player || "Oyuncu adı yok"}
-                    </span>
-                    {p.occupation && (
-                      <>
-                        <span style={styles.dot}>•</span>
-                        <span style={styles.occupation}>{p.occupation}</span>
-                      </>
-                    )}
+
+                  <div style={styles.statsRow}>
+                    {getTopSkills(p, 6).map(([key, value]) => (
+                      <span key={key}>
+                        {formatLabel(key)}: {value}
+                      </span>
+                    ))}
                   </div>
+
+                  <div style={styles.cardFooter}>
+                    <button
+                      type="button"
+                      style={styles.editButton}
+                      onClick={() => onEditPlayer && onEditPlayer(p)}
+                    >
+                      Düzenle
+                    </button>
+                    {/*}
+                    <button
+                      type="button"
+                      style={styles.characterSheetButton}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        localStorage.setItem('characterData', JSON.stringify(p));
+                        window.open('/CoCCharacter.html', '_blank');
+                      }}
+                    >
+                      CharacterSheet
+                    </button>
+                    <button
+                      type="button"
+                      style={styles.editCharacterButton}
+                      onClick={() => onCharacterForm && onCharacterForm(p)}
+                    >
+                      Edit
+                    </button>
+                    */}
+                  </div>
+                  {/*}
+                  <a
+                    href={`http://localhost:8080/players/${p.id}/sheet.html`}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{ ...styles.printButton, alignSelf: 'flex-start' }}
+                  >
+                    Çıktı (HTML)
+                  </a>
+                  */}
                 </div>
               </div>
-
-              {/* Küçük statlar */}
-              <div style={styles.statsRow}>
-                {getTopSkills(p, 6).map(([key, value]) => (
-                  <span key={key}>
-                    {key}: {value}
-                  </span>
-                ))}
-              </div>
-
-              {/* Alt kısım: butonlar */}
-              <div style={styles.cardFooter}>
-                <button
-                  type="button"
-                  style={styles.editButton}
-                  onClick={() => onEditPlayer && onEditPlayer(p)}
-                >
-                  Düzenle
-                </button>
-                <button
-                  type="button"
-                  style={styles.characterSheetButton}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    localStorage.setItem('characterData', JSON.stringify(p));
-                    window.open('/CoCCharacter.html', '_blank');
-                  }}
-                >
-                  CharacterSheet
-                </button>
-                <button
-                  type="button"
-                  style={styles.editCharacterButton}
-                  onClick={() => onCharacterForm && onCharacterForm(p)}
-                >
-                  Edit
-                </button>
-              </div>
-
-              <a
-                href={`http://localhost:8080/players/${p.id}/sheet.html`}
-                target="_blank"
-                rel="noreferrer"
-                style={styles.printButton}
-              >
-                Çıktı (HTML)
-              </a>
             </div>
           ))}
         </div>
@@ -245,6 +246,39 @@ const styles = {
     cursor: "pointer",
     boxShadow: "0 4px 10px rgba(0,0,0,0.25)",
   },
+  addCard: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "0.35rem",
+    width: "100%",
+    background: "#fff7ed",
+    borderRadius: "0.9rem",
+    border: "2px dashed #f59e0b",
+    color: "#7c2d12",
+    padding: "1rem",
+    minHeight: "140px",
+    cursor: "pointer",
+    boxShadow: "0 10px 20px rgba(0,0,0,0.12)",
+    transition: "transform 120ms ease, box-shadow 120ms ease",
+  },
+  addCardIcon: {
+    width: "48px",
+    height: "48px",
+    borderRadius: "50%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    border: "2px solid #f59e0b",
+    fontSize: "1.5rem",
+    fontWeight: 800,
+    background: "linear-gradient(135deg, #fbbf24, #f97316)",
+  },
+  addCardText: {
+    fontWeight: 700,
+    fontSize: "0.95rem",
+  },
   grid: {
     display: "grid",
     gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
@@ -263,20 +297,23 @@ const styles = {
     border: "1px solid #eab308",
     padding: "0.9rem 1rem",
     boxShadow: "0 10px 20px rgba(0,0,0,0.15)",
+  },
+  cardRow: {
+    display: "flex",
+    alignItems: "stretch",
+    gap: "1rem",
+  },
+  contentCol: {
     display: "flex",
     flexDirection: "column",
-    justifyContent: "space-between",
-    gap: "0.75rem",
-  },
-  cardHeader: {
-    display: "flex",
-    alignItems: "center",
-    gap: "0.75rem",
+    gap: "0.6rem",
+    flex: 1,
+    minWidth: 0,
   },
   avatarWrapper: {
-    width: "120px",
-    height: "120px",
-    borderRadius: "999px",
+    width: "200px",
+    minHeight: "140px",
+    borderRadius: "12px",
     overflow: "hidden",
     border: "3px solid #f97316",
     background: "linear-gradient(135deg, #f97316, #e11d48)",
@@ -284,6 +321,7 @@ const styles = {
     alignItems: "center",
     justifyContent: "center",
     flexShrink: 0,
+    alignSelf: "stretch",
   },
   avatarImg: {
     width: "100%",

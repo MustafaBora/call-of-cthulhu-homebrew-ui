@@ -691,7 +691,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
 
         {/* Row 5 */}
         <StatCell label="Dexterity" value={form.DEX} onChange={(v) => handleNumericChange("DEX", v)} />
-        <StatCell label="Bravery" value={form.BRV} onChange={(v) => handleNumericChange("APP", v)} />
+        <StatCell label="Bravery" value={form.BRV} onChange={(v) => handleNumericChange("BRV", v)} />
         <StatCell label="Luck" value={form.LUCK ?? 0} readOnly />
 
         {/* Row 6 */}
