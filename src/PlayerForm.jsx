@@ -376,16 +376,16 @@ function StatCell({ label, value, onChange, onDelta, readOnly = false }) {
               <button
                 type="button"
                 style={styles.stepButton}
-                onClick={() => onDelta(+5)}
+                onClick={() => onDelta(-5)}
               >
-                +5
+                -5
               </button>
               <button
                 type="button"
                 style={styles.stepButton}
-                onClick={() => onDelta(-5)}
+                onClick={() => onDelta(+5)}
               >
-                -5
+                +5
               </button>
             </div>
           )}
@@ -501,6 +501,20 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
       const next = clampStat(current + delta);
       return applyDerived({ ...prev, [field]: next });
     });
+  };
+
+  const handleExportJSON = () => {
+    const { avatar, ...exportData } = form;
+    const dataStr = JSON.stringify(exportData, null, 2);
+    const blob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${form.name || "character"}_${Date.now()}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const handleSubmit = async (e, stayOnPage = false) => {
@@ -805,16 +819,16 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
                         <button
                           type="button"
                           style={styles.stepButton}
-                          onClick={() => handleDelta(def.key, +5)}
+                          onClick={() => handleDelta(def.key, -5)}
                         >
-                          +5
+                          -5
                         </button>
                         <button
                           type="button"
                           style={styles.stepButton}
-                          onClick={() => handleDelta(def.key, -5)}
+                          onClick={() => handleDelta(def.key, +5)}
                         >
-                          -5
+                          +5
                         </button>
                       </div>
                     )}
@@ -864,6 +878,14 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
               Yazdır
             </button>
           )}
+
+          <button
+            type="button"
+            style={{ ...styles.button, background: "#8b5cf6" }}
+            onClick={handleExportJSON}
+          >
+            JSON'a Aktar
+          </button>
         </div>
       </form>
         </div>
