@@ -46,6 +46,7 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [importStatus, setImportStatus] = useState("");
 
   useEffect(() => {
     const fetchPlayers = async () => {
@@ -85,6 +86,51 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
     fetchPlayers();
   }, []);
 
+  const handleImportJSON = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setImportStatus("İçe aktarılıyor...");
+    setError("");
+
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError("Token bulunamadı. Lütfen tekrar giriş yap.");
+        setImportStatus("");
+        return;
+      }
+
+      const response = await fetch("http://localhost:8080/players", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error("Oyuncu içe aktarılamadı.");
+      }
+
+      const newPlayer = await response.json();
+      setPlayers((prev) => [...prev, newPlayer]);
+      setImportStatus("✓ Başarıyla içe aktarıldı!");
+      setTimeout(() => setImportStatus(""), 3000);
+    } catch (err) {
+      console.error(err);
+      setError(err.message || "JSON dosyası okunamadı.");
+      setImportStatus("");
+    }
+
+    // Reset input
+    event.target.value = "";
+  };
+
   if (loading) {
     return <div style={styles.page}>Yükleniyor...</div>;
   }
@@ -98,16 +144,30 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
       <div style={styles.cardWrapper}>
         <div style={styles.headerRow}>
           <h2 style={styles.title}>Oyuncu Listesi</h2>
-          {onNewPlayer && (
-            <button
-              type="button"
-              style={styles.newPlayerButton}
-              onClick={onNewPlayer}
-            >
-              + Yeni Oyuncu
-            </button>
-          )}
+          <div style={styles.buttonGroup}>
+            <label style={styles.importButton}>
+              JSON'dan İçe Aktar
+              <input
+                type="file"
+                accept=".json,application/json"
+                onChange={handleImportJSON}
+                style={styles.fileInput}
+              />
+            </label>
+            {onNewPlayer && (
+              <button
+                type="button"
+                style={styles.newPlayerButton}
+                onClick={onNewPlayer}
+              >
+                + Yeni Oyuncu
+              </button>
+            )}
+          </div>
         </div>
+        {importStatus && (
+          <div style={styles.importStatus}>{importStatus}</div>
+        )}
 
         <div style={styles.grid}>
           {onNewPlayer && (
@@ -234,6 +294,35 @@ const styles = {
     margin: 0,
     fontSize: "1.75rem",
     fontWeight: 700,
+  },
+  buttonGroup: {
+    display: "flex",
+    gap: "0.5rem",
+    alignItems: "center",
+  },
+  importButton: {
+    padding: "0.5rem 0.9rem",
+    borderRadius: "0.5rem",
+    border: "1px solid #7c2d12",
+    background: "#8b5cf6",
+    color: "#fff",
+    fontWeight: 700,
+    fontSize: "0.9rem",
+    cursor: "pointer",
+    boxShadow: "0 4px 10px rgba(0,0,0,0.25)",
+    display: "inline-block",
+  },
+  fileInput: {
+    display: "none",
+  },
+  importStatus: {
+    padding: "0.5rem 1rem",
+    borderRadius: "0.5rem",
+    background: "#22c55e",
+    color: "#fff",
+    fontSize: "0.9rem",
+    marginBottom: "1rem",
+    textAlign: "center",
   },
   newPlayerButton: {
     padding: "0.5rem 0.9rem",
