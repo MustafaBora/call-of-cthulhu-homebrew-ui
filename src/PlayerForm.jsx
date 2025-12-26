@@ -213,6 +213,14 @@ const SECOND_THRESHOLD = 75;
 const FIRST_PENALTY_MULT = 2;
 const SECOND_PENALTY_MULT = 3;
 
+// Belirli bir değerde 1 puan artırmanın maliyeti (threshold penaltileriyle)
+function getCurrentCostPerPoint(usage, value) {
+  if (usage === undefined || usage === null) return 0;
+  if (value < FIRST_THRESHOLD) return usage;
+  if (value < SECOND_THRESHOLD) return usage * FIRST_PENALTY_MULT;
+  return usage * SECOND_PENALTY_MULT;
+}
+
 /**
  * Belirli bir seviyeye ulaşmak için gereken toplam puanı hesaplar.
  * currentValue'dan targetValue'ye gitmek için kaç puan harcaması gerekir.
@@ -408,15 +416,27 @@ function getInitialForm(mode, player) {
     });
   }
 }
-function StatCell({ label, value, onChange, onDelta, readOnly = false }) {
+function StatCell({ label, value, onChange, onBlur, onDelta, base, usage, readOnly = false }) {
   const handleChange = readOnly
     ? undefined
     : (e) => onChange && onChange(e.target.value);
+
+  const handleBlur = readOnly
+    ? undefined
+    : () => onBlur && onBlur();
+
+  const numericValue = Number(value) || 0;
+  const labelWithBase = base !== undefined ? `${label} ${base}` : label;
+  const costNow = getCurrentCostPerPoint(usage, numericValue);
 
   return (
     <div style={styles.cell}>
       <div style={styles.statRow}>
         <div style={styles.statLabel}>{label}</div>
+        <div style={styles.labelExtra}>
+          {base !== undefined && <strong>{base}</strong>}
+          {(costNow || costNow === 0) ? ` Cost ${costNow}` : ""}
+        </div>
         <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
           {!readOnly && onDelta && (
             <div className="xp-buttons" style={styles.stepButtons}>
@@ -442,6 +462,7 @@ function StatCell({ label, value, onChange, onDelta, readOnly = false }) {
             max={90}
             value={Number(value) || 0}
             onChange={handleChange}
+            onBlur={handleBlur}
             readOnly={readOnly}
             style={styles.statBox}
           />
@@ -474,10 +495,14 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
   }, [mode, player]);
 
   const handleNumericChange = (name, rawValue) => {
-    const clamped = clampStat(rawValue, name);
+    // Allow free typing; no clamp here
+    setForm((prev) => ({ ...prev, [name]: rawValue }));
+  };
+
+  const handleNumericBlur = (name) => {
     setForm((prev) => {
-      const updated = { ...prev, [name]: clamped };
-      return applyDerived(updated);
+      const clamped = clampStat(prev[name], name);
+      return applyDerived({ ...prev, [name]: clamped });
     });
   };
 
@@ -736,30 +761,30 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
         </div>
 
         {/* Row 3 */}
-        <StatCell label="Strength" value={form.STR} onChange={(v) => handleNumericChange("STR", v)} onDelta={(d) => handleDelta("STR", d)} />
-        <StatCell label="SIZE" value={form.SIZ} onChange={(v) => handleNumericChange("SIZ", v)} onDelta={(d) => handleDelta("SIZ", d)} />
+        <StatCell label="Strength" value={form.STR} base={BASE.STR} usage={USAGE.STR} onChange={(v) => handleNumericChange("STR", v)} onBlur={() => handleNumericBlur("STR")} onDelta={(d) => handleDelta("STR", d)} />
+        <StatCell label="SIZE" value={form.SIZ} base={BASE.SIZ} usage={USAGE.SIZ} onChange={(v) => handleNumericChange("SIZ", v)} onBlur={() => handleNumericBlur("SIZ")} onDelta={(d) => handleDelta("SIZ", d)} />
         <StatCell label="Hit Points" value={form.HP ?? 0} readOnly />
 
         {/* Row 4 */}
-        <StatCell label="Condition" value={form.CON} onChange={(v) => handleNumericChange("CON", v)} onDelta={(d) => handleDelta("CON", d)} />
-        <StatCell label="POW" value={form.POW} onChange={(v) => handleNumericChange("POW", v)} onDelta={(d) => handleDelta("POW", d)} />
+        <StatCell label="Condition" value={form.CON} base={BASE.CON} usage={USAGE.CON} onChange={(v) => handleNumericChange("CON", v)} onBlur={() => handleNumericBlur("CON")} onDelta={(d) => handleDelta("CON", d)} />
+        <StatCell label="POW" value={form.POW} base={BASE.POW} usage={USAGE.POW} onChange={(v) => handleNumericChange("POW", v)} onBlur={() => handleNumericBlur("POW")} onDelta={(d) => handleDelta("POW", d)} />
         <StatCell label="Magic Points" value={form.MP ?? 0} readOnly />
 
         {/* Row 5 */}
-        <StatCell label="Dexterity" value={form.DEX} onChange={(v) => handleNumericChange("DEX", v)} onDelta={(d) => handleDelta("DEX", d)} />
-        <StatCell label="Bravery" value={form.BRV} onChange={(v) => handleNumericChange("BRV", v)} onDelta={(d) => handleDelta("BRV", d)} />
-        <StatCell label="Luck" value={form.LUCK}  onChange={(v) => handleNumericChange("LUCK", v)} onDelta={(d) => handleDelta("LUCK", d)} />
+        <StatCell label="Dexterity" value={form.DEX} base={BASE.DEX} usage={USAGE.DEX} onChange={(v) => handleNumericChange("DEX", v)} onBlur={() => handleNumericBlur("DEX")} onDelta={(d) => handleDelta("DEX", d)} />
+        <StatCell label="Bravery" value={form.BRV} base={BASE.BRV} usage={USAGE.BRV} onChange={(v) => handleNumericChange("BRV", v)} onBlur={() => handleNumericBlur("BRV")} onDelta={(d) => handleDelta("BRV", d)} />
+        <StatCell label="Luck" value={form.LUCK} base={BASE.LUCK} usage={USAGE.LUCK} onChange={(v) => handleNumericChange("LUCK", v)} onBlur={() => handleNumericBlur("LUCK")} onDelta={(d) => handleDelta("LUCK", d)} />
 
         {/* Row 6 */}
-        <StatCell label="Intellect" value={form.INT} onChange={(v) => handleNumericChange("INT", v)} onDelta={(d) => handleDelta("INT", d)} />
-        <StatCell label="Appeal" value={form.APP} onChange={(v) => handleNumericChange("APP", v)} onDelta={(d) => handleDelta("APP", d)} />
-        <StatCell label="Bonus" value={form.BONUS} onChange={(v) => handleNumericChange("BONUS", v)} onDelta={(d) => handleDelta("BONUS", d)} />
+        <StatCell label="Intellect" value={form.INT} base={BASE.INT} usage={USAGE.INT} onChange={(v) => handleNumericChange("INT", v)} onBlur={() => handleNumericBlur("INT")} onDelta={(d) => handleDelta("INT", d)} />
+        <StatCell label="Appeal" value={form.APP} base={BASE.APP} usage={USAGE.APP} onChange={(v) => handleNumericChange("APP", v)} onBlur={() => handleNumericBlur("APP")} onDelta={(d) => handleDelta("APP", d)} />
+        <StatCell label="Bonus" value={form.BONUS} base={BASE.BONUS} usage={USAGE.BONUS} onChange={(v) => handleNumericChange("BONUS", v)} onBlur={() => handleNumericBlur("BONUS")} onDelta={(d) => handleDelta("BONUS", d)} />
         <ReadSmall label="Total XP" value={form.totalXP ?? 0} />
         
         {/* Row 7 */}
-        <StatCell label="Perception" value={form.PER} onChange={(v) => handleNumericChange("PER", v)} onDelta={(d) => handleDelta("PER", d)} />
-        <StatCell label="Education" value={form.EDU} onChange={(v) => handleNumericChange("EDU", v)} onDelta={(d) => handleDelta("EDU", d)} />
-        <StatCell label="Sanity" value={form.SAN}  onChange={(v) => handleNumericChange("SAN", v)} onDelta={(d) => handleDelta("SAN", d)} />
+        <StatCell label="Perception" value={form.PER} base={BASE.PER} usage={USAGE.PER} onChange={(v) => handleNumericChange("PER", v)} onBlur={() => handleNumericBlur("PER")} onDelta={(d) => handleDelta("PER", d)} />
+        <StatCell label="Education" value={form.EDU} base={BASE.EDU} usage={USAGE.EDU} onChange={(v) => handleNumericChange("EDU", v)} onBlur={() => handleNumericBlur("EDU")} onDelta={(d) => handleDelta("EDU", d)} />
+        <StatCell label="Sanity" value={form.SAN}  base={BASE.SAN} usage={USAGE.SAN} onChange={(v) => handleNumericChange("SAN", v)} onBlur={() => handleNumericBlur("SAN")} onDelta={(d) => handleDelta("SAN", d)} />
         <ReadSmall label="Used XP" value={form.usedXP ?? 0} />
 
         {/* Row 8 */}
@@ -780,15 +805,15 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
             const base = BASE[def.key];
             const usage = USAGE[def.key];
             const isNumber = def.type === "number";
-
-            const labelExtra =
-              isNumber && usage
-                ? ` (Base: ${base ?? 0}, Cost: ${usage})`
-                : isNumber && base !== undefined
-                ? ` (Base: ${base})`
-                : "";
+            const labelWithBase = base !== undefined ? `${def.label} ${base}` : def.label;
 
             const numericValue = Number(value) || 0;
+            const currentCost = getCurrentCostPerPoint(usage, numericValue);
+
+            const labelExtra =
+              isNumber && (usage !== undefined)
+                ? ` (Cost: ${currentCost})`
+                : "";
             const halfValue = Math.floor(numericValue / 2);
             const fifthValue = Math.floor(numericValue / 5);
 
@@ -796,7 +821,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
               <div key={def.key} style={styles.field}>
                 <div className="field-header" style={styles.fieldHeader}> 
                   <span style={{ ...styles.labelText, flex: 1 }}>
-                    {def.label}
+                    {def.label} <strong>{labelWithBase.split(" ").pop()}</strong>
                     {labelExtra && (
                       <span className="label-extra" style={styles.labelExtra}>{labelExtra}</span>
                     )}
@@ -831,7 +856,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
                           ? handleNumericChange(def.key, e.target.value)
                           : handleTextChange(def.key, e.target.value)
                       }
-                      min={def.type === "number" ? 0 : undefined}
+                      onBlur={def.type === "number" ? () => handleNumericBlur(def.key) : undefined}
                       max={def.type === "number" ? 90 : undefined}
                       style={styles.inputInline}
                       placeholder={def.type === "number" && numericValue === 0 ? "0" : undefined}
