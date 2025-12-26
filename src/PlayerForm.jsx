@@ -11,7 +11,7 @@ const USAGE = {
 
   // Karakteristikler (Characteristics)
   APP: 60,
-  BONUS: 0,
+  BONUS: 120,
   BRV: 120,
   CON: 120,
   DEX: 220,
@@ -221,6 +221,14 @@ function getCurrentCostPerPoint(usage, value) {
   return usage * SECOND_PENALTY_MULT;
 }
 
+// Cost değerine göre renk döndürür
+function getCostColor(cost) {
+  if (cost < 100) return "#22c55e";      // yeşil
+  if (cost < 200) return "#c97316ff";      // turuncu
+  if (cost < 300) return "#ef4444";      // kırmızı
+  return "#a855f7";                      // mor
+}
+
 /**
  * Belirli bir seviyeye ulaşmak için gereken toplam puanı hesaplar.
  * currentValue'dan targetValue'ye gitmek için kaç puan harcaması gerekir.
@@ -428,28 +436,34 @@ function StatCell({ label, value, onChange, onBlur, onDelta, base, usage, readOn
   const numericValue = Number(value) || 0;
   const labelWithBase = base !== undefined ? `${label} ${base}` : label;
   const costNow = getCurrentCostPerPoint(usage, numericValue);
+  const costColor = getCostColor(costNow);
+  const tooltipText = `${costNow * 5} XP`;
 
   return (
     <div style={styles.cell}>
       <div style={styles.statRow}>
         <div style={styles.statLabel}>{label}</div>
         <div style={styles.labelExtra}>
-          {base !== undefined && <strong>{base}</strong>}
-          {(costNow || costNow === 0) ? ` Cost ${costNow}` : ""}
+          {base !== undefined && <strong className="no-print">{base}</strong>}
+          {!readOnly && (costNow || costNow === 0) ? (
+            <span className="no-print" style={{ color: costColor, fontWeight: "bold" }}> Cost {costNow}</span>
+          ) : ""}
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
           {!readOnly && onDelta && (
             <div className="xp-buttons" style={styles.stepButtons}>
               <button
                 type="button"
-                style={styles.stepButton}
+                style={{ ...styles.stepButton, background: costColor, color: "#fff" }}
+                title={tooltipText}
                 onClick={() => onDelta(-5)}
               >
                 -5
               </button>
               <button
                 type="button"
-                style={styles.stepButton}
+                style={{ ...styles.stepButton, background: costColor, color: "#fff" }}
+                title={tooltipText}
                 onClick={() => onDelta(+5)}
               >
                 +5
@@ -660,6 +674,8 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
           .xp-buttons { display: none !important; }
           .no-print { display: none !important; }
           .label-extra { display: none !important; }
+          .label-extra-hide-print { display: none !important; }
+          strong { font-weight: normal !important; }
           .value-row { flex-wrap: wrap !important; max-width: 100% !important; justify-content: flex-start !important; gap: 3px !important; }
           .value-row input { width: 28px !important; min-width: 22px !important; }
         }
@@ -705,7 +721,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
 
         {/* Avatar/Icon column (spans all rows) */}
         <div style={styles.avatarCol}>
-          <div style={styles.avatarBox}>
+          <div style={styles.avatarBox} onClick={() => document.getElementById('avatar-upload').click()}>
             {form.avatar ? (
               <img
                 src={`data:image/*;base64,${form.avatar}`}
@@ -713,11 +729,12 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
                 style={styles.avatarImg}
               />
             ) : (
-              <div style={styles.avatarPlaceholder} />
+              <div style={styles.avatarPlaceholder}>Resim Yükle</div>
             )}
           </div>
 
           <input
+            id="avatar-upload"
             className="no-print"
             style={styles.avatarInput}
             type="file"
@@ -809,6 +826,10 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
 
             const numericValue = Number(value) || 0;
             const currentCost = getCurrentCostPerPoint(usage, numericValue);
+            const totalCost = isNumber && usage !== undefined ? getCostBetween(def.key, base ?? 0, numericValue) : 0;
+            const costColor = getCostColor(currentCost);
+            const tooltipText = isNumber && usage !== undefined ? `Spent: ${totalCost}` : "";
+            const deltaTooltipText = `${currentCost * 5} XP`;
 
             const labelExtra =
               isNumber && (usage !== undefined)
@@ -819,11 +840,11 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
 
             return (
               <div key={def.key} style={styles.field}>
-                <div className="field-header" style={styles.fieldHeader}> 
+                <div className="field-header" style={styles.fieldHeader} title={tooltipText}> 
                   <span style={{ ...styles.labelText, flex: 1 }}>
-                    {def.label} <strong>{labelWithBase.split(" ").pop()}</strong>
+                    {def.label} <strong className="no-print">{labelWithBase.split(" ").pop()}</strong>
                     {labelExtra && (
-                      <span className="label-extra" style={styles.labelExtra}>{labelExtra}</span>
+                      <span className="label-extra no-print" style={{ ...styles.labelExtra, color: costColor, fontWeight: "bold" }}>{labelExtra}</span>
                     )}
                   </span>
 
@@ -832,14 +853,16 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
                       <div className="xp-buttons" style={styles.stepButtons}>
                         <button
                           type="button"
-                          style={styles.stepButton}
+                          style={{ ...styles.stepButton, background: costColor, color: "#fff" }}
+                          title={deltaTooltipText}
                           onClick={() => handleDelta(def.key, -5)}
                         >
                           -5
                         </button>
                         <button
                           type="button"
-                          style={styles.stepButton}
+                          style={{ ...styles.stepButton, background: costColor, color: "#fff" }}
+                          title={deltaTooltipText}
                           onClick={() => handleDelta(def.key, +5)}
                         >
                           +5
@@ -998,7 +1021,7 @@ const styles = {
     height: "140px",
     borderRadius: "0.75rem",
     overflow: "hidden",
-    border: "2px solid #f97316",
+    border: "2px solid #c97316",
     background: "#fefce8",
     display: "flex",
     alignItems: "center",
@@ -1008,13 +1031,15 @@ const styles = {
     width: "100%",
     height: "100%",
     objectFit: "cover",
+    cursor: "pointer",
   },
   avatarPlaceholder: {
     fontSize: "0.85rem",
     color: "#9ca3af",
+    textAlign: "center",
   },
   avatarInput: {
-    fontSize: "0.8rem",
+    display: "none",
   },
   cocIconContainer: {
     marginTop: "0.5rem",
@@ -1267,6 +1292,8 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    cursor: "pointer",
+    transition: "border-color 0.2s",
   },
 
   statRow: {

@@ -766,7 +766,7 @@ const styles = {
     height: "140px",
     borderRadius: "0.75rem",
     overflow: "hidden",
-    border: "2px solid #f97316",
+    border: "2px solid #c97316",
     background: "#fefce8",
     display: "flex",
     alignItems: "center",
