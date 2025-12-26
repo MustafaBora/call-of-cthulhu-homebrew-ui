@@ -1,6 +1,86 @@
 import { useEffect, useState } from "react";
 
-// BASE / MULT – tüm form modları için
+/**
+ * USAGE: 1 yükseltme için kaç puan harcaması gerektiğini gösterir.
+ * Örneğin: APP = 60 demek, APP'yi 1 yükseltmek için 60 puan harcamanız gerekir.
+ */
+const USAGE = {
+  totalXP: 0,
+  usedXP: 0,
+  remainingXP: 0,
+
+  // Karakteristikler (Characteristics)
+  APP: 60,
+  BONUS: 0,
+  BRV: 120,
+  CON: 120,
+  DEX: 220,
+  EDU: 20,
+  INT: 60,
+  LUCK: 180,
+  PER: 320,
+  POW: 140,
+  REP: 100,
+  SAN: 160,
+  SIZ: 40,
+  STR: 100,
+
+  // Beceriler (Skills)
+  Accounting: 20,
+  Anthropology: 20,
+  Appraise: 20,
+  Archeology: 20,
+  ArtCraft: 20,
+  ArtCraft2: 20,
+  Charm: 120,
+  Climb: 60,
+  CreditRating: 120,
+  CthulhuMythos: 160,
+  Disguise: 40,
+  Dodge: 180,
+  DriveAuto: 80,
+  ElectricalRepair: 40,
+  FastTalk: 120,
+  FightingBrawl: 160,
+  FightingOther: 160,
+  FirearmsHandgun: 160,
+  FirearmsOther: 140,
+  FirearmsRifleShotgun: 140,
+  FirstAid: 100,
+  History: 60,
+  Intimidate: 100,
+  Jump: 80,
+  LanguageOther1: 40,
+  LanguageOther2: 20,
+  LanguageOther3: 20,
+  LanguageOwn: 20,
+  Law: 40,
+  LibraryUse: 160,
+  Listen: 160,
+  Locksmith: 120,
+  MechanicalRepair: 40,
+  Medicine: 40,
+  NaturalWorld: 60,
+  Navigate: 40,
+  Occult: 60,
+  Persuade: 180,
+  Pilot: 20,
+  Psychoanalysis: 20,
+  Psychology: 120,
+  Ride: 80,
+  Science: 40,
+  ScienceOther: 20,
+  ScienceOther2: 20,
+  SleightOfHand: 100,
+  SpotHidden: 260,
+  Stealth: 140,
+  Survival: 20,
+  Swim: 20,
+  Throw: 100,
+  Track: 40,
+};
+
+// BASE değerleri (başlangıç değerleri)
 const BASE = {
   APP: 30,
   BONUS: 0,
@@ -36,7 +116,6 @@ const BASE = {
   FightingOther: 30,
   FirearmsHandgun: 30,
   FirearmsOther: 30,
-  FirearmsOther2: 30,
   FirearmsRifleShotgun: 30,
   FirstAid: 20,
   History: 10,
@@ -72,78 +151,7 @@ const BASE = {
   Track: 10,
 };
 
-const MULT = {
-  APP: 15,
-  BONUS: 12,
-  BRV: 6,
-  CON: 8,
-  DEX: 4,
-  EDU: 46,
-  INT: 14,
-  LUCK: 3,
-  PER: 5,
-  POW: 5,
-  REP: 14,
-  SAN: 3,
-  SIZ: 19,
-  STR: 11,
-
-  Accounting: 50,
-  Anthropology: 50,
-  Appraise: 50,
-  Archeology: 50,
-  ArtCraft: 46,
-  ArtCraft2: 46,
-  Charm: 10,
-  Climb: 20,
-  CreditRating: 11,
-  CthulhuMythos: 6,
-  Disguise: 27,
-  Dodge: 6,
-  DriveAuto: 16,
-  ElectricalRepair: 25,
-  FastTalk: 10,
-  FightingBrawl: 7,
-  FightingOther: 8,
-  FirearmsHandgun: 8,
-  FirearmsOther: 5,
-  FirearmsOther2: 5,
-  FirearmsRifleShotgun: 5,
-  FirstAid: 12,
-  History: 22,
-  Intimidate: 12,
-  Jump: 15,
-  LanguageOther1: 40,
-  LanguageOther2: 60,
-  LanguageOther3: 80,
-  LanguageOwn: 60,
-  Law: 29,
-  LibraryUse: 7,
-  Listen: 5,
-  Locksmith: 12,
-  MechanicalRepair: 25,
-  Medicine: 28,
-  NaturalWorld: 21,
-  Navigate: 30,
-  Occult: 20,
-  Persuade: 7,
-  Pilot: 50,
-  Psychoanalysis: 50,
-  Psychology: 9,
-  Ride: 16,
-  Science: 30,
-  ScienceOther: 44,
-  ScienceOther2: 44,
-  SleightOfHand: 13,
-  SpotHidden: 5,
-  Stealth: 9,
-  Survival: 50,
-  Swim: 45,
-  Throw: 12,
-  Track: 27,
-};
-
-const XP_KEYS = Object.keys(BASE);
+const XP_KEYS = Object.keys(USAGE);
 
 const FIELD_DEFS = [
   { key: "Accounting", label: "Accounting", type: "number" },
@@ -165,7 +173,6 @@ const FIELD_DEFS = [
   { key: "FightingOther", label: "Fighting (Other)", type: "number" },
   { key: "FirearmsHandgun", label: "Firearms (Handgun)", type: "number" },
   { key: "FirearmsOther", label: "Firearms (Other)", type: "number" },
-  { key: "FirearmsOther2", label: "Firearms (Other 2)", type: "number" },
   { key: "FirearmsRifleShotgun", label: "Firearms (Shotgun)", type: "number" },
   { key: "FirstAid", label: "First Aid", type: "number" },
   { key: "History", label: "History", type: "number" },
@@ -203,56 +210,104 @@ const FIELD_DEFS = [
 
 const FIRST_THRESHOLD = 50;
 const SECOND_THRESHOLD = 75;
+const FIRST_PENALTY_MULT = 2;
+const SECOND_PENALTY_MULT = 3;
 
-function getCostFromBase(skill, value) {
-  const base = BASE[skill] ?? 0;
-  const mult = MULT[skill] ?? 10;
+/**
+ * Belirli bir seviyeye ulaşmak için gereken toplam puanı hesaplar.
+ * currentValue'dan targetValue'ye gitmek için kaç puan harcaması gerekir.
+ * Backend'deki getCostBetween metodunun JavaScript implementasyonu.
+ */
+function getCostBetween(skill, currentValue, targetValue) {
+  const usage = USAGE[skill] ?? 0;
 
-  let current = 0;
-  const target = Math.max(0, Number(value) || 0);
-
-  if (target <= current) return 0;
-
-  let total = 0;
-
-  if (current < base) {
-    current = base;
+  // Hiç iyileştirme yoksa maliyet sıfır
+  if (targetValue <= currentValue || usage === 0) {
+    return 0;
   }
 
-  if (current <= FIRST_THRESHOLD) {
-    const end = Math.min(target, FIRST_THRESHOLD);
+  let totalCost = 0;
+  let current = currentValue;
+
+  // Parça 1: Mevcut seviye → 50 arası
+  if (current < FIRST_THRESHOLD) {
+    const end = Math.min(targetValue, FIRST_THRESHOLD);
     const diff = end - current;
-    if (diff > 0) {
-      total += Math.ceil(diff / mult);
-      current = end;
-    }
+    totalCost += diff * usage;
+    current = end;
   }
 
-  if (current > FIRST_THRESHOLD && current < SECOND_THRESHOLD) {
-    const end = Math.min(target, SECOND_THRESHOLD);
+  // Parça 2: 50 → 75 arası (2x daha pahalı)
+  if (current < SECOND_THRESHOLD && current >= FIRST_THRESHOLD) {
+    const end = Math.min(targetValue, SECOND_THRESHOLD);
     const diff = end - current;
-    if (diff > 0) {
-      total += Math.ceil(diff / mult) * 2;
-      current = end;
-    }
+    totalCost += diff * usage * FIRST_PENALTY_MULT;
+    current = end;
   }
 
-  if (current < target) {
-    const diff = target - current;
-    if (diff > 0) {
-      total += Math.ceil(diff / mult) * 4;
-    }
+  // Parça 3: 75+ arası (3x daha pahalı)
+  if (current < targetValue) {
+    const diff = targetValue - current;
+    totalCost += diff * usage * SECOND_PENALTY_MULT;
   }
 
-  return total;
+  return totalCost;
 }
 
+/**
+ * Taban seviyeinden (0) hedef seviyeye gitmek için gereken toplam puanı hesaplar.
+ * Backend'deki getCostFromBase metodunun JavaScript implementasyonu.
+ */
+function getCostFromBase(skill, targetValue) {
+  return getCostBetween(skill, 0, targetValue);
+}
+
+/**
+ * Player'ın tüm özellik ve becerilerini iyileştirmek için gereken toplam XP'yi hesaplar.
+ * Backend'deki calculateXP metodunun JavaScript implementasyonu.
+ */
 function computeUsedXP(values) {
+  console.log("=== XP Calculation Debug ===");
   let sum = 0;
-  for (const key of XP_KEYS) {
+  
+  // Characteristics
+  const characteristics = ["APP", "BONUS", "BRV", "CON", "DEX", "EDU", "INT", "LUCK", "PER", "POW", "REP", "SAN", "SIZ", "STR"];
+  console.log("--- Characteristics ---");
+  for (const key of characteristics) {
     const v = Number(values[key]) || 0;
-    sum += getCostFromBase(key, v);
+    const baseValue = BASE[key] ?? 0;
+    const cost = getCostBetween(key, baseValue, v);
+    if (v > 0 || cost > 0) {
+      console.log(`${key}: base=${baseValue}, value=${v}, cost=${cost}`);
+    }
+    sum += cost;
   }
+  
+  // Skills
+  const skills = [
+    "Accounting", "Anthropology", "Appraise", "Archeology", "ArtCraft", "ArtCraft2",
+    "Charm", "Climb", "CreditRating", "CthulhuMythos", "Disguise", "Dodge",
+    "DriveAuto", "ElectricalRepair", "FastTalk", "FightingBrawl", "FightingOther",
+    "FirearmsHandgun", "FirearmsOther", "FirearmsRifleShotgun",
+    "FirstAid", "History", "Intimidate", "Jump", "LanguageOther1", "LanguageOther2",
+    "LanguageOther3", "LanguageOwn", "Law", "LibraryUse", "Listen", "Locksmith",
+    "MechanicalRepair", "Medicine", "NaturalWorld", "Navigate", "Occult", "Persuade",
+    "Pilot", "Psychoanalysis", "Psychology", "Ride", "Science", "ScienceOther",
+    "ScienceOther2", "SleightOfHand", "SpotHidden", "Stealth", "Survival", "Swim",
+    "Throw", "Track"
+  ];
+  console.log("--- Skills ---");
+  for (const key of skills) {
+    const v = Number(values[key]) || 0;
+    const baseValue = BASE[key] ?? 0;
+    const cost = getCostBetween(key, baseValue, v);
+    if (v > 0 || cost > 0) {
+      console.log(`${key}: base=${baseValue}, value=${v}, cost=${cost}`);
+    }
+    sum += cost;
+  }
+  
+  console.log(`--- Total Used XP: ${sum} ---`);
   return sum;
 }
 
@@ -300,9 +355,10 @@ function applyDerived(values) {
   return updated;
 }
 
-function clampStat(num) {
+function clampStat(num, fieldName) {
   let n = Number(num) || 0;
-  if (n < 0) n = 0;
+  const minValue = (fieldName && BASE[fieldName]) ? BASE[fieldName] : 0;
+  if (n < minValue) n = minValue;
   if (n > 90) n = 90;
   return n;
 }
@@ -319,9 +375,9 @@ function getInitialForm(mode, player) {
       age: 25,
       sex: "",
       birthPlace: "",
-      totalXP: 200,
+      totalXP: 200000,
       usedXP: 0,
-      remainingXP: 200,
+      remainingXP: 200000,
       Build: 0,
       damageBonus: "0",
       MP: 0,
@@ -362,15 +418,6 @@ function StatCell({ label, value, onChange, onDelta, readOnly = false }) {
       <div style={styles.statRow}>
         <div style={styles.statLabel}>{label}</div>
         <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-          <input
-            type="number"
-            min={0}
-            max={90}
-            value={Number(value) || 0}
-            onChange={handleChange}
-            readOnly={readOnly}
-            style={styles.statBox}
-          />
           {!readOnly && onDelta && (
             <div className="xp-buttons" style={styles.stepButtons}>
               <button
@@ -389,6 +436,15 @@ function StatCell({ label, value, onChange, onDelta, readOnly = false }) {
               </button>
             </div>
           )}
+          <input
+            type="number"
+            min={0}
+            max={90}
+            value={Number(value) || 0}
+            onChange={handleChange}
+            readOnly={readOnly}
+            style={styles.statBox}
+          />
         </div>
       </div>
     </div>
@@ -406,54 +462,6 @@ function ReadSmall({ label, value }) {
   );
 }
 
-function ReadCell1({ label, subLabel, value }) {
-  return (
-    <div style={styles.cell}>
-      <div style={styles.vitalLabel}>{label}</div>
-      <div style={styles.vitalRow}>
-        {subLabel ? <span style={styles.vitalMini}>{subLabel}</span> : null}
-        <input readOnly value={value} style={styles.vitalBox} />
-      </div>
-    </div>
-  );
-}
-
-function ReadCell2({ label, leftLabel, leftValue, rightLabel, rightValue }) {
-  return (
-    <div style={styles.cell}>
-      <div style={styles.vitalLabel}>{label}</div>
-      <div style={styles.vitalRow}>
-        {leftLabel ? <span style={styles.vitalMini}>{leftLabel}</span> : null}
-        <input readOnly value={leftValue} style={styles.vitalBox} />
-        {rightLabel ? <span style={styles.vitalMini}>{rightLabel}</span> : null}
-        <input readOnly value={rightValue} style={styles.vitalBox} />
-      </div>
-    </div>
-  );
-}
-
-function ReadCell3({ label, aLabel, aValue, bLabel, bValue, cLabel, cValue }) {
-  return (
-    <div style={styles.cell}>
-      <div style={styles.vitalLabel}>{label}</div>
-      <div style={styles.vitalThree}>
-        <div style={styles.vitalCol}>
-          <span style={styles.vitalMini}>{aLabel}</span>
-          <input readOnly value={aValue} style={styles.vitalBox} />
-        </div>
-        <div style={styles.vitalCol}>
-          <span style={styles.vitalMini}>{bLabel}</span>
-          <input readOnly value={bValue} style={styles.vitalBox} />
-        </div>
-        <div style={styles.vitalCol}>
-          <span style={styles.vitalMini}>{cLabel}</span>
-          <input readOnly value={cValue} style={styles.vitalBox} />
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpdated }) {
   const [form, setForm] = useState(() => getInitialForm(mode, player));
   const [error, setError] = useState("");
@@ -466,7 +474,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
   }, [mode, player]);
 
   const handleNumericChange = (name, rawValue) => {
-    const clamped = clampStat(rawValue);
+    const clamped = clampStat(rawValue, name);
     setForm((prev) => {
       const updated = { ...prev, [name]: clamped };
       return applyDerived(updated);
@@ -498,13 +506,23 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
   const handleDelta = (field, delta) => {
     setForm((prev) => {
       const current = Number(prev[field]) || 0;
-      const next = clampStat(current + delta);
-      return applyDerived({ ...prev, [field]: next });
+      let next;
+      
+      if (delta > 0) {
+        // +5: round up to next multiple of 5
+        next = (Math.floor(current / 5) + 1) * 5;
+      } else {
+        // -5: round down to previous multiple of 5
+        next = Math.max(0, (Math.floor(current / 5) - 1) * 5);
+      }
+      
+      const clamped = clampStat(next, field);
+      return applyDerived({ ...prev, [field]: clamped });
     });
   };
 
   const handleExportJSON = () => {
-    const { avatar, ...exportData } = form;
+    const { avatar, id, ...exportData } = form;
     const dataStr = JSON.stringify(exportData, null, 2);
     const blob = new Blob([dataStr], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -589,8 +607,6 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
       setIsSubmitting(false);
     }
   };
-
-  const title = mode === "create" ? "Yeni Oyuncu Oluştur" : "Oyuncuyu Düzenle";
 
   return (
     <div style={styles.pageWrapper}>
@@ -751,6 +767,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
         <ReadSmall label="Build" value={form.Build ?? 0} />
         <ReadSmall label="Armor" value={form.armor ?? 0} />
         <ReadSmall label="Damage Bonus" value={form.damageBonus ?? "0"} />
+        <ReadSmall label="Move" value={form.MOVE ?? 8} />
       </div>
 
       <form
@@ -761,12 +778,12 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
           {FIELD_DEFS.map((def) => {
             const value = form[def.key] ?? "";
             const base = BASE[def.key];
-            const mult = MULT[def.key];
+            const usage = USAGE[def.key];
             const isNumber = def.type === "number";
 
             const labelExtra =
-              isNumber && mult
-                ? ` (Base: ${base ?? 0}, x${mult})`
+              isNumber && usage
+                ? ` (Base: ${base ?? 0}, Cost: ${usage})`
                 : isNumber && base !== undefined
                 ? ` (Base: ${base})`
                 : "";
@@ -786,34 +803,6 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
                   </span>
 
                   <div className="value-row" style={styles.valueRow}>
-                    <input
-                      type={def.type}
-                      name={def.key}
-                      value={value}
-                      onChange={(e) =>
-                        def.type === "number"
-                          ? handleNumericChange(def.key, e.target.value)
-                          : handleTextChange(def.key, e.target.value)
-                      }
-                      min={def.type === "number" ? 0 : undefined}
-                      max={def.type === "number" ? 90 : undefined}
-                      style={styles.inputInline}
-                    />
-
-                    <input
-                      readOnly
-                      value={halfValue}
-                      style={styles.inputInlineReadOnly}
-                      aria-label={`${def.label} half value`}
-                    />
-
-                    <input
-                      readOnly
-                      value={fifthValue}
-                      style={styles.inputInlineReadOnlySmall}
-                      aria-label={`${def.label} fifth value`}
-                    />
-
                     {isNumber && (
                       <div className="xp-buttons" style={styles.stepButtons}>
                         <button
@@ -832,6 +821,35 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
                         </button>
                       </div>
                     )}
+
+                    <input
+                      type={def.type}
+                      name={def.key}
+                      value={def.type === "number" && numericValue === 0 ? "" : value}
+                      onChange={(e) =>
+                        def.type === "number"
+                          ? handleNumericChange(def.key, e.target.value)
+                          : handleTextChange(def.key, e.target.value)
+                      }
+                      min={def.type === "number" ? 0 : undefined}
+                      max={def.type === "number" ? 90 : undefined}
+                      style={styles.inputInline}
+                      placeholder={def.type === "number" && numericValue === 0 ? "0" : undefined}
+                    />
+
+                    <input
+                      readOnly
+                      value={halfValue}
+                      style={styles.inputInlineReadOnly}
+                      aria-label={`${def.label} half value`}
+                    />
+
+                    <input
+                      readOnly
+                      value={fifthValue}
+                      style={styles.inputInlineReadOnlySmall}
+                      aria-label={`${def.label} fifth value`}
+                    />
                   </div>
                 </div>
               </div>
@@ -1224,18 +1242,6 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-  },
-  avatarImg: {
-    width: "100%",
-    height: "100%",
-    objectFit: "cover",
-  },
-  avatarPlaceholder: {
-    width: "100%",
-    height: "100%",
-  },
-  avatarInput: {
-    fontSize: "12px",
   },
 
   statRow: {
