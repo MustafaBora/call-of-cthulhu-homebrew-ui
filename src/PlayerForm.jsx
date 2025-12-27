@@ -498,6 +498,20 @@ function ReadSmall({ label, value }) {
   );
 }
 
+function TextCell({ label, value, onChange }) {
+  return (
+    <div style={styles.cell}>
+      <div style={styles.cellLabel}>{label}</div>
+      <input
+        type="text"
+        value={value || ""}
+        onChange={(e) => onChange(e.target.value)}
+        style={styles.lineInput}
+      />
+    </div>
+  );
+}
+
 function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpdated }) {
   const [form, setForm] = useState(() => getInitialForm(mode, player));
   const [error, setError] = useState("");
@@ -742,35 +756,9 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
       {/* ===== CoC Header Grid (form hariç üst kısım) ===== */}
       <div className="sheet-header" style={styles.headerGrid}>
         {/* Row 1 */}
-        <div style={styles.cell}>
-          <div style={styles.cellLabel}>Name</div>
-          <input
-            type="text"
-            value={form.name || ""}
-            onChange={(e) => handleTextChange("name", e.target.value)}
-            style={styles.lineInput}
-          />
-        </div>
-
-        <div style={styles.cell}>
-          <div style={styles.cellLabel}>Birthplace</div>
-          <input
-            type="text"
-            value={form.birthPlace || ""}
-            onChange={(e) => handleTextChange("birthPlace", e.target.value)}
-            style={styles.lineInput}
-          />
-        </div>
-
-        <div style={styles.cell}>
-          <div style={styles.cellLabel}>Pronoun</div>
-          <input
-            type="text"
-            value={form.pronoun || ""}
-            onChange={(e) => handleTextChange("pronoun", e.target.value)}
-            style={styles.lineInput}
-          />
-        </div>
+        <TextCell label="Name" value={form.name} onChange={(v) => handleTextChange("name", v)} />
+        <TextCell label="Birthplace" value={form.birthPlace} onChange={(v) => handleTextChange("birthPlace", v)} />
+        <TextCell label="Pronoun" value={form.pronoun} onChange={(v) => handleTextChange("pronoun", v)} />
 
         {/* Avatar/Icon column (spans all rows) */}
         <div style={styles.avatarCol}>
@@ -798,26 +786,8 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
         </div>
 
         {/* Row 2 */}
-        <div style={styles.cell}>
-          <div style={styles.cellLabel}>Occupation</div>
-          <input
-            type="text"
-            value={form.occupation || ""}
-            onChange={(e) => handleTextChange("occupation", e.target.value)}
-            style={styles.lineInput}
-          />
-        </div>
-
-        <div style={styles.cell}>
-          <div style={styles.cellLabel}>Residence</div>
-          <input
-            type="text"
-            value={form.residence || ""}
-            onChange={(e) => handleTextChange("residence", e.target.value)}
-            style={styles.lineInput}
-          />
-        </div>
-
+        <TextCell label="Occupation" value={form.occupation} onChange={(v) => handleTextChange("occupation", v)} />
+        <TextCell label="Residence" value={form.residence} onChange={(v) => handleTextChange("residence", v)} />
         <div style={styles.cell}>
           <div style={styles.cellLabel}>Age</div>
           <input
