@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 /**
  * Updated PlayerForm.jsx to use backend RulesSpec with multi-level penalties
  * Loads rules from GET /api/rules instead of hardcoding them
- * Supports 5 penalty levels: 40(2x), 50(3x), 60(4x), 70(5x), 80(6x)
+ * Supports 5 penalty levels: 40(1.5x), 50(2x), 60(3x), 70(4x), 80(6x)
  */
 
 const FIELD_DEFS = [
@@ -62,15 +62,32 @@ const FIELD_DEFS = [
 
 // Cost değerine göre renk döndürür
 function getCostColor(cost) {
-  if (cost < 100) return "#22c55e";      // yeşil
-  if (cost < 200) return "#c97316ff";      // turuncu
-  if (cost < 300) return "#ef4444";      // kırmızı
-  return "#a855f7";                      // mor
+  // Daha geniş skala: ilk renk krem, son iki renk koyu gri ve siyah
+  if (cost < 50) return "#dee3a7";       // krem (en ucuz)
+  if (cost < 100) return "#a4dc76";      // lime
+  if (cost < 150) return "#20b961";      // açık yeşil
+  if (cost < 200) return "#72c53e";      // yeşil
+  if (cost < 250) return "#aab318";      // sarı
+  if (cost < 300) return "#f59e0b";      // amber
+  if (cost < 400) return "#f97316";      // turuncu
+  if (cost < 500) return "#ef4444";      // kırmızı
+  if (cost < 600) return "#dc2626";      // koyu kırmızı
+  if (cost < 800) return "#be123c";      // crimson
+  if (cost < 1000) return "#9333ea";     // mor
+  if (cost < 1500) return "#7c3aed";     // koyu mor
+  if (cost < 2000) return "#581c87";     // çok koyu mor
+  if (cost < 4000) return "#374151";     // koyu gri
+  return "#000000";                      // siyah (en pahalı)
+}
+
+// Buton yazı rengi: kırmızı ve üzeri için beyaz, altı için siyah
+function getCostTextColor(cost) {
+  return cost >= 400 ? "#fff" : "#000";
 }
 
 /**
  * Belirli bir değerde 1 puan artırmanın maliyeti (multi-level threshold penaltileriyle)
- * Supports 5 penalty levels: 40->2x, 50->3x, 60->4x, 70->5x, 80->6x
+ * Supports 5 penalty levels: 40->1.5x, 50->2x, 60->3x, 70->4x, 80->6x
  */
 function getCurrentCostPerPoint(rulesSpec, usage, value) {
   if (!rulesSpec || !rulesSpec.penaltyRules) return 0;
@@ -344,7 +361,7 @@ function StatCell({ rulesSpec, label, value, onChange, onBlur, onDelta, base, us
             <div className="xp-buttons" style={styles.stepButtons}>
               <button
                 type="button"
-                style={{ ...styles.stepButton, background: costColor, color: "#fff" }}
+                style={{ ...styles.stepButton, background: costColor, color: getCostTextColor(costNow) }}
                 title={tooltipText}
                 onClick={() => onDelta(-stepAmount)}
               >
@@ -352,7 +369,7 @@ function StatCell({ rulesSpec, label, value, onChange, onBlur, onDelta, base, us
               </button>
               <button
                 type="button"
-                style={{ ...styles.stepButton, background: costColor, color: "#fff" }}
+                style={{ ...styles.stepButton, background: costColor, color: getCostTextColor(costNow) }}
                 title={tooltipText}
                 onClick={() => onDelta(+stepAmount)}
               >
@@ -807,7 +824,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
                           <div className="xp-buttons" style={styles.stepButtons}>
                             <button
                               type="button"
-                              style={{ ...styles.stepButton, background: costColor, color: "#fff" }}
+                              style={{ ...styles.stepButton, background: costColor, color: getCostTextColor(currentCost) }}
                               title={deltaTooltipText}
                               onClick={() => handleDelta(def.key, -5)}
                             >
@@ -815,7 +832,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
                             </button>
                             <button
                               type="button"
-                              style={{ ...styles.stepButton, background: costColor, color: "#fff" }}
+                              style={{ ...styles.stepButton, background: costColor, color: getCostTextColor(currentCost) }}
                               title={deltaTooltipText}
                               onClick={() => handleDelta(def.key, +5)}
                             >
