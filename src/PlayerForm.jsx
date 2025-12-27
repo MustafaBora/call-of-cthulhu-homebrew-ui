@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 /**
  * Updated PlayerForm.jsx to use backend RulesSpec with multi-level penalties
@@ -113,7 +114,7 @@ function getCurrentCostPerPoint(rulesSpec, usage, value) {
 
 /**
  * Belirli bir seviyeye ulaşmak için gereken toplam puanı hesaplar.
- * Updated to use rulesSpec from backend with multi-level penalties
+ * Updated to match backend logic exactly with multi-level penalties
  */
 function getCostBetween(rulesSpec, skill, currentValue, targetValue) {
   if (!rulesSpec) return 0;
@@ -134,30 +135,43 @@ function getCostBetween(rulesSpec, skill, currentValue, targetValue) {
   let totalCost = 0;
   let current = currentValue;
 
-  // Process each threshold level
+  // Process each threshold level (matching backend logic)
   for (let i = 0; i < thresholds.length; i++) {
     const threshold = thresholds[i];
     const multiplier = multipliers[i];
     
     if (current >= threshold) {
-      // Already past this threshold, continue
+      // Skip this threshold, already passed it
       continue;
     }
     
     if (current < threshold && current < targetValue) {
-      // We haven't reached this threshold yet
-      const nextThreshold = (i + 1 < thresholds.length) ? thresholds[i + 1] : Infinity;
+      // Calculate cost from current to this threshold (or to target if target is before this threshold)
+      const nextThreshold = (i + 1 < thresholds.length) ? thresholds[i + 1] : Number.MAX_SAFE_INTEGER;
       let end = Math.min(targetValue, nextThreshold);
       
-      // Cost from current to this threshold (or to target if target is before threshold)
       if (current < threshold) {
         end = Math.min(end, threshold);
       }
       
       const diff = end - current;
       if (diff > 0) {
-        totalCost += diff * usage; // Before threshold: base multiplier (1x)
-        current = end;
+        const currentMultiplier = (current >= threshold) ? multiplier : 1.0;
+        if (current < threshold && end > threshold) {
+          // Cost spans from before threshold to after - split it
+          const diffBefore = threshold - current;
+          totalCost += diffBefore * usage * 1.0; // Before threshold: 1x
+          totalCost += (end - threshold) * usage * multiplier;
+          current = end;
+        } else if (end <= threshold) {
+          // Entirely before threshold
+          totalCost += diff * usage * 1.0;
+          current = end;
+        } else {
+          // Entirely at or above threshold
+          totalCost += diff * usage * multiplier;
+          current = end;
+        }
       }
     }
   }
@@ -169,7 +183,7 @@ function getCostBetween(rulesSpec, skill, currentValue, targetValue) {
     totalCost += diff * usage * lastMultiplier;
   }
 
-  return totalCost;
+  return Math.round(totalCost);
 }
 
 /**
@@ -195,25 +209,59 @@ function computeUsedXP(rulesSpec, values) {
     sum += cost;
   }
   
-  // Skills
+  // Skills - using backend key names (with spaces)
   const skills = [
-    "Accounting", "Anthropology", "Appraise", "Archeology", "ArtCraft", "ArtCraft2",
-    "Charm", "Climb", "CreditRating", "CthulhuMythos", "Disguise", "Dodge",
-    "DriveAuto", "ElectricalRepair", "FastTalk", "FightingBrawl", "FightingOther",
-    "FirearmsHandgun", "FirearmsOther", "FirearmsRifleShotgun",
-    "FirstAid", "History", "Intimidate", "Jump", "LanguageOther1", "LanguageOther2",
-    "LanguageOther3", "LanguageOwn", "Law", "LibraryUse", "Listen", "Locksmith",
-    "MechanicalRepair", "Medicine", "NaturalWorld", "Navigate", "Occult", "Persuade",
-    "Pilot", "Psychoanalysis", "Psychology", "Ride", "Science", "ScienceOther",
-    "ScienceOther2", "SleightOfHand", "Stealth", "Survival", "Swim", "Throw", "Track"
+    "Accounting", "Anthropology", "Appraise", "Archeology", "Art Craft", "Art Craft 2",
+    "Charm", "Climb", "Credit Rating", "Cthulhu Mythos", "Disguise", "Dodge",
+    "Drive Auto", "Electrical Repair", "Fast Talk", "Fighting Brawl", "Fighting Other",
+    "Firearms Handgun", "Firearms Other", "Firearms Rifle Shotgun",
+    "First Aid", "History", "Intimidate", "Jump", "Language Other 1", "Language Other 2",
+    "Language Other 3", "Language Own", "Law", "Library Use", "Listen", "Locksmith",
+    "Mechanical Repair", "Medicine", "Natural World", "Navigate", "Occult", "Persuade",
+    "Pilot", "Psychoanalysis", "Psychology", "Ride", "Science", "Science Other",
+    "Science Other 2", "Sleight Of Hand", "SPOT", "Stealth", "Survival", "Swim", "Throw", "Track"
   ];
   console.log("--- Skills ---");
-  for (const key of skills) {
-    const v = Number(values[key]) || 0;
-    const baseValue = rulesSpec.base[key] ?? 0;
-    const cost = getCostBetween(rulesSpec, key, baseValue, v);
+  
+  // Map frontend keys to backend keys for skills
+  const skillKeyMap = {
+    "ArtCraft": "Art Craft",
+    "ArtCraft2": "Art Craft 2",
+    "CreditRating": "Credit Rating",
+    "CthulhuMythos": "Cthulhu Mythos",
+    "DriveAuto": "Drive Auto",
+    "ElectricalRepair": "Electrical Repair",
+    "FastTalk": "Fast Talk",
+    "FightingBrawl": "Fighting Brawl",
+    "FightingOther": "Fighting Other",
+    "FirearmsHandgun": "Firearms Handgun",
+    "FirearmsOther": "Firearms Other",
+    "FirearmsRifleShotgun": "Firearms Rifle Shotgun",
+    "FirstAid": "First Aid",
+    "LanguageOther1": "Language Other 1",
+    "LanguageOther2": "Language Other 2",
+    "LanguageOther3": "Language Other 3",
+    "LanguageOwn": "Language Own",
+    "LibraryUse": "Library Use",
+    "MechanicalRepair": "Mechanical Repair",
+    "NaturalWorld": "Natural World",
+    "ScienceOther": "Science Other",
+    "ScienceOther2": "Science Other 2",
+    "SleightOfHand": "Sleight Of Hand"
+  };
+  
+  // Calculate cost for each skill using the correct backend key
+  for (const frontendKey of Object.keys(values)) {
+    // Skip if not a skill field
+    if (!FIELD_DEFS.find(f => f.key === frontendKey && f.type === "number")) continue;
+    if (characteristics.includes(frontendKey)) continue;
+    
+    const backendKey = skillKeyMap[frontendKey] || frontendKey;
+    const v = Number(values[frontendKey]) || 0;
+    const baseValue = rulesSpec.base[backendKey] ?? 0;
+    const cost = getCostBetween(rulesSpec, backendKey, baseValue, v);
     if (v > 0 || cost > 0) {
-      console.log(`${key}: base=${baseValue}, value=${v}, cost=${cost}`);
+      console.log(`${frontendKey} (${backendKey}): base=${baseValue}, value=${v}, cost=${cost}`);
     }
     sum += cost;
   }
@@ -271,8 +319,37 @@ function applyDerived(rulesSpec, values) {
 function clampStat(rulesSpec, num, fieldName) {
   if (!rulesSpec) return num;
   
+  // Map frontend keys to backend keys
+  const skillKeyMap = {
+    "ArtCraft": "Art Craft",
+    "ArtCraft2": "Art Craft 2",
+    "CreditRating": "Credit Rating",
+    "CthulhuMythos": "Cthulhu Mythos",
+    "DriveAuto": "Drive Auto",
+    "ElectricalRepair": "Electrical Repair",
+    "FastTalk": "Fast Talk",
+    "FightingBrawl": "Fighting Brawl",
+    "FightingOther": "Fighting Other",
+    "FirearmsHandgun": "Firearms Handgun",
+    "FirearmsOther": "Firearms Other",
+    "FirearmsRifleShotgun": "Firearms Rifle Shotgun",
+    "FirstAid": "First Aid",
+    "LanguageOther1": "Language Other 1",
+    "LanguageOther2": "Language Other 2",
+    "LanguageOther3": "Language Other 3",
+    "LanguageOwn": "Language Own",
+    "LibraryUse": "Library Use",
+    "MechanicalRepair": "Mechanical Repair",
+    "NaturalWorld": "Natural World",
+    "ScienceOther": "Science Other",
+    "ScienceOther2": "Science Other 2",
+    "SleightOfHand": "Sleight Of Hand"
+  };
+  
+  const backendKey = skillKeyMap[fieldName] || fieldName;
+  
   let n = Number(num) || 0;
-  const minValue = rulesSpec.base[fieldName] ? rulesSpec.base[fieldName] : 0;
+  const minValue = rulesSpec.base[backendKey] ? rulesSpec.base[backendKey] : 0;
   if (n < minValue) n = minValue;
   // ARMOR ve RES için max 1, diğerleri için max 90
   const maxValue = (fieldName === 'ARMOR' || fieldName === 'RES') ? 1 : 90;
@@ -282,6 +359,33 @@ function clampStat(rulesSpec, num, fieldName) {
 
 function getInitialForm(rulesSpec, mode, player) {
   if (!rulesSpec) return {};
+  
+  // Map frontend keys to backend keys
+  const skillKeyMap = {
+    "ArtCraft": "Art Craft",
+    "ArtCraft2": "Art Craft 2",
+    "CreditRating": "Credit Rating",
+    "CthulhuMythos": "Cthulhu Mythos",
+    "DriveAuto": "Drive Auto",
+    "ElectricalRepair": "Electrical Repair",
+    "FastTalk": "Fast Talk",
+    "FightingBrawl": "Fighting Brawl",
+    "FightingOther": "Fighting Other",
+    "FirearmsHandgun": "Firearms Handgun",
+    "FirearmsOther": "Firearms Other",
+    "FirearmsRifleShotgun": "Firearms Rifle Shotgun",
+    "FirstAid": "First Aid",
+    "LanguageOther1": "Language Other 1",
+    "LanguageOther2": "Language Other 2",
+    "LanguageOther3": "Language Other 3",
+    "LanguageOwn": "Language Own",
+    "LibraryUse": "Library Use",
+    "MechanicalRepair": "Mechanical Repair",
+    "NaturalWorld": "Natural World",
+    "ScienceOther": "Science Other",
+    "ScienceOther2": "Science Other 2",
+    "SleightOfHand": "Sleight Of Hand"
+  };
   
   if (mode === "create") {
     // Yeni oyuncu oluşturma
@@ -307,14 +411,16 @@ function getInitialForm(rulesSpec, mode, player) {
       avatar: "",
     };
 
-    // Karakteristikler ve beceriler için BASE değerlerini başlangıç olarak ayarla
+    // Karakteristikler için BASE değerlerini başlangıç olarak ayarla
     for (const key of Object.keys(rulesSpec.base)) {
       obj[key] = rulesSpec.base[key] ?? obj[key];
     }
 
+    // FIELD_DEFS'teki her skill için backend key ile base değeri al
     for (const def of FIELD_DEFS) {
       if (def.type === "number") {
-        obj[def.key] = rulesSpec.base[def.key] ?? 0;
+        const backendKey = skillKeyMap[def.key] || def.key;
+        obj[def.key] = rulesSpec.base[backendKey] ?? 0;
       } else {
         obj[def.key] = "";
       }
@@ -560,7 +666,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
         }
 
         const created = await response.json();
-        onCreated && onCreated(created);
+        onCreated && onCreated(created, { stay: stayOnPage });
       } else {
         response = await fetch(`http://localhost:8080/players/${player.id}`, {
           method: "PUT",
@@ -576,7 +682,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
         }
 
         const updated = await response.json();
-        onUpdated && onUpdated(updated);
+        onUpdated && onUpdated(updated, { stay: stayOnPage });
       }
 
       if (!stayOnPage && onCancel) {
@@ -711,15 +817,19 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
             />
           )}
           
+          <div className="no-print" style={{ display: "flex", justifyContent: "flex-end", marginBottom: "8px" }}>
+            <LanguageSwitcher variant="compact" />
+          </div>
+          
           <div className="sheet-header" style={styles.headerGrid}>
             {/* Row 1 */}
+            <TextCell label="Player" value={form.player} onChange={(v) => handleTextChange("player", v)} />
             <TextCell label="Name" value={form.name} onChange={(v) => handleTextChange("name", v)} />
             <TextCell label="Birthplace" value={form.birthPlace} onChange={(v) => handleTextChange("birthPlace", v)} />
-            <TextCell label="Pronoun" value={form.pronoun} onChange={(v) => handleTextChange("pronoun", v)} />
 
             {/* Avatar */}
             <div style={styles.avatarCol}>
-              <div style={styles.avatarBox} onClick={() => document.getElementById('avatar-upload').click()}>
+              <div style={styles.avatarBox} onClick={() => document.getElementById('avatar-upload').click()} title={t("playerForm.uploadImageTooltip")}>
                 {form.avatar ? (
                   <img
                     src={`data:image/*;base64,${form.avatar}`}
@@ -727,7 +837,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
                     style={styles.avatarImg}
                   />
                 ) : (
-                  <div style={styles.avatarPlaceholder}>Resim Yükle</div>
+                    <div style={styles.avatarPlaceholder}>{t("playerForm.uploadImage")}</div>
                 )}
               </div>
               <input
@@ -740,21 +850,37 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
               />
             </div>
 
-            {/* Row 2 */}
-            <TextCell label="Occupation" value={form.occupation} onChange={(v) => handleTextChange("occupation", v)} />
-            <TextCell label="Residence" value={form.residence} onChange={(v) => handleTextChange("residence", v)} />
-            <div style={styles.cell} className="age-cell">
-              <div style={styles.cellLabel}>Age</div>
-              <input
-                type="number"
-                min={0}
-                max={120}
-                value={form.age || 0}
-                onChange={(e) => handleNumericChange("age", e.target.value)}
-                className="age-input"
-                style={styles.lineInput}
-              />
+            {/* Row 2: Pronoun and Age in same div */}
+            <div style={styles.cell} className="pronoun-age-cell">
+              <div style={{ display: "flex", gap: "8px" }}>
+                <div style={{ flex: 1 }}>
+                  <div style={styles.cellLabel}>Pronoun</div>
+                  <input
+                    type="text"
+                    value={form.pronoun || ""}
+                    onChange={(e) => handleTextChange("pronoun", e.target.value)}
+                    className="text-input"
+                    style={styles.lineInput}
+                  />
+                </div>
+                <div style={{ flex: "0 0 60px" }}>
+                  <div style={styles.cellLabel}>Age</div>
+                  <input
+                    type="number"
+                    min={0}
+                    max={120}
+                    value={form.age || 0}
+                    onChange={(e) => handleNumericChange("age", e.target.value)}
+                    className="age-input"
+                    style={styles.lineInput}
+                  />
+                </div>
+              </div>
             </div>
+            <TextCell label="Residence" value={form.residence} onChange={(v) => handleTextChange("residence", v)} />
+
+            {/* Row 3 */}
+            <TextCell label="Occupation" value={form.occupation} onChange={(v) => handleTextChange("occupation", v)} />
 
             {/* Characteristics from rulesSpec */}
             <StatCell rulesSpec={rulesSpec} label="Strength" value={form.STR} base={rulesSpec.base.STR} usage={rulesSpec.usage.STR} onChange={(v) => handleNumericChange("STR", v)} onBlur={() => handleNumericBlur("STR")} onDelta={(d) => handleDelta("STR", d)} />
@@ -791,15 +917,43 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
           <form onSubmit={(e) => handleSubmit(e, false)} style={styles.form}>
             <div className="sheet-grid" style={styles.grid}>
               {FIELD_DEFS.map((def) => {
+                // Map frontend keys to backend keys
+                const skillKeyMap = {
+                  "ArtCraft": "Art Craft",
+                  "ArtCraft2": "Art Craft 2",
+                  "CreditRating": "Credit Rating",
+                  "CthulhuMythos": "Cthulhu Mythos",
+                  "DriveAuto": "Drive Auto",
+                  "ElectricalRepair": "Electrical Repair",
+                  "FastTalk": "Fast Talk",
+                  "FightingBrawl": "Fighting Brawl",
+                  "FightingOther": "Fighting Other",
+                  "FirearmsHandgun": "Firearms Handgun",
+                  "FirearmsOther": "Firearms Other",
+                  "FirearmsRifleShotgun": "Firearms Rifle Shotgun",
+                  "FirstAid": "First Aid",
+                  "LanguageOther1": "Language Other 1",
+                  "LanguageOther2": "Language Other 2",
+                  "LanguageOther3": "Language Other 3",
+                  "LanguageOwn": "Language Own",
+                  "LibraryUse": "Library Use",
+                  "MechanicalRepair": "Mechanical Repair",
+                  "NaturalWorld": "Natural World",
+                  "ScienceOther": "Science Other",
+                  "ScienceOther2": "Science Other 2",
+                  "SleightOfHand": "Sleight Of Hand"
+                };
+                
+                const backendKey = skillKeyMap[def.key] || def.key;
                 const value = form[def.key] ?? "";
-                const base = rulesSpec.base[def.key];
-                const usage = rulesSpec.usage[def.key];
+                const base = rulesSpec.base[backendKey];
+                const usage = rulesSpec.usage[backendKey];
                 const isNumber = def.type === "number";
                 const labelWithBase = base !== undefined ? `${def.label} ${base}` : def.label;
 
                 const numericValue = Number(value) || 0;
                 const currentCost = getCurrentCostPerPoint(rulesSpec, usage, numericValue);
-                const totalCost = isNumber && usage !== undefined ? getCostBetween(rulesSpec, def.key, base ?? 0, numericValue) : 0;
+                const totalCost = isNumber && usage !== undefined ? getCostBetween(rulesSpec, backendKey, base ?? 0, numericValue) : 0;
                 const costColor = getCostColor(currentCost);
                 const tooltipText = isNumber && usage !== undefined ? `Spent: ${totalCost}` : "";
                 const deltaTooltipText = `${currentCost * 5} XP`;

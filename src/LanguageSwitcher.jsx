@@ -5,8 +5,8 @@ function LanguageSwitcher({ variant = "default" }) {
 
   const languages = [
     { code: "en", label: "EN", flag: "EN" },
-    { code: "de", label: "DE", flag: "🇩🇪" },
-    { code: "tr", label: "TR", flag: "🇹🇷" },
+    { code: "de", label: "DE", flag: "DE" },
+    { code: "tr", label: "TR", flag: "TR" },
   ];
 
   const handleLanguageChange = (langCode) => {
