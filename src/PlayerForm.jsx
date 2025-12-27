@@ -440,7 +440,7 @@ function StatCell({ label, value, onChange, onBlur, onDelta, base, usage, readOn
   const tooltipText = `${costNow * stepAmount} XP`;
 
   return (
-    <div style={styles.cell}>
+    <div style={styles.cell} className="stat-cell">
       <div style={styles.statRow}>
         <div style={styles.statLabel}>{label}</div>
         <div style={styles.labelExtra}>
@@ -478,6 +478,7 @@ function StatCell({ label, value, onChange, onBlur, onDelta, base, usage, readOn
             onChange={handleChange}
             onBlur={handleBlur}
             readOnly={readOnly}
+            className="stat-box-input"
             style={styles.statBox}
           />
         </div>
@@ -488,10 +489,10 @@ function StatCell({ label, value, onChange, onBlur, onDelta, base, usage, readOn
 
 function ReadSmall({ label, value }) {
   return (
-    <div style={styles.cell}>
+    <div style={styles.cell} className="read-small">
       <div style={styles.statRow}>
         <div style={styles.statLabel}>{label}</div>
-        <input readOnly value={value} style={styles.statBox} />
+        <input readOnly value={value} className="stat-box-input" style={styles.statBox} />
       </div>
     </div>
   );
@@ -688,7 +689,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
           }
           .sheet-header { gap: 3px 4px !important; background: transparent !important; border: none !important; }
           .sheet-header .cell { padding: 2px 3px !important; background: transparent !important; border: 1px solid rgba(0,0,0,0.18) !important; }
-          .sheet-header input { padding: 2px 3px !important; font-size: 10px !important; }
+          .sheet-header input { padding: 2px 3px !important; font-size: 10px !important; background: transparent !important; }
           .sheet-grid { gap: 0.5rem 0.9rem !important; background: transparent !important; border: none !important; }
           .sheet-grid .field-header > span:first-child { padding-left: 5px !important; }
           .sheet-grid .field-header { gap: 0.28rem !important; }
@@ -709,11 +710,19 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
             font-size: 9px !important;
             text-align: right !important;
             padding: 2px 3px !important;
+            background: transparent !important;
           }
           .sheet-header .cell { padding: 2px 3px !important; }
           .sheet-header .statRow { justify-content: space-between !important; }
           .value-row { flex-wrap: wrap !important; max-width: 100% !important; justify-content: flex-start !important; gap: 3px !important; }
-          .value-row input { width: 22px !important; min-width: 18px !important; text-align: right !important; font-size: 9px !important; padding: 2px 3px !important; }
+          .value-row input { width: 22px !important; min-width: 18px !important; text-align: right !important; font-size: 9px !important; padding: 2px 3px !important; background: transparent !important; }
+          /* StatCell and ReadSmall transparency */
+          .stat-cell { background: transparent !important; }
+          .read-small { background: transparent !important; }
+          .stat-box-input { background: transparent !important; }
+          .cell { background: transparent !important; }
+          input[type="number"] { background: transparent !important; }
+          input[readOnly] { background: transparent !important; }
         }
       `}</style>
 
