@@ -1,161 +1,10 @@
 import { useEffect, useState } from "react";
 
 /**
- * USAGE: 1 yükseltme için kaç puan harcaması gerektiğini gösterir.
- * Örneğin: APP = 60 demek, APP'yi 1 yükseltmek için 60 puan harcamanız gerekir.
+ * Updated PlayerForm.jsx to use backend RulesSpec with multi-level penalties
+ * Loads rules from GET /api/rules instead of hardcoding them
+ * Supports 5 penalty levels: 40(2x), 50(3x), 60(4x), 70(5x), 80(6x)
  */
-const USAGE = {
-  totalXP: 0,
-  usedXP: 0,
-  remainingXP: 0,
-
-  // Karakteristikler (Characteristics)
-  APP: 60,
-  BONUS: 120,
-  BRV: 120,
-  STA: 120,
-  AGI: 220,
-  EDU: 20,
-  INT: 60,
-  LUCK: 180,
-  PER: 320,
-  POW: 140,
-  REP: 100,
-  SAN: 160,
-  SIZ: 40,
-  ARMOR: 15000,
-  RES: 15000,
-  SPOT: 260,
-  STR: 100,
-
-  // Beceriler (Skills)
-  Accounting: 20,
-  Anthropology: 20,
-  Appraise: 20,
-  Archeology: 20,
-  ArtCraft: 20,
-  ArtCraft2: 20,
-  Charm: 120,
-  Climb: 60,
-  CreditRating: 120,
-  CthulhuMythos: 160,
-  Disguise: 40,
-  Dodge: 180,
-  DriveAuto: 80,
-  ElectricalRepair: 40,
-  FastTalk: 120,
-  FightingBrawl: 160,
-  FightingOther: 160,
-  FirearmsHandgun: 160,
-  FirearmsOther: 140,
-  FirearmsRifleShotgun: 140,
-  FirstAid: 100,
-  History: 60,
-  Intimidate: 100,
-  Jump: 80,
-  LanguageOther1: 40,
-  LanguageOther2: 20,
-  LanguageOther3: 20,
-  LanguageOwn: 20,
-  Law: 40,
-  LibraryUse: 160,
-  Listen: 160,
-  Locksmith: 120,
-  MechanicalRepair: 40,
-  Medicine: 40,
-  NaturalWorld: 60,
-  Navigate: 40,
-  Occult: 60,
-  Persuade: 180,
-  Pilot: 20,
-  Psychoanalysis: 20,
-  Psychology: 120,
-  Ride: 80,
-  Science: 40,
-  ScienceOther: 20,
-  ScienceOther2: 20,
-  SleightOfHand: 100,
-  SpotHidden: 260,
-  Stealth: 140,
-  Survival: 20,
-  Swim: 20,
-  Throw: 100,
-  Track: 40,
-};
-
-// BASE değerleri (başlangıç değerleri)
-const BASE = {
-  APP: 30,
-  BONUS: 0,
-  BRV: 45,
-  STA: 30,
-  AGI: 35,
-  EDU: 20,
-  INT: 30,
-  LUCK: 35,
-  PER: 0,
-  POW: 30,
-  REP: 1,
-  SAN: 45,
-  SIZ: 31,
-  ARMOR: 0,
-  RES: 0,
-  SPOT: 15,
-  STR: 25,
-
-  Accounting: 7,
-  Anthropology: 6,
-  Appraise: 8,
-  Archeology: 3,
-  ArtCraft: 15,
-  ArtCraft2: 14,
-  Charm: 20,
-  Climb: 20,
-  CreditRating: 5,
-  CthulhuMythos: 0,
-  Disguise: 5,
-  Dodge: 20,
-  DriveAuto: 10,
-  ElectricalRepair: 15,
-  FastTalk: 14,
-  FightingBrawl: 30,
-  FightingOther: 30,
-  FirearmsHandgun: 30,
-  FirearmsOther: 30,
-  FirearmsRifleShotgun: 30,
-  FirstAid: 20,
-  History: 10,
-  Intimidate: 15,
-  Jump: 20,
-  LanguageOther1: 20,
-  LanguageOther2: 0,
-  LanguageOther3: 0,
-  LanguageOwn: 50,
-  Law: 5,
-  LibraryUse: 20,
-  Listen: 30,
-  Locksmith: 10,
-  MechanicalRepair: 15,
-  Medicine: 4,
-  NaturalWorld: 15,
-  Navigate: 15,
-  Occult: 4,
-  Persuade: 15,
-  Pilot: 1,
-  Psychoanalysis: 2,
-  Psychology: 10,
-  Ride: 10,
-  Science: 10,
-  ScienceOther: 21,
-  ScienceOther2: 20,
-  SleightOfHand: 10,
-  SpotHidden: 15,
-  Stealth: 20,
-  Survival: 11,
-  Swim: 22,
-  Throw: 20,
-  Track: 10,
-};
 
 const FIELD_DEFS = [
   { key: "Accounting", label: "Accounting", type: "number" },
@@ -211,19 +60,6 @@ const FIELD_DEFS = [
   { key: "Track", label: "Track", type: "number" },
 ];
 
-const FIRST_THRESHOLD = 50;
-const SECOND_THRESHOLD = 75;
-const FIRST_PENALTY_MULT = 2;
-const SECOND_PENALTY_MULT = 3;
-
-// Belirli bir değerde 1 puan artırmanın maliyeti (threshold penaltileriyle)
-function getCurrentCostPerPoint(usage, value) {
-  if (usage === undefined || usage === null) return 0;
-  if (value < FIRST_THRESHOLD) return usage;
-  if (value < SECOND_THRESHOLD) return usage * FIRST_PENALTY_MULT;
-  return usage * SECOND_PENALTY_MULT;
-}
-
 // Cost değerine göre renk döndürür
 function getCostColor(cost) {
   if (cost < 100) return "#22c55e";      // yeşil
@@ -233,41 +69,86 @@ function getCostColor(cost) {
 }
 
 /**
- * Belirli bir seviyeye ulaşmak için gereken toplam puanı hesaplar.
- * currentValue'dan targetValue'ye gitmek için kaç puan harcaması gerekir.
- * Backend'deki getCostBetween metodunun JavaScript implementasyonu.
+ * Belirli bir değerde 1 puan artırmanın maliyeti (multi-level threshold penaltileriyle)
+ * Supports 5 penalty levels: 40->2x, 50->3x, 60->4x, 70->5x, 80->6x
  */
-function getCostBetween(skill, currentValue, targetValue) {
-  const usage = USAGE[skill] ?? 0;
+function getCurrentCostPerPoint(rulesSpec, usage, value) {
+  if (!rulesSpec || !rulesSpec.penaltyRules) return 0;
+  if (usage === undefined || usage === null) return 0;
+  
+  const { thresholds, multipliers } = rulesSpec.penaltyRules;
+  
+  if (!thresholds || !multipliers || thresholds.length === 0) return usage;
+  
+  // Find which multiplier applies to current value
+  for (let i = 0; i < thresholds.length; i++) {
+    if (value >= thresholds[i]) {
+      // Check if we're in this bracket or a higher one
+      if (i === thresholds.length - 1 || value < thresholds[i + 1]) {
+        return usage * multipliers[i];
+      }
+    }
+  }
+  
+  return usage; // Before first threshold: base cost (1x multiplier)
+}
+
+/**
+ * Belirli bir seviyeye ulaşmak için gereken toplam puanı hesaplar.
+ * Updated to use rulesSpec from backend with multi-level penalties
+ */
+function getCostBetween(rulesSpec, skill, currentValue, targetValue) {
+  if (!rulesSpec) return 0;
+  
+  const usage = rulesSpec.usage[skill] ?? 0;
+  const { thresholds, multipliers } = rulesSpec.penaltyRules;
 
   // Hiç iyileştirme yoksa maliyet sıfır
   if (targetValue <= currentValue || usage === 0) {
     return 0;
   }
 
+  if (!thresholds || !multipliers || thresholds.length === 0) {
+    // No penalty system, just linear cost
+    return (targetValue - currentValue) * usage;
+  }
+
   let totalCost = 0;
   let current = currentValue;
 
-  // Parça 1: Mevcut seviye → 50 arası
-  if (current < FIRST_THRESHOLD) {
-    const end = Math.min(targetValue, FIRST_THRESHOLD);
-    const diff = end - current;
-    totalCost += diff * usage;
-    current = end;
+  // Process each threshold level
+  for (let i = 0; i < thresholds.length; i++) {
+    const threshold = thresholds[i];
+    const multiplier = multipliers[i];
+    
+    if (current >= threshold) {
+      // Already past this threshold, continue
+      continue;
+    }
+    
+    if (current < threshold && current < targetValue) {
+      // We haven't reached this threshold yet
+      const nextThreshold = (i + 1 < thresholds.length) ? thresholds[i + 1] : Infinity;
+      let end = Math.min(targetValue, nextThreshold);
+      
+      // Cost from current to this threshold (or to target if target is before threshold)
+      if (current < threshold) {
+        end = Math.min(end, threshold);
+      }
+      
+      const diff = end - current;
+      if (diff > 0) {
+        totalCost += diff * usage; // Before threshold: base multiplier (1x)
+        current = end;
+      }
+    }
   }
-
-  // Parça 2: 50 → 75 arası (2x daha pahalı)
-  if (current < SECOND_THRESHOLD && current >= FIRST_THRESHOLD) {
-    const end = Math.min(targetValue, SECOND_THRESHOLD);
-    const diff = end - current;
-    totalCost += diff * usage * FIRST_PENALTY_MULT;
-    current = end;
-  }
-
-  // Parça 3: 75+ arası (3x daha pahalı)
+  
+  // Cost for anything above the last threshold
   if (current < targetValue) {
+    const lastMultiplier = multipliers[multipliers.length - 1];
     const diff = targetValue - current;
-    totalCost += diff * usage * SECOND_PENALTY_MULT;
+    totalCost += diff * usage * lastMultiplier;
   }
 
   return totalCost;
@@ -275,9 +156,11 @@ function getCostBetween(skill, currentValue, targetValue) {
 
 /**
  * Player'ın tüm özellik ve becerilerini iyileştirmek için gereken toplam XP'yi hesaplar.
- * Backend'deki calculateXP metodunun JavaScript implementasyonu.
+ * Updated to use rulesSpec from backend
  */
-function computeUsedXP(values) {
+function computeUsedXP(rulesSpec, values) {
+  if (!rulesSpec) return 0;
+  
   console.log("=== XP Calculation Debug ===");
   let sum = 0;
   
@@ -286,8 +169,8 @@ function computeUsedXP(values) {
   console.log("--- Characteristics ---");
   for (const key of characteristics) {
     const v = Number(values[key]) || 0;
-    const baseValue = BASE[key] ?? 0;
-    const cost = getCostBetween(key, baseValue, v);
+    const baseValue = rulesSpec.base[key] ?? 0;
+    const cost = getCostBetween(rulesSpec, key, baseValue, v);
     if (v > 0 || cost > 0) {
       console.log(`${key}: base=${baseValue}, value=${v}, cost=${cost}`);
     }
@@ -309,8 +192,8 @@ function computeUsedXP(values) {
   console.log("--- Skills ---");
   for (const key of skills) {
     const v = Number(values[key]) || 0;
-    const baseValue = BASE[key] ?? 0;
-    const cost = getCostBetween(key, baseValue, v);
+    const baseValue = rulesSpec.base[key] ?? 0;
+    const cost = getCostBetween(rulesSpec, key, baseValue, v);
     if (v > 0 || cost > 0) {
       console.log(`${key}: base=${baseValue}, value=${v}, cost=${cost}`);
     }
@@ -321,7 +204,9 @@ function computeUsedXP(values) {
   return sum;
 }
 
-function applyDerived(values) {
+function applyDerived(rulesSpec, values) {
+  if (!rulesSpec) return values;
+  
   const v = (k) => Number(values[k]) || 0;
   const updated = { ...values };
 
@@ -357,7 +242,7 @@ function applyDerived(values) {
   else if (agi < siz && agi < str) move = 7;
   updated.MOVE = move;
 
-  const usedXP = computeUsedXP(updated);
+  const usedXP = computeUsedXP(rulesSpec, updated);
   const totalXP = v("totalXP");
   updated.usedXP = usedXP;
   updated.remainingXP = totalXP - usedXP;
@@ -365,9 +250,11 @@ function applyDerived(values) {
   return updated;
 }
 
-function clampStat(num, fieldName) {
+function clampStat(rulesSpec, num, fieldName) {
+  if (!rulesSpec) return num;
+  
   let n = Number(num) || 0;
-  const minValue = (fieldName && BASE[fieldName]) ? BASE[fieldName] : 0;
+  const minValue = rulesSpec.base[fieldName] ? rulesSpec.base[fieldName] : 0;
   if (n < minValue) n = minValue;
   // ARMOR ve RES için max 1, diğerleri için max 90
   const maxValue = (fieldName === 'ARMOR' || fieldName === 'RES') ? 1 : 90;
@@ -375,7 +262,9 @@ function clampStat(num, fieldName) {
   return n;
 }
 
-function getInitialForm(mode, player) {
+function getInitialForm(rulesSpec, mode, player) {
+  if (!rulesSpec) return {};
+  
   if (mode === "create") {
     // Yeni oyuncu oluşturma
     const obj = {
@@ -401,22 +290,22 @@ function getInitialForm(mode, player) {
     };
 
     // Karakteristikler ve beceriler için BASE değerlerini başlangıç olarak ayarla
-    for (const key of Object.keys(BASE)) {
-      obj[key] = BASE[key] ?? obj[key];
+    for (const key of Object.keys(rulesSpec.base)) {
+      obj[key] = rulesSpec.base[key] ?? obj[key];
     }
 
     for (const def of FIELD_DEFS) {
       if (def.type === "number") {
-        obj[def.key] = BASE[def.key] ?? 0;
+        obj[def.key] = rulesSpec.base[def.key] ?? 0;
       } else {
         obj[def.key] = "";
       }
     }
 
-    return applyDerived(obj);
+    return applyDerived(rulesSpec, obj);
   } else {
     // Edit modu
-    return applyDerived({
+    return applyDerived(rulesSpec, {
       ...player,
       ARMOR: player?.ARMOR ?? player?.armor ?? 0,
       RES: player?.RES ?? player?.res ?? 0,
@@ -424,7 +313,8 @@ function getInitialForm(mode, player) {
     });
   }
 }
-function StatCell({ label, value, onChange, onBlur, onDelta, base, usage, readOnly = false, isSmallStep = false }) {
+
+function StatCell({ rulesSpec, label, value, onChange, onBlur, onDelta, base, usage, readOnly = false, isSmallStep = false }) {
   const handleChange = readOnly
     ? undefined
     : (e) => onChange && onChange(e.target.value);
@@ -434,7 +324,7 @@ function StatCell({ label, value, onChange, onBlur, onDelta, base, usage, readOn
     : () => onBlur && onBlur();
 
   const numericValue = Number(value) || 0;
-  const costNow = getCurrentCostPerPoint(usage, numericValue);
+  const costNow = getCurrentCostPerPoint(rulesSpec, usage, numericValue);
   const costColor = getCostColor(costNow);
   const stepAmount = isSmallStep ? 1 : 5;
   const tooltipText = `${costNow * stepAmount} XP`;
@@ -514,30 +404,51 @@ function TextCell({ label, value, onChange }) {
 }
 
 function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpdated }) {
-  const [form, setForm] = useState(() => getInitialForm(mode, player));
+  const [rulesSpec, setRulesSpec] = useState(null);
+  const [rulesLoading, setRulesLoading] = useState(true);
+  const [rulesError, setRulesError] = useState("");
+  const [form, setForm] = useState(() => getInitialForm(null, mode, player));
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Load rules spec from backend on mount
   useEffect(() => {
-    if (mode === "edit" && player) {
-      setForm(getInitialForm("edit", player));
-    }
+    const loadRulesSpec = async () => {
+      try {
+        setRulesLoading(true);
+        const response = await fetch("http://localhost:8080/players/rules");
+        if (!response.ok) {
+          throw new Error("Rules specification yüklenemedi");
+        }
+        const spec = await response.json();
+        setRulesSpec(spec);
+        
+        // Initialize form with loaded spec
+        setForm(getInitialForm(spec, mode, player));
+      } catch (err) {
+        console.error("Rules yükleme hatası:", err);
+        setRulesError(err.message || "Rules yüklenirken bir hata oluştu");
+      } finally {
+        setRulesLoading(false);
+      }
+    };
+    
+    loadRulesSpec();
   }, [mode, player]);
 
   const handleNumericChange = (name, rawValue) => {
-    // Allow free typing; no clamp here
     setForm((prev) => ({ ...prev, [name]: rawValue }));
   };
 
   const handleNumericBlur = (name) => {
     setForm((prev) => {
-      const clamped = clampStat(prev[name], name);
-      return applyDerived({ ...prev, [name]: clamped });
+      const clamped = clampStat(rulesSpec, prev[name], name);
+      return applyDerived(rulesSpec, { ...prev, [name]: clamped });
     });
   };
 
   const handleTextChange = (name, value) => {
-    setForm((prev) => applyDerived({ ...prev, [name]: value }));
+    setForm((prev) => applyDerived(rulesSpec, { ...prev, [name]: value }));
   };
 
   const handleAvatarChange = (e) => {
@@ -564,15 +475,13 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
       let next;
       
       if (delta > 0) {
-        // +5: round up to next multiple of 5
         next = (Math.floor(current / 5) + 1) * 5;
       } else {
-        // -5: round down to previous multiple of 5
         next = Math.max(0, (Math.floor(current / 5) - 1) * 5);
       }
       
-      const clamped = clampStat(next, field);
-      return applyDerived({ ...prev, [field]: clamped });
+      const clamped = clampStat(rulesSpec, next, field);
+      return applyDerived(rulesSpec, { ...prev, [field]: clamped });
     });
   };
 
@@ -634,7 +543,6 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
         const created = await response.json();
         onCreated && onCreated(created);
       } else {
-        // Edit mode
         response = await fetch(`http://localhost:8080/players/${player.id}`, {
           method: "PUT",
           headers: {
@@ -663,10 +571,39 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
     }
   };
 
+  // Show loading state while rules are being fetched
+  if (rulesLoading) {
+    return (
+      <div style={styles.pageWrapper}>
+        <div style={styles.page}>
+          <div style={{ padding: "2rem", textAlign: "center" }}>
+            <p>Rules yükleniyor...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error if rules failed to load
+  if (rulesError) {
+    return (
+      <div style={styles.pageWrapper}>
+        <div style={styles.page}>
+          <div style={{ ...styles.error, margin: "2rem" }}>
+            <p><strong>Hata:</strong> {rulesError}</p>
+            <p>Sunucunun çalışır durumda olduğundan emin olun.</p>
+          </div>
+          <button onClick={onCancel} style={{ ...styles.button, margin: "1rem", background: "#9ca3af" }}>
+            Geri dön
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={styles.pageWrapper}>
       <style>{`
-        /* Hide number spinners but keep numeric input */
         input[type="number"]::-webkit-outer-spin-button,
         input[type="number"]::-webkit-inner-spin-button {
           -webkit-appearance: none;
@@ -731,11 +668,9 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
           .sheet-header .statRow { justify-content: space-between !important; }
           .value-row { flex-wrap: wrap !important; max-width: 100% !important; justify-content: flex-start !important; gap: 3px !important; }
           .value-row input { width: 22px !important; min-width: 18px !important; text-align: right !important; font-size: 9px !important; padding: 2px 3px !important; background: transparent !important; }
-          /* StatCell and ReadSmall transparency */
           .stat-cell { background: transparent !important; }
           .read-small { background: transparent !important; }
           .stat-box-input { background: transparent !important; }
-          /* TextCell transparency */
           .text-cell { background: transparent !important; }
           .text-input { background: transparent !important; }
           .age-cell { background: transparent !important; }
@@ -746,252 +681,235 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
         }
       `}</style>
 
-      {/* Main Layout Container */}
       <div style={styles.mainContainer}>
+        <div className="sheet-page" style={styles.page}>
+          {form.avatar && (
+            <img
+              src={`data:image/*;base64,${form.avatar}`}
+              alt=""
+              className="print-bg-image"
+              aria-hidden="true"
+            />
+          )}
+          
+          <div className="sheet-header" style={styles.headerGrid}>
+            {/* Row 1 */}
+            <TextCell label="Name" value={form.name} onChange={(v) => handleTextChange("name", v)} />
+            <TextCell label="Birthplace" value={form.birthPlace} onChange={(v) => handleTextChange("birthPlace", v)} />
+            <TextCell label="Pronoun" value={form.pronoun} onChange={(v) => handleTextChange("pronoun", v)} />
 
-      {/* Main Content */}
-      <div className="sheet-page" style={styles.page}>
-      {form.avatar && (
-        <img
-          src={`data:image/*;base64,${form.avatar}`}
-          alt=""
-          className="print-bg-image"
-          aria-hidden="true"
-        />
-      )}
-      {/* ===== CoC Header Grid (form hariç üst kısım) ===== */}
-      <div className="sheet-header" style={styles.headerGrid}>
-        {/* Row 1 */}
-        <TextCell label="Name" value={form.name} onChange={(v) => handleTextChange("name", v)} />
-        <TextCell label="Birthplace" value={form.birthPlace} onChange={(v) => handleTextChange("birthPlace", v)} />
-        <TextCell label="Pronoun" value={form.pronoun} onChange={(v) => handleTextChange("pronoun", v)} />
-
-        {/* Avatar/Icon column (spans all rows) */}
-        <div style={styles.avatarCol}>
-          <div style={styles.avatarBox} onClick={() => document.getElementById('avatar-upload').click()}>
-            {form.avatar ? (
-              <img
-                src={`data:image/*;base64,${form.avatar}`}
-                alt={form.name || "avatar"}
-                style={styles.avatarImg}
+            {/* Avatar */}
+            <div style={styles.avatarCol}>
+              <div style={styles.avatarBox} onClick={() => document.getElementById('avatar-upload').click()}>
+                {form.avatar ? (
+                  <img
+                    src={`data:image/*;base64,${form.avatar}`}
+                    alt={form.name || "avatar"}
+                    style={styles.avatarImg}
+                  />
+                ) : (
+                  <div style={styles.avatarPlaceholder}>Resim Yükle</div>
+                )}
+              </div>
+              <input
+                id="avatar-upload"
+                className="no-print"
+                style={styles.avatarInput}
+                type="file"
+                accept="image/*"
+                onChange={handleAvatarChange}
               />
-            ) : (
-              <div style={styles.avatarPlaceholder}>Resim Yükle</div>
-            )}
+            </div>
+
+            {/* Row 2 */}
+            <TextCell label="Occupation" value={form.occupation} onChange={(v) => handleTextChange("occupation", v)} />
+            <TextCell label="Residence" value={form.residence} onChange={(v) => handleTextChange("residence", v)} />
+            <div style={styles.cell} className="age-cell">
+              <div style={styles.cellLabel}>Age</div>
+              <input
+                type="number"
+                min={0}
+                max={120}
+                value={form.age || 0}
+                onChange={(e) => handleNumericChange("age", e.target.value)}
+                className="age-input"
+                style={styles.lineInput}
+              />
+            </div>
+
+            {/* Characteristics from rulesSpec */}
+            <StatCell rulesSpec={rulesSpec} label="Strength" value={form.STR} base={rulesSpec.base.STR} usage={rulesSpec.usage.STR} onChange={(v) => handleNumericChange("STR", v)} onBlur={() => handleNumericBlur("STR")} onDelta={(d) => handleDelta("STR", d)} />
+            <StatCell rulesSpec={rulesSpec} label="SIZE" value={form.SIZ} base={rulesSpec.base.SIZ} usage={rulesSpec.usage.SIZ} onChange={(v) => handleNumericChange("SIZ", v)} onBlur={() => handleNumericBlur("SIZ")} onDelta={(d) => handleDelta("SIZ", d)} />
+            <ReadSmall label="Hit Points" value={form.HP ?? 0} />
+
+            <StatCell rulesSpec={rulesSpec} label="Stamina" value={form.STA} base={rulesSpec.base.STA} usage={rulesSpec.usage.STA} onChange={(v) => handleNumericChange("STA", v)} onBlur={() => handleNumericBlur("STA")} onDelta={(d) => handleDelta("STA", d)} />
+            <StatCell rulesSpec={rulesSpec} label="POW" value={form.POW} base={rulesSpec.base.POW} usage={rulesSpec.usage.POW} onChange={(v) => handleNumericChange("POW", v)} onBlur={() => handleNumericBlur("POW")} onDelta={(d) => handleDelta("POW", d)} />
+            <ReadSmall label="Magic Points" value={form.MP ?? 0} />
+
+            <StatCell rulesSpec={rulesSpec} label="Agility" value={form.AGI} base={rulesSpec.base.AGI} usage={rulesSpec.usage.AGI} onChange={(v) => handleNumericChange("AGI", v)} onBlur={() => handleNumericBlur("AGI")} onDelta={(d) => handleDelta("AGI", d)} />
+            <StatCell rulesSpec={rulesSpec} label="Education" value={form.EDU} base={rulesSpec.base.EDU} usage={rulesSpec.usage.EDU} onChange={(v) => handleNumericChange("EDU", v)} onBlur={() => handleNumericBlur("EDU")} onDelta={(d) => handleDelta("EDU", d)} />
+            <StatCell rulesSpec={rulesSpec} label="Luck" value={form.LUCK} base={rulesSpec.base.LUCK} usage={rulesSpec.usage.LUCK} onChange={(v) => handleNumericChange("LUCK", v)} onBlur={() => handleNumericBlur("LUCK")} onDelta={(d) => handleDelta("LUCK", d)} />
+
+            <StatCell rulesSpec={rulesSpec} label="Intellect" value={form.INT} base={rulesSpec.base.INT} usage={rulesSpec.usage.INT} onChange={(v) => handleNumericChange("INT", v)} onBlur={() => handleNumericBlur("INT")} onDelta={(d) => handleDelta("INT", d)} />
+            <StatCell rulesSpec={rulesSpec} label="Appeal" value={form.APP} base={rulesSpec.base.APP} usage={rulesSpec.usage.APP} onChange={(v) => handleNumericChange("APP", v)} onBlur={() => handleNumericBlur("APP")} onDelta={(d) => handleDelta("APP", d)} />
+            <StatCell rulesSpec={rulesSpec} label="Bonus" value={form.BONUS} base={rulesSpec.base.BONUS} usage={rulesSpec.usage.BONUS} onChange={(v) => handleNumericChange("BONUS", v)} onBlur={() => handleNumericBlur("BONUS")} onDelta={(d) => handleDelta("BONUS", d)} />
+            
+            <StatCell rulesSpec={rulesSpec} label="Spot" value={form.SPOT} base={rulesSpec.base.SPOT} usage={rulesSpec.usage.SPOT} onChange={(v) => handleNumericChange("SPOT", v)} onBlur={() => handleNumericBlur("SPOT")} onDelta={(d) => handleDelta("SPOT", d)} />
+            <StatCell rulesSpec={rulesSpec} label="Perception" value={form.PER} base={rulesSpec.base.PER} usage={rulesSpec.usage.PER} onChange={(v) => handleNumericChange("PER", v)} onBlur={() => handleNumericBlur("PER")} onDelta={(d) => handleDelta("PER", d)} />
+            <StatCell rulesSpec={rulesSpec} label="Sanity" value={form.SAN} base={rulesSpec.base.SAN} usage={rulesSpec.usage.SAN} onChange={(v) => handleNumericChange("SAN", v)} onBlur={() => handleNumericBlur("SAN")} onDelta={(d) => handleDelta("SAN", d)} />
+            <ReadSmall label="Build" value={form.Build ?? 0} />
+
+            <ReadSmall label="Reputation" value={form.REP ?? 0} />
+            <StatCell rulesSpec={rulesSpec} label="Bravery" value={form.BRV} base={rulesSpec.base.BRV} usage={rulesSpec.usage.BRV} onChange={(v) => handleNumericChange("BRV", v)} onBlur={() => handleNumericBlur("BRV")} onDelta={(d) => handleDelta("BRV", d)} />
+            <ReadSmall label="Move" value={form.MOVE ?? 8} />
+            <ReadSmall label="Damage Bonus" value={form.damageBonus ?? "0"} />
+            <StatCell rulesSpec={rulesSpec} label="Armor" value={form.ARMOR} base={rulesSpec.base.ARMOR} usage={rulesSpec.usage.ARMOR} onChange={(v) => handleNumericChange("ARMOR", v)} onBlur={() => handleNumericBlur("ARMOR")} onDelta={(d) => handleDelta("ARMOR", d)} isSmallStep={true} />
+            <StatCell rulesSpec={rulesSpec} label="Resiliance" value={form.RES} base={rulesSpec.base.RES} usage={rulesSpec.usage.RES} onChange={(v) => handleNumericChange("RES", v)} onBlur={() => handleNumericBlur("RES")} onDelta={(d) => handleDelta("RES", d)} isSmallStep={true} />
+            <ReadSmall label="Total XP" value={form.totalXP ?? 0} />
+            <ReadSmall label="Used XP" value={form.usedXP ?? 0} />
           </div>
 
-          <input
-            id="avatar-upload"
-            className="no-print"
-            style={styles.avatarInput}
-            type="file"
-            accept="image/*"
-            onChange={handleAvatarChange}
-          />
+          <form onSubmit={(e) => handleSubmit(e, false)} style={styles.form}>
+            <div className="sheet-grid" style={styles.grid}>
+              {FIELD_DEFS.map((def) => {
+                const value = form[def.key] ?? "";
+                const base = rulesSpec.base[def.key];
+                const usage = rulesSpec.usage[def.key];
+                const isNumber = def.type === "number";
+                const labelWithBase = base !== undefined ? `${def.label} ${base}` : def.label;
 
-        </div>
+                const numericValue = Number(value) || 0;
+                const currentCost = getCurrentCostPerPoint(rulesSpec, usage, numericValue);
+                const totalCost = isNumber && usage !== undefined ? getCostBetween(rulesSpec, def.key, base ?? 0, numericValue) : 0;
+                const costColor = getCostColor(currentCost);
+                const tooltipText = isNumber && usage !== undefined ? `Spent: ${totalCost}` : "";
+                const deltaTooltipText = `${currentCost * 5} XP`;
 
-        {/* Row 2 */}
-        <TextCell label="Occupation" value={form.occupation} onChange={(v) => handleTextChange("occupation", v)} />
-        <TextCell label="Residence" value={form.residence} onChange={(v) => handleTextChange("residence", v)} />
-        <div style={styles.cell} className="age-cell">
-          <div style={styles.cellLabel}>Age</div>
-          <input
-            type="number"
-            min={0}
-            max={120}
-            value={form.age || 0}
-            onChange={(e) => handleNumericChange("age", e.target.value)}
-            className="age-input"
-            style={styles.lineInput}
-          />
-        </div>
+                const labelExtra =
+                  isNumber && (usage !== undefined)
+                    ? ` (Cost: ${currentCost})`
+                    : "";
+                const halfValue = Math.floor(numericValue / 2);
+                const fifthValue = Math.floor(numericValue / 5);
 
-        {/* Row 3 */}
-        <StatCell label="Strength" value={form.STR} base={BASE.STR} usage={USAGE.STR} onChange={(v) => handleNumericChange("STR", v)} onBlur={() => handleNumericBlur("STR")} onDelta={(d) => handleDelta("STR", d)} />
-        <StatCell label="SIZE" value={form.SIZ} base={BASE.SIZ} usage={USAGE.SIZ} onChange={(v) => handleNumericChange("SIZ", v)} onBlur={() => handleNumericBlur("SIZ")} onDelta={(d) => handleDelta("SIZ", d)} />
-        <StatCell label="Hit Points" value={form.HP ?? 0} readOnly />
+                return (
+                  <div key={def.key} style={styles.field}>
+                    <div className="field-header" style={styles.fieldHeader} title={tooltipText}> 
+                      <span style={{ ...styles.labelText, flex: 1 }}>
+                        {def.label} <strong className="no-print">{labelWithBase.split(" ").pop()}</strong>
+                        {labelExtra && (
+                          <span className="label-extra no-print" style={{ ...styles.labelExtra, color: costColor, fontWeight: "bold" }}>{labelExtra}</span>
+                        )}
+                      </span>
 
-        {/* Row 4 */}
-        <StatCell label="Stamina" value={form.STA} base={BASE.STA} usage={USAGE.STA} onChange={(v) => handleNumericChange("STA", v)} onBlur={() => handleNumericBlur("STA")} onDelta={(d) => handleDelta("STA", d)} />
-        <StatCell label="POW" value={form.POW} base={BASE.POW} usage={USAGE.POW} onChange={(v) => handleNumericChange("POW", v)} onBlur={() => handleNumericBlur("POW")} onDelta={(d) => handleDelta("POW", d)} />
-        <StatCell label="Magic Points" value={form.MP ?? 0} readOnly />
+                      <div className="value-row" style={styles.valueRow}>
+                        {isNumber && (
+                          <div className="xp-buttons" style={styles.stepButtons}>
+                            <button
+                              type="button"
+                              style={{ ...styles.stepButton, background: costColor, color: "#fff" }}
+                              title={deltaTooltipText}
+                              onClick={() => handleDelta(def.key, -5)}
+                            >
+                              -5
+                            </button>
+                            <button
+                              type="button"
+                              style={{ ...styles.stepButton, background: costColor, color: "#fff" }}
+                              title={deltaTooltipText}
+                              onClick={() => handleDelta(def.key, +5)}
+                            >
+                              +5
+                            </button>
+                          </div>
+                        )}
 
-        {/* Row 5 */}
-        <StatCell label="Agility" value={form.AGI} base={BASE.AGI} usage={USAGE.AGI} onChange={(v) => handleNumericChange("AGI", v)} onBlur={() => handleNumericBlur("AGI")} onDelta={(d) => handleDelta("AGI", d)} />
-        <StatCell label="Education" value={form.EDU} base={BASE.EDU} usage={USAGE.EDU} onChange={(v) => handleNumericChange("EDU", v)} onBlur={() => handleNumericBlur("EDU")} onDelta={(d) => handleDelta("EDU", d)} />
-        <StatCell label="Luck" value={form.LUCK} base={BASE.LUCK} usage={USAGE.LUCK} onChange={(v) => handleNumericChange("LUCK", v)} onBlur={() => handleNumericBlur("LUCK")} onDelta={(d) => handleDelta("LUCK", d)} />
+                        <input
+                          type={def.type}
+                          name={def.key}
+                          value={def.type === "number" && numericValue === 0 ? "" : value}
+                          onChange={(e) =>
+                            def.type === "number"
+                              ? handleNumericChange(def.key, e.target.value)
+                              : handleTextChange(def.key, e.target.value)
+                          }
+                          onBlur={def.type === "number" ? () => handleNumericBlur(def.key) : undefined}
+                          max={def.type === "number" ? 90 : undefined}
+                          style={styles.inputInline}
+                          placeholder={def.type === "number" && numericValue === 0 ? "0" : undefined}
+                        />
 
-        {/* Row 6 */}
-        <StatCell label="Intellect" value={form.INT} base={BASE.INT} usage={USAGE.INT} onChange={(v) => handleNumericChange("INT", v)} onBlur={() => handleNumericBlur("INT")} onDelta={(d) => handleDelta("INT", d)} />
-        <StatCell label="Appeal" value={form.APP} base={BASE.APP} usage={USAGE.APP} onChange={(v) => handleNumericChange("APP", v)} onBlur={() => handleNumericBlur("APP")} onDelta={(d) => handleDelta("APP", d)} />
-        <StatCell label="Bonus" value={form.BONUS} base={BASE.BONUS} usage={USAGE.BONUS} onChange={(v) => handleNumericChange("BONUS", v)} onBlur={() => handleNumericBlur("BONUS")} onDelta={(d) => handleDelta("BONUS", d)} />
-        
-        {/* Row 7 */}
-        <StatCell label="Spot" value={form.SPOT} base={BASE.SPOT} usage={USAGE.SPOT} onChange={(v) => handleNumericChange("SPOT", v)} onBlur={() => handleNumericBlur("SPOT")} onDelta={(d) => handleDelta("SPOT", d)} />
-        <StatCell label="Perception" value={form.PER} base={BASE.PER} usage={USAGE.PER} onChange={(v) => handleNumericChange("PER", v)} onBlur={() => handleNumericBlur("PER")} onDelta={(d) => handleDelta("PER", d)} />
-        <StatCell label="Sanity" value={form.SAN}  base={BASE.SAN} usage={USAGE.SAN} onChange={(v) => handleNumericChange("SAN", v)} onBlur={() => handleNumericBlur("SAN")} onDelta={(d) => handleDelta("SAN", d)} />
-        <ReadSmall label="Build" value={form.Build ?? 0} />
+                        <input
+                          readOnly
+                          value={halfValue}
+                          style={styles.inputInlineReadOnly}
+                          aria-label={`${def.label} half value`}
+                        />
 
-        {/* Row 8 */}
-        <ReadSmall label="Reputation" value={form.REP ?? 0} />
-        <StatCell label="Bravery" value={form.BRV} base={BASE.BRV} usage={USAGE.BRV} onChange={(v) => handleNumericChange("BRV", v)} onBlur={() => handleNumericBlur("BRV")} onDelta={(d) => handleDelta("BRV", d)} />
-        <ReadSmall label="Move" value={form.MOVE ?? 8} />
-        <ReadSmall label="Damage Bonus" value={form.damageBonus ?? "0"} />
-        <StatCell label="Armor" value={form.ARMOR} base={BASE.ARMOR} usage={USAGE.ARMOR} onChange={(v) => handleNumericChange("ARMOR", v)} onBlur={() => handleNumericBlur("ARMOR")} onDelta={(d) => handleDelta("ARMOR", d)} isSmallStep={true} />
-        <StatCell label="Resiliance" value={form.RES} base={BASE.RES} usage={USAGE.RES} onChange={(v) => handleNumericChange("RES", v)} onBlur={() => handleNumericBlur("RES")} onDelta={(d) => handleDelta("RES", d)} isSmallStep={true} />
-        <ReadSmall label="Total XP" value={form.totalXP ?? 0} />
-        <ReadSmall label="Used XP" value={form.usedXP ?? 0} />
-      </div>
-
-      <form
-        onSubmit={(e) => handleSubmit(e, false)}
-        style={styles.form}
-      >
-        <div className="sheet-grid" style={styles.grid}>
-          {FIELD_DEFS.map((def) => {
-            const value = form[def.key] ?? "";
-            const base = BASE[def.key];
-            const usage = USAGE[def.key];
-            const isNumber = def.type === "number";
-            const labelWithBase = base !== undefined ? `${def.label} ${base}` : def.label;
-
-            const numericValue = Number(value) || 0;
-            const currentCost = getCurrentCostPerPoint(usage, numericValue);
-            const totalCost = isNumber && usage !== undefined ? getCostBetween(def.key, base ?? 0, numericValue) : 0;
-            const costColor = getCostColor(currentCost);
-            const tooltipText = isNumber && usage !== undefined ? `Spent: ${totalCost}` : "";
-            const deltaTooltipText = `${currentCost * 5} XP`;
-
-            const labelExtra =
-              isNumber && (usage !== undefined)
-                ? ` (Cost: ${currentCost})`
-                : "";
-            const halfValue = Math.floor(numericValue / 2);
-            const fifthValue = Math.floor(numericValue / 5);
-
-            return (
-              <div key={def.key} style={styles.field}>
-                <div className="field-header" style={styles.fieldHeader} title={tooltipText}> 
-                  <span style={{ ...styles.labelText, flex: 1 }}>
-                    {def.label} <strong className="no-print">{labelWithBase.split(" ").pop()}</strong>
-                    {labelExtra && (
-                      <span className="label-extra no-print" style={{ ...styles.labelExtra, color: costColor, fontWeight: "bold" }}>{labelExtra}</span>
-                    )}
-                  </span>
-
-                  <div className="value-row" style={styles.valueRow}>
-                    {isNumber && (
-                      <div className="xp-buttons" style={styles.stepButtons}>
-                        <button
-                          type="button"
-                          style={{ ...styles.stepButton, background: costColor, color: "#fff" }}
-                          title={deltaTooltipText}
-                          onClick={() => handleDelta(def.key, -5)}
-                        >
-                          -5
-                        </button>
-                        <button
-                          type="button"
-                          style={{ ...styles.stepButton, background: costColor, color: "#fff" }}
-                          title={deltaTooltipText}
-                          onClick={() => handleDelta(def.key, +5)}
-                        >
-                          +5
-                        </button>
+                        <input
+                          readOnly
+                          value={fifthValue}
+                          style={styles.inputInlineReadOnlySmall}
+                          aria-label={`${def.label} fifth value`}
+                        />
                       </div>
-                    )}
-
-                    <input
-                      type={def.type}
-                      name={def.key}
-                      value={def.type === "number" && numericValue === 0 ? "" : value}
-                      onChange={(e) =>
-                        def.type === "number"
-                          ? handleNumericChange(def.key, e.target.value)
-                          : handleTextChange(def.key, e.target.value)
-                      }
-                      onBlur={def.type === "number" ? () => handleNumericBlur(def.key) : undefined}
-                      max={def.type === "number" ? 90 : undefined}
-                      style={styles.inputInline}
-                      placeholder={def.type === "number" && numericValue === 0 ? "0" : undefined}
-                    />
-
-                    <input
-                      readOnly
-                      value={halfValue}
-                      style={styles.inputInlineReadOnly}
-                      aria-label={`${def.label} half value`}
-                    />
-
-                    <input
-                      readOnly
-                      value={fifthValue}
-                      style={styles.inputInlineReadOnlySmall}
-                      aria-label={`${def.label} fifth value`}
-                    />
+                    </div>
                   </div>
-                </div>
-              </div>
-            );
-          })}
+                );
+              })}
+            </div>
+
+            {error && <div style={styles.error}>{error}</div>}
+
+            <div className="update-buttons no-print" style={styles.buttonsBar}>
+              <button
+                type="button"
+                style={{ ...styles.button, background: "#9ca3af" }}
+                onClick={onCancel}
+                disabled={isSubmitting}
+              >
+                Geri dön
+              </button>
+
+              <button
+                type="submit"
+                style={{ ...styles.button, background: "#fbbf24" }}
+                disabled={isSubmitting}
+                onClick={(e) => handleSubmit(e, false)}
+              >
+                Kaydet ve geri dön
+              </button>
+
+              <button
+                type="button"
+                style={{ ...styles.button, background: "#22c55e" }}
+                disabled={isSubmitting}
+                onClick={(e) => handleSubmit(e, true)}
+              >
+                Kaydet ve sayfada kal
+              </button>
+
+              {mode === "create" && (
+                <button
+                  type="button"
+                  style={{ ...styles.button, background: "#0ea5e9" }}
+                  onClick={() => window.print()}
+                >
+                  Yazdır
+                </button>
+              )}
+
+              <button
+                type="button"
+                style={{ ...styles.button, background: "#8b5cf6" }}
+                onClick={handleExportJSON}
+              >
+                JSON'a Aktar
+              </button>
+            </div>
+          </form>
         </div>
-
-        {error && <div style={styles.error}>{error}</div>}
-
-        <div className="update-buttons no-print" style={styles.buttonsBar}>
-          <button
-            type="button"
-            style={{ ...styles.button, background: "#9ca3af" }}
-            onClick={onCancel}
-            disabled={isSubmitting}
-          >
-            Geri dön
-          </button>
-
-          <button
-            type="submit"
-            style={{ ...styles.button, background: "#fbbf24" }}
-            disabled={isSubmitting}
-            onClick={(e) => handleSubmit(e, false)}
-          >
-            Kaydet ve geri dön
-          </button>
-
-          <button
-            type="button"
-            style={{ ...styles.button, background: "#22c55e" }}
-            disabled={isSubmitting}
-            onClick={(e) => handleSubmit(e, true)}
-          >
-            Kaydet ve sayfada kal
-          </button>
-
-          {mode === "create" && (
-            <button
-              type="button"
-              style={{ ...styles.button, background: "#0ea5e9" }}
-              onClick={() => window.print()}
-            >
-              Yazdır
-            </button>
-          )}
-
-          <button
-            type="button"
-            style={{ ...styles.button, background: "#8b5cf6" }}
-            onClick={handleExportJSON}
-          >
-            JSON'a Aktar
-          </button>
-        </div>
-      </form>
-        </div>
-
-        {/* right vertical line removed */}
       </div>
-
-      {/* bottom banner removed */}
     </div>
   );
 }
@@ -1002,12 +920,6 @@ const styles = {
     flexDirection: "column",
     minHeight: "100vh",
   },
-  topBanner: {
-    display: "none",
-  },
-  bannerImg: {
-    display: "none",
-  },
   mainContainer: {
     display: "flex",
     flex: 1,
@@ -1017,13 +929,6 @@ const styles = {
     width: "100%",
     maxWidth: "100%",
     alignItems: "stretch",
-  },
-  /* vertical decorations removed */
-  bottomLine: {
-    display: "none",
-  },
-  bottomLineImg: {
-    display: "none",
   },
   page: {
     flex: 1,
@@ -1036,34 +941,36 @@ const styles = {
     flexDirection: "column",
     minWidth: 0,
   },
-  topRow: {
-    display: "flex",
-    flexDirection: "row-reverse",
-    gap: "1.5rem",
-    marginBottom: "1rem",
-  },
-  avatarBlock: {
+  avatarCol: {
+    gridColumn: 4,
+    gridRow: "1 / span 6",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    gap: "0.5rem",
+    alignSelf: "start",
+    gap: "6px",
+    border: "1px solid rgba(0,0,0,0.18)",
+    borderRadius: "8px",
+    padding: "8px",
+    background: "#fff",
   },
-  avatarPreviewWrapper: {
-    width: "140px",
-    height: "140px",
-    borderRadius: "0.75rem",
+  avatarBox: {
+    width: "182px",
+    height: "238px",
+    border: "2px solid #111",
+    borderRadius: "4px",
     overflow: "hidden",
-    border: "2px solid #c97316",
-    background: "#fefce8",
+    background: "#fff",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    cursor: "pointer",
+    transition: "border-color 0.2s",
   },
   avatarImg: {
     width: "100%",
     height: "100%",
     objectFit: "cover",
-    cursor: "pointer",
   },
   avatarPlaceholder: {
     fontSize: "0.85rem",
@@ -1072,39 +979,6 @@ const styles = {
   },
   avatarInput: {
     display: "none",
-  },
-  cocIconContainer: {
-    marginTop: "0.5rem",
-    display: "flex",
-    justifyContent: "center",
-  },
-  cocIcon: {
-    width: "100px",
-    height: "auto",
-    objectFit: "contain",
-  },
-  metaBlock: {
-    flex: 1,
-    display: "flex",
-    flexDirection: "column",
-    gap: "0.5rem",
-  },
-  metaRow: {
-    display: "flex",
-    gap: "0.75rem",
-    alignItems: "flex-end",
-  },
-  metaRowXP: {
-    display: "flex",
-    flexWrap: "wrap",
-    gap: "0.75rem",
-    marginTop: "0.5rem",
-  },
-  metaXPBox: {
-    display: "flex",
-    flexDirection: "column",
-    fontSize: "0.8rem",
-    minWidth: "110px",
   },
   form: {
     marginTop: "0.5rem",
@@ -1133,18 +1007,6 @@ const styles = {
     alignItems: "center",
     gap: "0.24rem",
   },
-  label: {
-    display: "flex",
-    flexDirection: "column",
-    flex: 1,
-    fontSize: "0.8rem",
-  },
-  labelSmall: {
-    display: "flex",
-    flexDirection: "column",
-    flex: 0.4,
-    fontSize: "0.8rem",
-  },
   labelText: {
     color: "#4b5563",
   },
@@ -1152,15 +1014,6 @@ const styles = {
     paddingLeft: "4px",
     color: "#6b7280",
     fontSize: "0.75rem",
-  },
-  input: {
-    padding: "0.35rem 0.45rem",
-    borderRadius: "0.5rem",
-    border: "1px solid #000000ff",
-    background: "#ffffffff",
-    color: "#111827",
-    fontSize: "0.85rem",
-    boxSizing: "border-box",
   },
   inputInline: {
     padding: "0.13rem 0.18rem",
@@ -1213,14 +1066,6 @@ const styles = {
     flexWrap: "wrap",
     marginLeft: "auto",
   },
-  inputReadOnly: {
-    padding: "0.35rem 0.45rem",
-    borderRadius: "0.5rem",
-    border: "1px solid #d1d5db",
-    background: "#f9fafb",
-    color: "#111827",
-    fontSize: "0.85rem",
-  },
   stepButtons: {
     display: "flex",
     flexDirection: "row",
@@ -1249,8 +1094,7 @@ const styles = {
     display: "flex",
     gap: "0.5rem",
     justifyContent: "flex-end",
-    background:
-      "linear-gradient(to top, rgba(0,0,0,0.15), rgba(0,0,0,0))",
+    background: "linear-gradient(to top, rgba(0,0,0,0.15), rgba(0,0,0,0))",
     paddingTop: "0.5rem",
     paddingBottom: "0.25rem",
   },
@@ -1263,17 +1107,17 @@ const styles = {
     cursor: "pointer",
     color: "#111827",
   },
-    headerGrid: {
-      display: "grid",
-      gridTemplateColumns: "2fr 2fr 2fr 3fr",
-      gridAutoRows: "minmax(25px, auto)",
-      gap: "4px 5px",
-      border: "1px solid #111",
-      borderRadius: "8px",
-      padding: "8px",
-      marginBottom: "8px",
-      alignItems: "stretch",
-    },
+  headerGrid: {
+    display: "grid",
+    gridTemplateColumns: "2fr 2fr 2fr 3fr",
+    gridAutoRows: "minmax(25px, auto)",
+    gap: "4px 5px",
+    border: "1px solid #111",
+    borderRadius: "8px",
+    padding: "8px",
+    marginBottom: "8px",
+    alignItems: "stretch",
+  },
   cell: {
     border: "1px solid rgba(0,0,0,0.18)",
     borderRadius: "4px",
@@ -1283,10 +1127,6 @@ const styles = {
     justifyContent: "center",
     minWidth: 0,
     background: "#fff",
-  },
-  emptyCell: {
-    border: "1px solid transparent",
-    background: "transparent",
   },
   cellLabel: {
     fontSize: "10px",
@@ -1303,34 +1143,6 @@ const styles = {
     background: "transparent",
     boxSizing: "border-box",
   },
-
-  avatarCol: {
-    gridColumn: 4,
-    gridRow: "1 / span 6",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    alignSelf: "start",
-    gap: "6px",
-    border: "1px solid rgba(0,0,0,0.18)",
-    borderRadius: "8px",
-    padding: "8px",
-    background: "#fff",
-  },
-  avatarBox: {
-    width: "182px",
-    height: "238px",
-    border: "2px solid #111",
-    borderRadius: "4px",
-    overflow: "hidden",
-    background: "#fff",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    cursor: "pointer",
-    transition: "border-color 0.2s",
-  },
-
   statRow: {
     display: "flex",
     alignItems: "center",
@@ -1351,66 +1163,6 @@ const styles = {
     fontSize: "12px",
     background: "#fff",
   },
-
-  vitalLabel: {
-    fontWeight: 800,
-    fontSize: "11px",
-    marginBottom: "3px",
-  },
-  vitalMini: {
-    fontSize: "9px",
-    opacity: 0.9,
-    marginBottom: 0,
-  },
-  vitalRow: {
-    display: "flex",
-    alignItems: "center",
-    gap: "6px",
-    flexWrap: "nowrap",
-    minWidth: 0,
-  },
-  vitalBox: {
-    width: "64px",
-    minWidth: "64px",
-    minHeight: "26px",
-    padding: "3px 5px",
-    border: "1px solid #111",
-    borderRadius: "6px",
-    textAlign: "left",
-    fontSize: "11px",
-    background: "#fff",
-    boxSizing: "border-box",
-  },
-  vitalCol: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: "4px",
-    flexWrap: "nowrap",
-    minWidth: 0,
-  },
-  vitalOne: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: "6px",
-    flexWrap: "nowrap",
-  },
-  vitalTwo: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: "6px",
-    flexWrap: "nowrap",
-  },
-  vitalThree: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: "6px",
-    flexWrap: "nowrap",
-  },
-
 };
 
 export default PlayerForm;
