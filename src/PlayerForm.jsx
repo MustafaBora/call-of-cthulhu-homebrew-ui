@@ -13,8 +13,8 @@ const USAGE = {
   APP: 60,
   BONUS: 120,
   BRV: 120,
-  CON: 120,
-  DEX: 220,
+  STA: 120,
+  AGI: 220,
   EDU: 20,
   INT: 60,
   LUCK: 180,
@@ -85,8 +85,8 @@ const BASE = {
   APP: 30,
   BONUS: 0,
   BRV: 45,
-  CON: 30,
-  DEX: 35,
+  STA: 30,
+  AGI: 35,
   EDU: 20,
   INT: 30,
   LUCK: 35,
@@ -150,8 +150,6 @@ const BASE = {
   Throw: 20,
   Track: 10,
 };
-
-const XP_KEYS = Object.keys(USAGE);
 
 const FIELD_DEFS = [
   { key: "Accounting", label: "Accounting", type: "number" },
@@ -271,14 +269,6 @@ function getCostBetween(skill, currentValue, targetValue) {
 }
 
 /**
- * Taban seviyeinden (0) hedef seviyeye gitmek için gereken toplam puanı hesaplar.
- * Backend'deki getCostFromBase metodunun JavaScript implementasyonu.
- */
-function getCostFromBase(skill, targetValue) {
-  return getCostBetween(skill, 0, targetValue);
-}
-
-/**
  * Player'ın tüm özellik ve becerilerini iyileştirmek için gereken toplam XP'yi hesaplar.
  * Backend'deki calculateXP metodunun JavaScript implementasyonu.
  */
@@ -287,7 +277,7 @@ function computeUsedXP(values) {
   let sum = 0;
   
   // Characteristics
-  const characteristics = ["APP", "BONUS", "BRV", "CON", "DEX", "EDU", "INT", "LUCK", "PER", "POW", "REP", "SAN", "SIZ", "STR"];
+  const characteristics = ["APP", "BONUS", "BRV", "STA", "AGI", "EDU", "INT", "LUCK", "PER", "POW", "REP", "SAN", "SIZ", "STR"];
   console.log("--- Characteristics ---");
   for (const key of characteristics) {
     const v = Number(values[key]) || 0;
@@ -331,7 +321,7 @@ function applyDerived(values) {
   const v = (k) => Number(values[k]) || 0;
   const updated = { ...values };
 
-  updated.HP = Math.floor((v("CON") + v("SIZ")) / 10);
+  updated.HP = Math.floor((v("STA") + v("SIZ")) / 10);
   updated.MP = Math.floor(v("POW") / 5);
 
   const sum = v("SIZ") + v("STR");
@@ -355,12 +345,12 @@ function applyDerived(values) {
     updated.damageBonus = "0";
   }
 
-  const dex = v("DEX");
+  const agi = v("AGI");
   const siz = v("SIZ");
   const str = v("STR");
   let move = 8;
-  if (dex > siz && dex > str) move = 9;
-  else if (dex < siz && dex < str) move = 7;
+  if (agi > siz && agi > str) move = 9;
+  else if (agi < siz && agi < str) move = 7;
   updated.MOVE = move;
 
   const usedXP = computeUsedXP(updated);
@@ -434,7 +424,6 @@ function StatCell({ label, value, onChange, onBlur, onDelta, base, usage, readOn
     : () => onBlur && onBlur();
 
   const numericValue = Number(value) || 0;
-  const labelWithBase = base !== undefined ? `${label} ${base}` : label;
   const costNow = getCurrentCostPerPoint(usage, numericValue);
   const costColor = getCostColor(costNow);
   const tooltipText = `${costNow * 5} XP`;
@@ -677,7 +666,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
           .label-extra-hide-print { display: none !important; }
           strong { font-weight: normal !important; }
           .value-row { flex-wrap: wrap !important; max-width: 100% !important; justify-content: flex-start !important; gap: 3px !important; }
-          .value-row input { width: 28px !important; min-width: 22px !important; }
+          .value-row input { width: 14px !important; min-width: 11px !important; text-align: right !important; font-size: 8px !important; padding: 1px 2px !important; }
         }
       `}</style>
 
@@ -783,12 +772,12 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
         <StatCell label="Hit Points" value={form.HP ?? 0} readOnly />
 
         {/* Row 4 */}
-        <StatCell label="Condition" value={form.CON} base={BASE.CON} usage={USAGE.CON} onChange={(v) => handleNumericChange("CON", v)} onBlur={() => handleNumericBlur("CON")} onDelta={(d) => handleDelta("CON", d)} />
+        <StatCell label="Stamina" value={form.STA} base={BASE.STA} usage={USAGE.STA} onChange={(v) => handleNumericChange("STA", v)} onBlur={() => handleNumericBlur("STA")} onDelta={(d) => handleDelta("STA", d)} />
         <StatCell label="POW" value={form.POW} base={BASE.POW} usage={USAGE.POW} onChange={(v) => handleNumericChange("POW", v)} onBlur={() => handleNumericBlur("POW")} onDelta={(d) => handleDelta("POW", d)} />
         <StatCell label="Magic Points" value={form.MP ?? 0} readOnly />
 
         {/* Row 5 */}
-        <StatCell label="Dexterity" value={form.DEX} base={BASE.DEX} usage={USAGE.DEX} onChange={(v) => handleNumericChange("DEX", v)} onBlur={() => handleNumericBlur("DEX")} onDelta={(d) => handleDelta("DEX", d)} />
+        <StatCell label="Agility" value={form.AGI} base={BASE.AGI} usage={USAGE.AGI} onChange={(v) => handleNumericChange("AGI", v)} onBlur={() => handleNumericBlur("AGI")} onDelta={(d) => handleDelta("AGI", d)} />
         <StatCell label="Bravery" value={form.BRV} base={BASE.BRV} usage={USAGE.BRV} onChange={(v) => handleNumericChange("BRV", v)} onBlur={() => handleNumericBlur("BRV")} onDelta={(d) => handleDelta("BRV", d)} />
         <StatCell label="Luck" value={form.LUCK} base={BASE.LUCK} usage={USAGE.LUCK} onChange={(v) => handleNumericChange("LUCK", v)} onBlur={() => handleNumericBlur("LUCK")} onDelta={(d) => handleDelta("LUCK", d)} />
 
@@ -1141,6 +1130,7 @@ const styles = {
     width: "32px",
     minWidth: "28px",
     maxWidth: "40px",
+    textAlign: "right",
   },
   inputInlineReadOnly: {
     padding: "0.11rem 0.16rem",
@@ -1153,6 +1143,7 @@ const styles = {
     width: "24px",
     minWidth: "20px",
     maxWidth: "32px",
+    textAlign: "right",
   },
   inputInlineReadOnlySmall: {
     padding: "0.10rem 0.14rem",
@@ -1165,6 +1156,7 @@ const styles = {
     width: "20px",
     minWidth: "18px",
     maxWidth: "28px",
+    textAlign: "right",
   },
   valueRow: {
     display: "flex",
