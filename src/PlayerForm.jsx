@@ -691,7 +691,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
             left: 0 !important;
             width: 100% !important;
             height: 100% !important;
-            object-fit: cover !important;
+            object-fit: contain !important;
             opacity: 0.15 !important;
             z-index: 0 !important;
             filter: grayscale(100%) !important;
