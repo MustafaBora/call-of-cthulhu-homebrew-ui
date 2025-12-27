@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import defaultAvatar from "./assets/default-avatar.png";
 import LanguageSwitcher from "./LanguageSwitcher";
 
 /**
@@ -219,7 +220,7 @@ function computeUsedXP(rulesSpec, values) {
     "Language Other 3", "Language Own", "Law", "Library Use", "Listen", "Locksmith",
     "Mechanical Repair", "Medicine", "Natural World", "Navigate", "Occult", "Persuade",
     "Pilot", "Psychoanalysis", "Psychology", "Ride", "Science", "Science Other",
-    "Science Other 2", "Sleight Of Hand", "SPOT", "Stealth", "Survival", "Swim", "Throw", "Track"
+    "Science Other 2", "Sleight Of Hand", "Stealth", "Survival", "Swim", "Throw", "Track"
   ];
   console.log("--- Skills ---");
   
@@ -250,12 +251,11 @@ function computeUsedXP(rulesSpec, values) {
     "SleightOfHand": "Sleight Of Hand"
   };
   
-  // Calculate cost for each skill using the correct backend key
-  for (const frontendKey of Object.keys(values)) {
-    // Skip if not a skill field
-    if (!FIELD_DEFS.find(f => f.key === frontendKey && f.type === "number")) continue;
-    if (characteristics.includes(frontendKey)) continue;
+  // Calculate cost for each skill using FIELD_DEFS
+  for (const def of FIELD_DEFS) {
+    if (def.type !== "number") continue;
     
+    const frontendKey = def.key;
     const backendKey = skillKeyMap[frontendKey] || frontendKey;
     const v = Number(values[frontendKey]) || 0;
     const baseValue = rulesSpec.base[backendKey] ?? 0;
@@ -431,9 +431,12 @@ function getInitialForm(rulesSpec, mode, player) {
     // Edit modu
     return applyDerived(rulesSpec, {
       ...player,
+      // Map backend CON/DEX to frontend STA/AGI for consistency in the UI
+      STA: player?.CON ?? player?.STA ?? 0,
+      AGI: player?.DEX ?? player?.AGI ?? 0,
       ARMOR: player?.ARMOR ?? player?.armor ?? 0,
       RES: player?.RES ?? player?.res ?? 0,
-      avatar: player.avatar || "",
+      avatar: player?.avatar || "",
     });
   }
 }
@@ -535,6 +538,27 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { t } = useTranslation();
+
+  const handleSetAll40 = () => {
+    if (!rulesSpec) return;
+    const keys = [
+      "APP", "BONUS", "BRV", "STA", "AGI", "EDU", "INT", "LUCK",
+      "PER", "SPOT", "POW", "REP", "SAN", "SIZ", "ARMOR", "RES", "STR"
+    ];
+    setForm((prev) => {
+      const next = { ...prev };
+      for (const k of keys) {
+        next[k] = clampStat(rulesSpec, 40, k);
+      }
+      // Also set all numeric skills to 40
+      for (const def of FIELD_DEFS) {
+        if (def.type === "number") {
+          next[def.key] = clampStat(rulesSpec, 40, def.key);
+        }
+      }
+      return applyDerived(rulesSpec, next);
+    });
+  };
 
   // Load rules spec from backend on mount
   useEffect(() => {
@@ -649,6 +673,11 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
         }
       });
 
+      // Backend entity uses CON/DEX instead of STA/AGI
+      // Ensure payload includes these mapped values to avoid XP mismatches
+      payload.CON = Number(payload.STA) || 0;
+      payload.DEX = Number(payload.AGI) || 0;
+
       let response;
 
       if (mode === "create") {
@@ -693,6 +722,36 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
       setError(err.message || "Bir hata oluştu.");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!player || !player.id) return;
+    const confirmed = window.confirm("Bu oyuncuyu silmek istediğinize emin misiniz?");
+    if (!confirmed) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError("Token bulunamadı. Lütfen tekrar giriş yap.");
+        return;
+      }
+
+      const response = await fetch(`http://localhost:8080/players/${player.id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Player silinemedi.");
+      }
+
+      if (onCancel) onCancel();
+    } catch (err) {
+      console.error(err);
+      setError(err.message || "Silme işlemi sırasında hata oluştu.");
     }
   };
 
@@ -830,15 +889,11 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
             {/* Avatar */}
             <div style={styles.avatarCol}>
               <div style={styles.avatarBox} onClick={() => document.getElementById('avatar-upload').click()} title={t("playerForm.uploadImageTooltip")}>
-                {form.avatar ? (
-                  <img
-                    src={`data:image/*;base64,${form.avatar}`}
-                    alt={form.name || "avatar"}
-                    style={styles.avatarImg}
-                  />
-                ) : (
-                    <div style={styles.avatarPlaceholder}>{t("playerForm.uploadImage")}</div>
-                )}
+                <img
+                  src={form.avatar ? `data:image/*;base64,${form.avatar}` : defaultAvatar}
+                  alt={form.name || "avatar"}
+                  style={styles.avatarImg}
+                />
               </div>
               <input
                 id="avatar-upload"
@@ -899,7 +954,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
             <StatCell rulesSpec={rulesSpec} label="Appeal" value={form.APP} base={rulesSpec.base.APP} usage={rulesSpec.usage.APP} onChange={(v) => handleNumericChange("APP", v)} onBlur={() => handleNumericBlur("APP")} onDelta={(d) => handleDelta("APP", d)} />
             <StatCell rulesSpec={rulesSpec} label="Bonus" value={form.BONUS} base={rulesSpec.base.BONUS} usage={rulesSpec.usage.BONUS} onChange={(v) => handleNumericChange("BONUS", v)} onBlur={() => handleNumericBlur("BONUS")} onDelta={(d) => handleDelta("BONUS", d)} />
             
-            <StatCell rulesSpec={rulesSpec} label="Spot" value={form.SPOT} base={rulesSpec.base.SPOT} usage={rulesSpec.usage.SPOT} onChange={(v) => handleNumericChange("SPOT", v)} onBlur={() => handleNumericBlur("SPOT")} onDelta={(d) => handleDelta("SPOT", d)} />
+            <StatCell rulesSpec={rulesSpec} label="Spot Hidden" value={form.SPOT} base={rulesSpec.base.SPOT} usage={rulesSpec.usage.SPOT} onChange={(v) => handleNumericChange("SPOT", v)} onBlur={() => handleNumericBlur("SPOT")} onDelta={(d) => handleDelta("SPOT", d)} />
             <StatCell rulesSpec={rulesSpec} label="Perception" value={form.PER} base={rulesSpec.base.PER} usage={rulesSpec.usage.PER} onChange={(v) => handleNumericChange("PER", v)} onBlur={() => handleNumericBlur("PER")} onDelta={(d) => handleDelta("PER", d)} />
             <StatCell rulesSpec={rulesSpec} label="Sanity" value={form.SAN} base={rulesSpec.base.SAN} usage={rulesSpec.usage.SAN} onChange={(v) => handleNumericChange("SAN", v)} onBlur={() => handleNumericBlur("SAN")} onDelta={(d) => handleDelta("SAN", d)} />
             <ReadSmall label="Build" value={form.Build ?? 0} />
@@ -1079,6 +1134,25 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
               >
                 {t("playerForm.exportJson")}
               </button>
+
+              <button
+                type="button"
+                style={{ ...styles.button, background: "#f87171" }}
+                onClick={handleSetAll40}
+              >
+                {t("playerForm.setAll40")}
+              </button>
+
+              {mode !== "create" && (
+                <button
+                  type="button"
+                  style={{ ...styles.button, background: "#ef4444", color: "#fff" }}
+                  onClick={handleDelete}
+                  disabled={isSubmitting}
+                >
+                  {t("playerForm.delete")}
+                </button>
+              )}
             </div>
           </form>
         </div>
