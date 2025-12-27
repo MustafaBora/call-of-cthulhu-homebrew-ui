@@ -500,12 +500,13 @@ function ReadSmall({ label, value }) {
 
 function TextCell({ label, value, onChange }) {
   return (
-    <div style={styles.cell}>
+    <div style={styles.cell} className="text-cell">
       <div style={styles.cellLabel}>{label}</div>
       <input
         type="text"
         value={value || ""}
         onChange={(e) => onChange(e.target.value)}
+        className="text-input"
         style={styles.lineInput}
       />
     </div>
@@ -734,6 +735,11 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
           .stat-cell { background: transparent !important; }
           .read-small { background: transparent !important; }
           .stat-box-input { background: transparent !important; }
+          /* TextCell transparency */
+          .text-cell { background: transparent !important; }
+          .text-input { background: transparent !important; }
+          .age-cell { background: transparent !important; }
+          .age-input { background: transparent !important; }
           .cell { background: transparent !important; }
           input[type="number"] { background: transparent !important; }
           input[readOnly] { background: transparent !important; }
@@ -788,7 +794,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
         {/* Row 2 */}
         <TextCell label="Occupation" value={form.occupation} onChange={(v) => handleTextChange("occupation", v)} />
         <TextCell label="Residence" value={form.residence} onChange={(v) => handleTextChange("residence", v)} />
-        <div style={styles.cell}>
+        <div style={styles.cell} className="age-cell">
           <div style={styles.cellLabel}>Age</div>
           <input
             type="number"
@@ -796,6 +802,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
             max={120}
             value={form.age || 0}
             onChange={(e) => handleNumericChange("age", e.target.value)}
+            className="age-input"
             style={styles.lineInput}
           />
         </div>
