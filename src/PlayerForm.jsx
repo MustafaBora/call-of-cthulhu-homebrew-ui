@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 /**
  * Updated PlayerForm.jsx to use backend RulesSpec with multi-level penalties
@@ -427,6 +428,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
   const [form, setForm] = useState(() => getInitialForm(null, mode, player));
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { t } = useTranslation();
 
   // Load rules spec from backend on mount
   useEffect(() => {
@@ -594,7 +596,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
       <div style={styles.pageWrapper}>
         <div style={styles.page}>
           <div style={{ padding: "2rem", textAlign: "center" }}>
-            <p>Rules yükleniyor...</p>
+            <p>{t("playerForm.rulesLoading")}</p>
           </div>
         </div>
       </div>
@@ -607,11 +609,11 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
       <div style={styles.pageWrapper}>
         <div style={styles.page}>
           <div style={{ ...styles.error, margin: "2rem" }}>
-            <p><strong>Hata:</strong> {rulesError}</p>
-            <p>Sunucunun çalışır durumda olduğundan emin olun.</p>
+            <p><strong>{t("playerForm.rulesErrorTitle")}:</strong> {rulesError}</p>
+            <p>{t("playerForm.rulesErrorHint")}</p>
           </div>
           <button onClick={onCancel} style={{ ...styles.button, margin: "1rem", background: "#9ca3af" }}>
-            Geri dön
+            {t("playerForm.back")}
           </button>
         </div>
       </div>
@@ -885,7 +887,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
                 onClick={onCancel}
                 disabled={isSubmitting}
               >
-                Geri dön
+                {t("playerForm.back")}
               </button>
 
               <button
@@ -894,7 +896,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
                 disabled={isSubmitting}
                 onClick={(e) => handleSubmit(e, false)}
               >
-                Kaydet ve geri dön
+                {t("playerForm.saveReturn")}
               </button>
 
               <button
@@ -903,7 +905,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
                 disabled={isSubmitting}
                 onClick={(e) => handleSubmit(e, true)}
               >
-                Kaydet ve sayfada kal
+                {t("playerForm.saveStay")}
               </button>
 
               {mode === "create" && (
@@ -912,7 +914,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
                   style={{ ...styles.button, background: "#0ea5e9" }}
                   onClick={() => window.print()}
                 >
-                  Yazdır
+                  {t("playerForm.print")}
                 </button>
               )}
 
@@ -921,7 +923,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
                 style={{ ...styles.button, background: "#8b5cf6" }}
                 onClick={handleExportJSON}
               >
-                JSON'a Aktar
+                {t("playerForm.exportJson")}
               </button>
             </div>
           </form>

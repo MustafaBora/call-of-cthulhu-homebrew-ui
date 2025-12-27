@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 function getInitials(text) {
   if (!text) return "?";
@@ -47,6 +49,7 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [importStatus, setImportStatus] = useState("");
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchPlayers = async () => {
@@ -90,7 +93,7 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    setImportStatus("İçe aktarılıyor...");
+    setImportStatus(t("players.importing"));
     setError("");
 
     try {
@@ -114,12 +117,12 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
       });
 
       if (!response.ok) {
-        throw new Error("Oyuncu içe aktarılamadı.");
+        throw new Error(t("players.importFailed"));
       }
 
       const newPlayer = await response.json();
       setPlayers((prev) => [...prev, newPlayer]);
-      setImportStatus("✓ Başarıyla içe aktarıldı!");
+      setImportStatus(t("players.importSuccess"));
       setTimeout(() => setImportStatus(""), 3000);
     } catch (err) {
       console.error(err);
@@ -132,21 +135,22 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
   };
 
   if (loading) {
-    return <div style={styles.page}>Yükleniyor...</div>;
+    return <div style={styles.page}>{t("players.loading")}</div>;
   }
 
   if (error) {
-    return <div style={styles.page}>Hata: {error}</div>;
+    return <div style={styles.page}>{t("players.errorPrefix")}: {error}</div>;
   }
 
   return (
     <div style={styles.page}>
       <div style={styles.cardWrapper}>
         <div style={styles.headerRow}>
-          <h2 style={styles.title}>Oyuncu Listesi</h2>
+          <h2 style={styles.title}>{t("players.title")}</h2>
           <div style={styles.buttonGroup}>
+            <LanguageSwitcher variant="compact" />
             <label style={styles.importButton}>
-              JSON'dan İçe Aktar
+              {t("players.importJson")}
               <input
                 type="file"
                 accept=".json,application/json"
@@ -160,7 +164,7 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
                 style={styles.newPlayerButton}
                 onClick={onNewPlayer}
               >
-                + Yeni Oyuncu
+                + {t("players.newPlayer")}
               </button>
             )}
           </div>
@@ -175,10 +179,10 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
               type="button"
               style={styles.addCard}
               onClick={onNewPlayer}
-              aria-label="Yeni oyuncu oluştur"
+              aria-label={t("players.newPlayer")}
             >
               <div style={styles.addCardIcon}>+</div>
-              <div style={styles.addCardText}>Yeni Oyuncu</div>
+              <div style={styles.addCardText}>{t("players.addNew")}</div>
             </button>
           )}
           {players.map((p) => (
@@ -200,11 +204,11 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
                 <div style={styles.contentCol}>
                   <div style={styles.headerText}>
                     <div style={styles.nameLine}>
-                      {p.name || "İsimsiz karakter"}
+                      {p.name || t("players.unnamed")}
                     </div>
                     <div style={styles.subLine}>
                       <span style={styles.playerName}>
-                        {p.player || "Oyuncu adı yok"}
+                        {p.player || t("players.unknownPlayer")}
                       </span>
                       {p.occupation && (
                         <>
@@ -229,7 +233,7 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
                       style={styles.editButton}
                       onClick={() => onEditPlayer && onEditPlayer(p)}
                     >
-                      Düzenle
+                      {t("players.edit")}
                     </button>
                     {/*}
                     <button

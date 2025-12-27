@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import PlayersList from "./PlayersList";
 import PlayerForm from "./PlayerForm";
 import CocCharacterForm from "./CocCharacterForm";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
@@ -10,6 +12,7 @@ function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
+  const { t } = useTranslation();
 
   // login sonrası görünüm
   const [mode, setMode] = useState("list"); // "list" | "new" | "edit" | "characterForm"
@@ -163,6 +166,12 @@ function LoginPage() {
       maxWidth: "400px",
       color: "#e5e7eb",
       border: "1px solid #1e293b",
+      position: "relative",
+    },
+    languageSwitcherWrapper: {
+      position: "absolute",
+      top: "1rem",
+      right: "1rem",
     },
     title: {
       margin: 0,
@@ -219,11 +228,16 @@ function LoginPage() {
   return (
     <div style={styles.page}>
       <div style={styles.card}>
-        <h2 style={styles.title}>D100 {isRegistering ? "Register" : "Login"}</h2>
+        <div style={styles.languageSwitcherWrapper}>
+          <LanguageSwitcher variant="compact" />
+        </div>
+        <h2 style={styles.title}>
+          {isRegistering ? t("login.titleRegister") : t("login.titleLogin")}
+        </h2>
         <p style={styles.subtitle}>
           {isRegistering
-            ? "Hesap oluşturmak için bilgilerini gir"
-            : "Devam etmek için giriş yap"}
+            ? t("login.subtitleRegister")
+            : t("login.subtitleLogin")}
         </p>
 
         <form
@@ -231,24 +245,24 @@ function LoginPage() {
           style={styles.form}
         >
           <label style={styles.label}>
-            E-posta
+            {t("login.email")}
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               style={styles.input}
-              placeholder="bora@asd.com"
+              placeholder={t("login.placeholderEmail")}
             />
           </label>
 
           <label style={styles.label}>
-            Şifre
+            {t("login.password")}
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               style={styles.input}
-              placeholder="••••••"
+              placeholder={t("login.placeholderPassword")}
             />
           </label>
 
@@ -257,11 +271,11 @@ function LoginPage() {
           <button type="submit" style={styles.button} disabled={isSubmitting}>
             {isSubmitting
               ? isRegistering
-                ? "Kayıt olunuyor..."
-                : "Giriş yapılıyor..."
+                ? t("login.submittingRegister")
+                : t("login.submittingLogin")
               : isRegistering
-              ? "Kayıt ol"
-              : "Giriş yap"}
+              ? t("login.submitRegister")
+              : t("login.submitLogin")}
           </button>
 
           <button
@@ -277,8 +291,8 @@ function LoginPage() {
             }}
           >
             {isRegistering
-              ? "Zaten hesabın var mı? Giriş yap"
-              : "Hesabın yok mu? Kayıt ol"}
+              ? t("login.toggleToLogin")
+              : t("login.toggleToRegister")}
           </button>
         </form>
       </div>
