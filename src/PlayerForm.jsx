@@ -23,6 +23,9 @@ const USAGE = {
   REP: 100,
   SAN: 160,
   SIZ: 40,
+  ARMOR: 15000,
+  RES: 15000,
+  SPOT: 260,
   STR: 100,
 
   // Beceriler (Skills)
@@ -95,6 +98,9 @@ const BASE = {
   REP: 1,
   SAN: 45,
   SIZ: 31,
+  ARMOR: 0,
+  RES: 0,
+  SPOT: 15,
   STR: 25,
 
   Accounting: 7,
@@ -198,7 +204,6 @@ const FIELD_DEFS = [
   { key: "ScienceOther", label: "Science (Other)", type: "number" },
   { key: "ScienceOther2", label: "Science (Other 2)", type: "number" },
   { key: "SleightOfHand", label: "Sleight of Hand", type: "number" },
-  { key: "SpotHidden", label: "Spot Hidden", type: "number" },
   { key: "Stealth", label: "Stealth", type: "number" },
   { key: "Survival", label: "Survival", type: "number" },
   { key: "Swim", label: "Swim", type: "number" },
@@ -277,7 +282,7 @@ function computeUsedXP(values) {
   let sum = 0;
   
   // Characteristics
-  const characteristics = ["APP", "BONUS", "BRV", "STA", "AGI", "EDU", "INT", "LUCK", "PER", "POW", "REP", "SAN", "SIZ", "STR"];
+  const characteristics = ["APP", "BONUS", "BRV", "STA", "AGI", "EDU", "INT", "LUCK", "PER", "SPOT", "POW", "REP", "SAN", "SIZ", "ARMOR", "RES", "STR"];
   console.log("--- Characteristics ---");
   for (const key of characteristics) {
     const v = Number(values[key]) || 0;
@@ -299,8 +304,7 @@ function computeUsedXP(values) {
     "LanguageOther3", "LanguageOwn", "Law", "LibraryUse", "Listen", "Locksmith",
     "MechanicalRepair", "Medicine", "NaturalWorld", "Navigate", "Occult", "Persuade",
     "Pilot", "Psychoanalysis", "Psychology", "Ride", "Science", "ScienceOther",
-    "ScienceOther2", "SleightOfHand", "SpotHidden", "Stealth", "Survival", "Swim",
-    "Throw", "Track"
+    "ScienceOther2", "SleightOfHand", "Stealth", "Survival", "Swim", "Throw", "Track"
   ];
   console.log("--- Skills ---");
   for (const key of skills) {
@@ -389,6 +393,8 @@ function getInitialForm(mode, player) {
       MP: 0,
       HP: 0,
       MOVE: 8,
+      ARMOR: 0,
+      RES: 0,
       avatar: "",
     };
 
@@ -410,6 +416,8 @@ function getInitialForm(mode, player) {
     // Edit modu
     return applyDerived({
       ...player,
+      ARMOR: player?.ARMOR ?? player?.armor ?? 0,
+      RES: player?.RES ?? player?.res ?? 0,
       avatar: player.avatar || "",
     });
   }
@@ -665,8 +673,21 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
           .label-extra { display: none !important; }
           .label-extra-hide-print { display: none !important; }
           strong { font-weight: normal !important; }
+          .sheet-header .statRow { gap: 4px !important; }
+          .sheet-header .statLabel { font-size: 9px !important; }
+          .sheet-header input[type="number"],
+          .sheet-header input[readOnly] {
+            width: 48px !important;
+            min-width: 42px !important;
+            max-width: 52px !important;
+            font-size: 9px !important;
+            text-align: right !important;
+            padding: 2px 3px !important;
+          }
+          .sheet-header .cell { padding: 2px 3px !important; }
+          .sheet-header .statRow { justify-content: space-between !important; }
           .value-row { flex-wrap: wrap !important; max-width: 100% !important; justify-content: flex-start !important; gap: 3px !important; }
-          .value-row input { width: 14px !important; min-width: 11px !important; text-align: right !important; font-size: 8px !important; padding: 1px 2px !important; }
+          .value-row input { width: 22px !important; min-width: 18px !important; text-align: right !important; font-size: 9px !important; padding: 2px 3px !important; }
         }
       `}</style>
 
@@ -778,27 +799,29 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
 
         {/* Row 5 */}
         <StatCell label="Agility" value={form.AGI} base={BASE.AGI} usage={USAGE.AGI} onChange={(v) => handleNumericChange("AGI", v)} onBlur={() => handleNumericBlur("AGI")} onDelta={(d) => handleDelta("AGI", d)} />
-        <StatCell label="Bravery" value={form.BRV} base={BASE.BRV} usage={USAGE.BRV} onChange={(v) => handleNumericChange("BRV", v)} onBlur={() => handleNumericBlur("BRV")} onDelta={(d) => handleDelta("BRV", d)} />
+        <StatCell label="Education" value={form.EDU} base={BASE.EDU} usage={USAGE.EDU} onChange={(v) => handleNumericChange("EDU", v)} onBlur={() => handleNumericBlur("EDU")} onDelta={(d) => handleDelta("EDU", d)} />
         <StatCell label="Luck" value={form.LUCK} base={BASE.LUCK} usage={USAGE.LUCK} onChange={(v) => handleNumericChange("LUCK", v)} onBlur={() => handleNumericBlur("LUCK")} onDelta={(d) => handleDelta("LUCK", d)} />
 
         {/* Row 6 */}
         <StatCell label="Intellect" value={form.INT} base={BASE.INT} usage={USAGE.INT} onChange={(v) => handleNumericChange("INT", v)} onBlur={() => handleNumericBlur("INT")} onDelta={(d) => handleDelta("INT", d)} />
         <StatCell label="Appeal" value={form.APP} base={BASE.APP} usage={USAGE.APP} onChange={(v) => handleNumericChange("APP", v)} onBlur={() => handleNumericBlur("APP")} onDelta={(d) => handleDelta("APP", d)} />
         <StatCell label="Bonus" value={form.BONUS} base={BASE.BONUS} usage={USAGE.BONUS} onChange={(v) => handleNumericChange("BONUS", v)} onBlur={() => handleNumericBlur("BONUS")} onDelta={(d) => handleDelta("BONUS", d)} />
-        <ReadSmall label="Total XP" value={form.totalXP ?? 0} />
         
         {/* Row 7 */}
+        <StatCell label="Spot" value={form.SPOT} base={BASE.SPOT} usage={USAGE.SPOT} onChange={(v) => handleNumericChange("SPOT", v)} onBlur={() => handleNumericBlur("SPOT")} onDelta={(d) => handleDelta("SPOT", d)} />
         <StatCell label="Perception" value={form.PER} base={BASE.PER} usage={USAGE.PER} onChange={(v) => handleNumericChange("PER", v)} onBlur={() => handleNumericBlur("PER")} onDelta={(d) => handleDelta("PER", d)} />
-        <StatCell label="Education" value={form.EDU} base={BASE.EDU} usage={USAGE.EDU} onChange={(v) => handleNumericChange("EDU", v)} onBlur={() => handleNumericBlur("EDU")} onDelta={(d) => handleDelta("EDU", d)} />
         <StatCell label="Sanity" value={form.SAN}  base={BASE.SAN} usage={USAGE.SAN} onChange={(v) => handleNumericChange("SAN", v)} onBlur={() => handleNumericBlur("SAN")} onDelta={(d) => handleDelta("SAN", d)} />
-        <ReadSmall label="Used XP" value={form.usedXP ?? 0} />
+        <ReadSmall label="Build" value={form.Build ?? 0} />
 
         {/* Row 8 */}
         <ReadSmall label="Reputation" value={form.REP ?? 0} />
-        <ReadSmall label="Build" value={form.Build ?? 0} />
-        <ReadSmall label="Armor" value={form.armor ?? 0} />
+        <StatCell label="Bravery" value={form.BRV} base={BASE.BRV} usage={USAGE.BRV} onChange={(v) => handleNumericChange("BRV", v)} onBlur={() => handleNumericBlur("BRV")} onDelta={(d) => handleDelta("BRV", d)} />
+        <StatCell label="Armor" value={form.ARMOR} base={BASE.ARMOR} usage={USAGE.ARMOR} onChange={(v) => handleNumericChange("ARMOR", v)} onBlur={() => handleNumericBlur("ARMOR")} onDelta={(d) => handleDelta("ARMOR", d)} />
         <ReadSmall label="Damage Bonus" value={form.damageBonus ?? "0"} />
+        <StatCell label="RES" value={form.RES} base={BASE.RES} usage={USAGE.RES} onChange={(v) => handleNumericChange("RES", v)} onBlur={() => handleNumericBlur("RES")} onDelta={(d) => handleDelta("RES", d)} />
         <ReadSmall label="Move" value={form.MOVE ?? 8} />
+        <ReadSmall label="Total XP" value={form.totalXP ?? 0} />
+        <ReadSmall label="Used XP" value={form.usedXP ?? 0} />
       </div>
 
       <form
