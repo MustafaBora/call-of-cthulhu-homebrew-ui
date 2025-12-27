@@ -686,10 +686,10 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
             position: relative !important;
             z-index: 1 !important;
           }
-          .sheet-header { gap: 3px 4px !important; }
-          .sheet-header .cell { padding: 2px 3px !important; }
+          .sheet-header { gap: 3px 4px !important; background: transparent !important; border: none !important; }
+          .sheet-header .cell { padding: 2px 3px !important; background: transparent !important; border: 1px solid rgba(0,0,0,0.18) !important; }
           .sheet-header input { padding: 2px 3px !important; font-size: 10px !important; }
-          .sheet-grid { gap: 0.5rem 0.9rem !important; }
+          .sheet-grid { gap: 0.5rem 0.9rem !important; background: transparent !important; border: none !important; }
           .sheet-grid .field-header > span:first-child { padding-left: 5px !important; }
           .sheet-grid .field-header { gap: 0.28rem !important; }
           .sheet-grid .value-row { gap: 3px !important; }
@@ -700,6 +700,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
           strong { font-weight: normal !important; }
           .sheet-header .statRow { gap: 4px !important; }
           .sheet-header .statLabel { font-size: 9px !important; }
+          .avatarImg { filter: none !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
           .sheet-header input[type="number"],
           .sheet-header input[readOnly] {
             width: 48px !important;
