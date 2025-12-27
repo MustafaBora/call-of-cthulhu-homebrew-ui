@@ -369,7 +369,9 @@ function clampStat(num, fieldName) {
   let n = Number(num) || 0;
   const minValue = (fieldName && BASE[fieldName]) ? BASE[fieldName] : 0;
   if (n < minValue) n = minValue;
-  if (n > 90) n = 90;
+  // ARMOR ve RES için max 1, diğerleri için max 90
+  const maxValue = (fieldName === 'ARMOR' || fieldName === 'RES') ? 1 : 90;
+  if (n > maxValue) n = maxValue;
   return n;
 }
 
@@ -422,7 +424,7 @@ function getInitialForm(mode, player) {
     });
   }
 }
-function StatCell({ label, value, onChange, onBlur, onDelta, base, usage, readOnly = false }) {
+function StatCell({ label, value, onChange, onBlur, onDelta, base, usage, readOnly = false, isSmallStep = false }) {
   const handleChange = readOnly
     ? undefined
     : (e) => onChange && onChange(e.target.value);
@@ -434,7 +436,8 @@ function StatCell({ label, value, onChange, onBlur, onDelta, base, usage, readOn
   const numericValue = Number(value) || 0;
   const costNow = getCurrentCostPerPoint(usage, numericValue);
   const costColor = getCostColor(costNow);
-  const tooltipText = `${costNow * 5} XP`;
+  const stepAmount = isSmallStep ? 1 : 5;
+  const tooltipText = `${costNow * stepAmount} XP`;
 
   return (
     <div style={styles.cell}>
@@ -453,17 +456,17 @@ function StatCell({ label, value, onChange, onBlur, onDelta, base, usage, readOn
                 type="button"
                 style={{ ...styles.stepButton, background: costColor, color: "#fff" }}
                 title={tooltipText}
-                onClick={() => onDelta(-5)}
+                onClick={() => onDelta(-stepAmount)}
               >
-                -5
+                -{stepAmount}
               </button>
               <button
                 type="button"
                 style={{ ...styles.stepButton, background: costColor, color: "#fff" }}
                 title={tooltipText}
-                onClick={() => onDelta(+5)}
+                onClick={() => onDelta(+stepAmount)}
               >
-                +5
+                +{stepAmount}
               </button>
             </div>
           )}
@@ -658,9 +661,31 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
           appearance: textfield;
         }
 
+        .print-bg-image {
+          display: none;
+        }
+
         @media print {
           @page { size: A4; margin: 8mm; }
-          .sheet-page { padding: 0.75rem !important; }
+          .sheet-page { padding: 0.75rem !important; position: relative !important; }
+          .print-bg-image {
+            display: block !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            opacity: 0.15 !important;
+            z-index: 0 !important;
+            filter: grayscale(100%) !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          .sheet-header, .sheet-grid, form {
+            position: relative !important;
+            z-index: 1 !important;
+          }
           .sheet-header { gap: 3px 4px !important; }
           .sheet-header .cell { padding: 2px 3px !important; }
           .sheet-header input { padding: 2px 3px !important; font-size: 10px !important; }
@@ -696,6 +721,14 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
 
       {/* Main Content */}
       <div className="sheet-page" style={styles.page}>
+      {form.avatar && (
+        <img
+          src={`data:image/*;base64,${form.avatar}`}
+          alt=""
+          className="print-bg-image"
+          aria-hidden="true"
+        />
+      )}
       {/* ===== CoC Header Grid (form hariç üst kısım) ===== */}
       <div className="sheet-header" style={styles.headerGrid}>
         {/* Row 1 */}
@@ -816,10 +849,10 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
         {/* Row 8 */}
         <ReadSmall label="Reputation" value={form.REP ?? 0} />
         <StatCell label="Bravery" value={form.BRV} base={BASE.BRV} usage={USAGE.BRV} onChange={(v) => handleNumericChange("BRV", v)} onBlur={() => handleNumericBlur("BRV")} onDelta={(d) => handleDelta("BRV", d)} />
-        <StatCell label="Armor" value={form.ARMOR} base={BASE.ARMOR} usage={USAGE.ARMOR} onChange={(v) => handleNumericChange("ARMOR", v)} onBlur={() => handleNumericBlur("ARMOR")} onDelta={(d) => handleDelta("ARMOR", d)} />
-        <ReadSmall label="Damage Bonus" value={form.damageBonus ?? "0"} />
-        <StatCell label="RES" value={form.RES} base={BASE.RES} usage={USAGE.RES} onChange={(v) => handleNumericChange("RES", v)} onBlur={() => handleNumericBlur("RES")} onDelta={(d) => handleDelta("RES", d)} />
         <ReadSmall label="Move" value={form.MOVE ?? 8} />
+        <ReadSmall label="Damage Bonus" value={form.damageBonus ?? "0"} />
+        <StatCell label="Armor" value={form.ARMOR} base={BASE.ARMOR} usage={USAGE.ARMOR} onChange={(v) => handleNumericChange("ARMOR", v)} onBlur={() => handleNumericBlur("ARMOR")} onDelta={(d) => handleDelta("ARMOR", d)} isSmallStep={true} />
+        <StatCell label="Resiliance" value={form.RES} base={BASE.RES} usage={USAGE.RES} onChange={(v) => handleNumericChange("RES", v)} onBlur={() => handleNumericBlur("RES")} onDelta={(d) => handleDelta("RES", d)} isSmallStep={true} />
         <ReadSmall label="Total XP" value={form.totalXP ?? 0} />
         <ReadSmall label="Used XP" value={form.usedXP ?? 0} />
       </div>
