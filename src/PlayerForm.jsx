@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import defaultAvatar from "./assets/default-avatar.png";
+import frameHorizontal from "./assets/horizontal.png";
+import frameVertical from "./assets/vertical.png";
+import frameVerticalShort from "./assets/vertical-short.png";
 import LanguageSwitcher from "./LanguageSwitcher";
 
 /**
@@ -808,6 +811,53 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
           appearance: textfield;
         }
 
+        /* CoC decorative frame */
+        .sheet-page {
+          position: relative;
+          --frame-thickness: 28px;
+        }
+        .coc-frame {
+          pointer-events: none;
+        }
+        .frame-top,
+        .frame-bottom {
+          position: absolute;
+          left: 0;
+          width: 100%;
+          height: var(--frame-thickness);
+          background-image: url(${frameHorizontal});
+          background-repeat: no-repeat;
+          background-size: 100% 100%;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+          z-index: 1;
+        }
+        .frame-top { top: 0; }
+        .frame-bottom { bottom: 0; }
+        .frame-left,
+        .frame-right {
+          position: absolute;
+          top: var(--frame-thickness);
+          height: calc(100% - (var(--frame-thickness) * 2));
+          width: var(--frame-thickness);
+          background-image: url(${frameVertical});
+          background-repeat: repeat-y;
+          background-size: 100% auto;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+          z-index: 1;
+        }
+        .frame-left { left: 0; }
+        .frame-right { right: 0; }
+
+        /* Use short vertical for small screens */
+        @media (max-height: 700px), (max-width: 640px) {
+          .frame-left,
+          .frame-right {
+            background-image: url(${frameVerticalShort});
+          }
+        }
+
         .print-bg-image {
           display: none;
         }
@@ -815,6 +865,15 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
         @media print {
           @page { size: A4; margin: 8mm; }
           .sheet-page { padding: 0.75rem !important; position: relative !important; }
+          /* Ensure frame prints */
+          .frame-top,
+          .frame-bottom,
+          .frame-left,
+          .frame-right {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            opacity: 1 !important;
+          }
           .print-bg-image {
             display: block !important;
             position: absolute !important;
@@ -831,8 +890,10 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
           }
           .sheet-header, .sheet-grid, form {
             position: relative !important;
-            z-index: 1 !important;
+            z-index: 2 !important;
           }
+          /* Keep avatar box transparent in print so PNG transparency is preserved */
+          .avatarBox { background: transparent !important; }
           .sheet-header { gap: 3px 4px !important; background: transparent !important; border: none !important; }
           .sheet-header .cell { padding: 2px 3px !important; background: transparent !important; border: 1px solid rgba(0,0,0,0.18) !important; }
           .sheet-header input { padding: 2px 3px !important; font-size: 10px !important; background: transparent !important; }
@@ -877,6 +938,11 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
 
       <div style={styles.mainContainer}>
         <div className="sheet-page" style={styles.page}>
+          {/* Decorative frame elements */}
+          <div className="coc-frame frame-top" aria-hidden="true"></div>
+          <div className="coc-frame frame-left" aria-hidden="true"></div>
+          <div className="coc-frame frame-right" aria-hidden="true"></div>
+          <div className="coc-frame frame-bottom" aria-hidden="true"></div>
           {form.avatar && (
             <img
               src={`data:image/*;base64,${form.avatar}`}
@@ -898,7 +964,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
 
             {/* Avatar */}
             <div style={styles.avatarCol}>
-              <div style={styles.avatarBox} onClick={() => document.getElementById('avatar-upload').click()} title={t("playerForm.uploadImageTooltip")}>
+              <div className="avatarBox" style={styles.avatarBox} onClick={() => document.getElementById('avatar-upload').click()} title={t("playerForm.uploadImageTooltip")}>
                 <img
                   src={form.avatar ? `data:image/*;base64,${form.avatar}` : defaultAvatar}
                   alt={form.name || "avatar"}
