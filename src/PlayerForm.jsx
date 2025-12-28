@@ -4,7 +4,7 @@ import defaultAvatar from "./assets/default-avatar.png";
 import frameHorizontalShort from "./assets/horizontal-short.png";
 import frameVertical from "./assets/vertical.png";
 import frameVerticalShort from "./assets/vertical-short.png";
-import cornerTL from "./assets/sign-1.png";
+import cornerTL from "./assets/signs-1.png";
 import cornerTR from "./assets/signs-2.png";
 import cornerBL from "./assets/signs-3.png";
 import cornerBR from "./assets/signs-4.png";
@@ -830,14 +830,29 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
           width: 100%;
           height: var(--frame-thickness);
           background-image: url(${frameHorizontalShort});
-          background-repeat: no-repeat;
-          background-size: 100% 100%;
+          background-repeat: repeat-x;
+          background-size: auto 100%;
           -webkit-print-color-adjust: exact;
           print-color-adjust: exact;
           z-index: 1;
         }
         .frame-top { top: 0; }
         .frame-bottom { bottom: 0; }
+                /* Corner signs */
+                .coc-corner {
+                  position: absolute;
+                  width: calc(var(--frame-thickness) * 3);
+                  height: calc(var(--frame-thickness) * 3);
+                  background-repeat: no-repeat;
+                  background-size: contain;
+                  -webkit-print-color-adjust: exact;
+                  print-color-adjust: exact;
+                  z-index: 1;
+                }
+                .corner-tl { top: 0; left: 0; background-image: url(${cornerTL}); }
+                .corner-tr { top: 0; right: 0; background-image: url(${cornerTR}); }
+                .corner-bl { bottom: 0; left: 0; background-image: url(${cornerBL}); }
+                .corner-br { bottom: 0; right: 0; background-image: url(${cornerBR}); }
         .frame-left,
         .frame-right {
           position: absolute;
@@ -916,10 +931,10 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
           .avatarCol { background: transparent !important; border-color: rgba(0,0,0,0.18) !important; }
           /* Ensure divider prints clearly */
           .sheet-divider { background: rgba(0,0,0,0.35) !important; height: 1px !important; }
-          .sheet-header { gap: 3px 4px !important; background: transparent !important; border: none !important; }
+          .sheet-header { gap: 3px 4px !important; background: transparent !important; border: 1px solid #111 !important; border-radius: 8px !important; }
           .sheet-header .cell { padding: 2px 3px !important; background: transparent !important; border: 1px solid rgba(0,0,0,0.18) !important; }
           .sheet-header input { padding: 2px 3px !important; font-size: 10px !important; background: transparent !important; }
-          .sheet-grid { gap: 0.5rem 0.9rem !important; background: transparent !important; border: none !important; }
+          .sheet-grid { gap: 0.5rem 0.9rem !important; background: transparent !important; border: 1px solid #111 !important; border-radius: 12px !important; margin: 12px !important; }
           .sheet-grid .field-header > span:first-child { padding-left: 5px !important; }
           .sheet-grid .field-header { gap: 0.28rem !important; }
           .sheet-grid .value-row { gap: 3px !important; }
@@ -1009,7 +1024,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
             </div>
 
             {/* Row 2: Pronoun and Age in same div */}
-            <div style={styles.cell} className="pronoun-age-cell">
+            <div style={{ ...styles.cell, background: "transparent" }} className="pronoun-age-cell">
               <div style={{ display: "flex", gap: "8px" }}>
                 <div style={{ flex: 1 }}>
                   <div style={styles.cellLabel}>Pronoun</div>
@@ -1335,6 +1350,7 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     minHeight: "100vh",
+    paddingBottom: "10px",
   },
   mainContainer: {
     display: "flex",
@@ -1409,6 +1425,7 @@ const styles = {
     background: "#ffffffff",
     borderRadius: "0.75rem",
     border: "1px solid #000000ff",
+    marginLeft: "1rem",
   },
   field: {
     display: "flex",
@@ -1422,6 +1439,9 @@ const styles = {
     justifyContent: "space-between",
     alignItems: "center",
     gap: "0.24rem",
+    marginTop: "1px",
+    marginLeft: "10px",
+    marginRight: "10px",
   },
   labelText: {
     color: "#4b5563",
@@ -1531,7 +1551,8 @@ const styles = {
     border: "1px solid #111",
     borderRadius: "8px",
     padding: "8px",
-    marginBottom: "8px",
+    margin: "15px",
+    marginBottom: "12px",
     alignItems: "stretch",
   },
   cell: {
