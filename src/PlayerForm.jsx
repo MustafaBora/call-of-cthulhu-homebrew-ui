@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import defaultAvatar from "./assets/default-avatar.png";
-import frameHorizontal from "./assets/horizontal.png";
+import frameHorizontalShort from "./assets/horizontal-short.png";
 import frameVertical from "./assets/vertical.png";
 import frameVerticalShort from "./assets/vertical-short.png";
+import cornerTL from "./assets/sign-1.png";
+import cornerTR from "./assets/signs-2.png";
+import cornerBL from "./assets/signs-3.png";
+import cornerBR from "./assets/signs-4.png";
 import LanguageSwitcher from "./LanguageSwitcher";
 
 /**
@@ -825,7 +829,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
           left: 0;
           width: 100%;
           height: var(--frame-thickness);
-          background-image: url(${frameHorizontal});
+          background-image: url(${frameHorizontalShort});
           background-repeat: no-repeat;
           background-size: 100% 100%;
           -webkit-print-color-adjust: exact;
@@ -858,6 +862,15 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
           }
         }
 
+        /* Divider between characteristics and skills */
+        .sheet-divider {
+          position: relative;
+          height: 1px;
+          margin: 10px 0;
+          background: linear-gradient(to right, rgba(0,0,0,0.05), rgba(0,0,0,0.35), rgba(0,0,0,0.05));
+          z-index: 2;
+        }
+
         .print-bg-image {
           display: none;
         }
@@ -870,6 +883,11 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
           .frame-bottom,
           .frame-left,
           .frame-right {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            opacity: 1 !important;
+          }
+          .coc-corner {
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
             opacity: 1 !important;
@@ -894,6 +912,10 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
           }
           /* Keep avatar box transparent in print so PNG transparency is preserved */
           .avatarBox { background: transparent !important; }
+          /* Make avatar column wrapper transparent in print */
+          .avatarCol { background: transparent !important; border-color: rgba(0,0,0,0.18) !important; }
+          /* Ensure divider prints clearly */
+          .sheet-divider { background: rgba(0,0,0,0.35) !important; height: 1px !important; }
           .sheet-header { gap: 3px 4px !important; background: transparent !important; border: none !important; }
           .sheet-header .cell { padding: 2px 3px !important; background: transparent !important; border: 1px solid rgba(0,0,0,0.18) !important; }
           .sheet-header input { padding: 2px 3px !important; font-size: 10px !important; background: transparent !important; }
@@ -943,6 +965,11 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
           <div className="coc-frame frame-left" aria-hidden="true"></div>
           <div className="coc-frame frame-right" aria-hidden="true"></div>
           <div className="coc-frame frame-bottom" aria-hidden="true"></div>
+          {/* Corner signs */}
+          <div className="coc-corner corner-tl" aria-hidden="true"></div>
+          <div className="coc-corner corner-tr" aria-hidden="true"></div>
+          <div className="coc-corner corner-bl" aria-hidden="true"></div>
+          <div className="coc-corner corner-br" aria-hidden="true"></div>
           {form.avatar && (
             <img
               src={`data:image/*;base64,${form.avatar}`}
@@ -963,7 +990,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
             <TextCell label="Birthplace" value={form.birthPlace} onChange={(v) => handleTextChange("birthPlace", v)} />
 
             {/* Avatar */}
-            <div style={styles.avatarCol}>
+            <div className="avatarCol" style={styles.avatarCol}>
               <div className="avatarBox" style={styles.avatarBox} onClick={() => document.getElementById('avatar-upload').click()} title={t("playerForm.uploadImageTooltip")}>
                 <img
                   src={form.avatar ? `data:image/*;base64,${form.avatar}` : defaultAvatar}
@@ -1045,6 +1072,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
             <ReadSmall label="Used XP" value={form.usedXP ?? 0} />
             <ReadSmall label="Level" value={form.level ?? 0} />
           </div>
+          <div className="sheet-divider" aria-hidden="true"></div>
 
           <form onSubmit={(e) => handleSubmit(e, false)} style={styles.form}>
             <div className="sheet-grid" style={styles.grid}>
