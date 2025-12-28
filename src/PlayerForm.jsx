@@ -26,17 +26,17 @@ const FIELD_DEFS = [
   { key: "ElectricalRepair", label: "Electrical Repair", type: "number" },
   { key: "FastTalk", label: "Fast Talk", type: "number" },
   { key: "FightingBrawl", label: "Fighting (Brawl)", type: "number" },
-  { key: "FightingOther", label: "Fighting (Other)", type: "number" },
+  { key: "FightingOther", label: "FO", type: "number" },
   { key: "FirearmsHandgun", label: "Firearms (Handgun)", type: "number" },
-  { key: "FirearmsOther", label: "Firearms (Other)", type: "number" },
+  { key: "FirearmsOther", label: "FA-O", type: "number" },
   { key: "FirearmsRifleShotgun", label: "Firearms (Shotgun)", type: "number" },
   { key: "FirstAid", label: "First Aid", type: "number" },
   { key: "History", label: "History", type: "number" },
   { key: "Intimidate", label: "Intimidate", type: "number" },
   { key: "Jump", label: "Jump", type: "number" },
-  { key: "LanguageOther1", label: "Language (Other 1)", type: "number" },
-  { key: "LanguageOther2", label: "Language (Other 2)", type: "number" },
-  { key: "LanguageOther3", label: "Language (Other 3)", type: "number" },
+  { key: "LanguageOther1", label: "LO1", type: "number" },
+  { key: "LanguageOther2", label: "LO2", type: "number" },
+  { key: "LanguageOther3", label: "LO3", type: "number" },
   { key: "LanguageOwn", label: "Language (Own)", type: "number" },
   { key: "Law", label: "Law", type: "number" },
   { key: "LibraryUse", label: "Library Use", type: "number" },
@@ -53,8 +53,8 @@ const FIELD_DEFS = [
   { key: "Psychology", label: "Psychology", type: "number" },
   { key: "Ride", label: "Ride", type: "number" },
   { key: "Science", label: "Science", type: "number" },
-  { key: "ScienceOther", label: "Science (Other)", type: "number" },
-  { key: "ScienceOther2", label: "Science (Other 2)", type: "number" },
+  { key: "ScienceOther", label: "SO", type: "number" },
+  { key: "ScienceOther2", label: "SO2", type: "number" },
   { key: "SleightOfHand", label: "Sleight of Hand", type: "number" },
   { key: "Stealth", label: "Stealth", type: "number" },
   { key: "Survival", label: "Survival", type: "number" },
@@ -312,6 +312,15 @@ function applyDerived(rulesSpec, values) {
   const totalXP = v("totalXP");
   updated.usedXP = usedXP;
   updated.remainingXP = totalXP - usedXP;
+  
+  // Calculate level based on used XP - minimum level is always 1
+  if (rulesSpec.levelRules) {
+    const { baseXP, xpPerLevel } = rulesSpec.levelRules;
+    const level = Math.max(1, Math.floor((usedXP - baseXP) / xpPerLevel));
+    updated.level = level;
+  } else {
+    updated.level = 1;
+  }
 
   return updated;
 }
@@ -401,6 +410,7 @@ function getInitialForm(rulesSpec, mode, player) {
       totalXP: 200000,
       usedXP: 0,
       remainingXP: 200000,
+      level: 1,
       Build: 0,
       damageBonus: "0",
       MP: 0,
@@ -539,7 +549,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { t } = useTranslation();
 
-  const handleSetAll40 = () => {
+  const handleSetAll = (value) => {
     if (!rulesSpec) return;
     const keys = [
       "APP", "BONUS", "BRV", "STA", "AGI", "EDU", "INT", "LUCK",
@@ -548,12 +558,12 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
     setForm((prev) => {
       const next = { ...prev };
       for (const k of keys) {
-        next[k] = clampStat(rulesSpec, 40, k);
+        next[k] = clampStat(rulesSpec, value, k);
       }
-      // Also set all numeric skills to 40
+      // Also set all numeric skills to the target value
       for (const def of FIELD_DEFS) {
         if (def.type === "number") {
-          next[def.key] = clampStat(rulesSpec, 40, def.key);
+          next[def.key] = clampStat(rulesSpec, value, def.key);
         }
       }
       return applyDerived(rulesSpec, next);
@@ -967,6 +977,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
             <StatCell rulesSpec={rulesSpec} label="Resiliance" value={form.RES} base={rulesSpec.base.RES} usage={rulesSpec.usage.RES} onChange={(v) => handleNumericChange("RES", v)} onBlur={() => handleNumericBlur("RES")} onDelta={(d) => handleDelta("RES", d)} isSmallStep={true} />
             <ReadSmall label="Total XP" value={form.totalXP ?? 0} />
             <ReadSmall label="Used XP" value={form.usedXP ?? 0} />
+            <ReadSmall label="Level" value={form.level ?? 0} />
           </div>
 
           <form onSubmit={(e) => handleSubmit(e, false)} style={styles.form}>
@@ -1137,10 +1148,74 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
 
               <button
                 type="button"
-                style={{ ...styles.button, background: "#f87171" }}
-                onClick={handleSetAll40}
+                style={{ ...styles.button, background: "#fafafa", color: "#000" }}
+                onClick={() => handleSetAll(10)}
               >
-                {t("playerForm.setAll40")}
+                All 10
+              </button>
+
+              <button
+                type="button"
+                style={{ ...styles.button, background: "#f5f5f5", color: "#000" }}
+                onClick={() => handleSetAll(15)}
+              >
+                All 15
+              </button>
+
+              <button
+                type="button"
+                style={{ ...styles.button, background: "#eeeeee", color: "#000" }}
+                onClick={() => handleSetAll(20)}
+              >
+                All 20
+              </button>
+
+              <button
+                type="button"
+                style={{ ...styles.button, background: "#e0e0e0", color: "#000" }}
+                onClick={() => handleSetAll(25)}
+              >
+                All 25
+              </button>
+
+              <button
+                type="button"
+                style={{ ...styles.button, background: "#d1d5db", color: "#000" }}
+                onClick={() => handleSetAll(30)}
+              >
+                All 30
+              </button>
+
+              <button
+                type="button"
+                style={{ ...styles.button, background: "#9ca3af", color: "#000" }}
+                onClick={() => handleSetAll(35)}
+              >
+                All 35
+              </button>
+
+              <button
+                type="button"
+                style={{ ...styles.button, background: "#6b7280", color: "#fff" }}
+                onClick={() => handleSetAll(40)}
+              >
+                All 40
+              </button>
+
+              <button
+                type="button"
+                style={{ ...styles.button, background: "#374151", color: "#fff" }}
+                onClick={() => handleSetAll(45)}
+              >
+                All 45
+              </button>
+
+              <button
+                type="button"
+                style={{ ...styles.button, background: "#1f2937", color: "#fff" }}
+                onClick={() => handleSetAll(50)}
+              >
+                All 50
               </button>
 
               {mode !== "create" && (
