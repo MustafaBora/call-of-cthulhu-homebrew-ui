@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "./LanguageSwitcher";
+import defaultAvatar from "./assets/default-avatar.png";
 
 function getInitials(text) {
   if (!text) return "?";
@@ -188,18 +189,17 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
           {players.map((p) => (
             <div key={p.id} style={styles.card}>
               <div style={styles.cardRow}>
-                <div style={styles.avatarWrapper}>
-                  {p.avatar ? (
-                    <img
-                      src={`data:image/*;base64,${p.avatar}`}
-                      alt={p.name || p.player || "Avatar"}
-                      style={styles.avatarImg}
-                    />
-                  ) : (
-                    <div style={styles.avatarFallback}>
-                      {getInitials(p.name || p.player)}
-                    </div>
-                  )}
+                <div
+                  style={{ ...styles.avatarWrapper, cursor: onEditPlayer ? "pointer" : styles.avatarWrapper.cursor }}
+                  onClick={() => onEditPlayer && onEditPlayer(p)}
+                  role={onEditPlayer ? "button" : undefined}
+                  tabIndex={onEditPlayer ? 0 : undefined}
+                >
+                  <img
+                    src={p.avatar ? `data:image/*;base64,${p.avatar}` : defaultAvatar}
+                    alt={p.name || p.player || "Avatar"}
+                    style={styles.avatarImg}
+                  />
                 </div>
                 <div style={styles.contentCol}>
                   <div style={styles.headerText}>

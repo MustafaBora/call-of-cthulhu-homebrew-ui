@@ -467,7 +467,7 @@ function getInitialForm(rulesSpec, mode, player) {
   }
 }
 
-function StatCell({ rulesSpec, label, value, onChange, onBlur, onDelta, base, cost, readOnly = false, isSmallStep = false }) {
+function StatCell({ rulesSpec, label, value, onChange, onBlur, onDelta, base, cost, readOnly = false, isSmallStep = false, className = "" }) {
   const handleChange = readOnly
     ? undefined
     : (e) => onChange && onChange(e.target.value);
@@ -482,8 +482,10 @@ function StatCell({ rulesSpec, label, value, onChange, onBlur, onDelta, base, co
   const stepAmount = isSmallStep ? 1 : 5;
   const tooltipText = `${costNow * stepAmount} XP`;
 
+  const containerClass = ["stat-cell", className].filter(Boolean).join(" ");
+
   return (
-    <div style={styles.cell} className="stat-cell">
+    <div style={styles.cell} className={containerClass}>
       <div style={styles.statRow}>
         <div style={styles.statLabel}>{label}</div>
         <div style={styles.labelExtra}>
@@ -530,9 +532,10 @@ function StatCell({ rulesSpec, label, value, onChange, onBlur, onDelta, base, co
   );
 }
 
-function ReadSmall({ label, value }) {
+function ReadSmall({ label, value, className = "" }) {
+  const containerClass = ["read-small", className].filter(Boolean).join(" ");
   return (
-    <div style={styles.cell} className="read-small">
+    <div style={styles.cell} className={containerClass}>
       <div style={styles.statRow}>
         <div style={styles.statLabel}>{label}</div>
         <input readOnly value={value} className="stat-box-input" style={styles.statBox} />
@@ -912,6 +915,11 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
             opacity: 1 !important;
             z-index: 0 !important;
           }
+          /* Use short verticals on print to stay within A4 */
+          .frame-left,
+          .frame-right {
+            background-image: url(${frameVerticalShort}) !important;
+          }
           .coc-corner {
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
@@ -958,6 +966,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
           .sheet-grid .value-row { gap: 3px !important; }
           .xp-buttons { display: none !important; }
           .no-print { display: none !important; }
+          .print-hide { display: none !important; }
           .label-extra { display: none !important; }
           .label-extra-hide-print { display: none !important; }
           strong { font-weight: normal !important; }
@@ -1099,10 +1108,32 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
             <StatCell rulesSpec={rulesSpec} label="Bravery" value={form.BRV} base={rulesSpec.base.BRV} cost={rulesSpec.cost.BRV} onChange={(v) => handleNumericChange("BRV", v)} onBlur={() => handleNumericBlur("BRV")} onDelta={(d) => handleDelta("BRV", d)} />
             <ReadSmall label="Move" value={form.MOVE ?? 8} />
             <ReadSmall label="Damage Bonus" value={form.damageBonus ?? "0"} />
-            <StatCell rulesSpec={rulesSpec} label="Armor" value={form.ARMOR} base={rulesSpec.base.ARMOR} cost={rulesSpec.cost.ARMOR} onChange={(v) => handleNumericChange("ARMOR", v)} onBlur={() => handleNumericBlur("ARMOR")} onDelta={(d) => handleDelta("ARMOR", d)} isSmallStep={true} />
-            <StatCell rulesSpec={rulesSpec} label="Resiliance" value={form.RES} base={rulesSpec.base.RES} cost={rulesSpec.cost.RES} onChange={(v) => handleNumericChange("RES", v)} onBlur={() => handleNumericBlur("RES")} onDelta={(d) => handleDelta("RES", d)} isSmallStep={true} />
-            <ReadSmall label="Total XP" value={form.totalXP ?? 0} />
-            <ReadSmall label="Used XP" value={form.usedXP ?? 0} />
+            <StatCell
+              rulesSpec={rulesSpec}
+              label="Armor"
+              value={form.ARMOR}
+              base={rulesSpec.base.ARMOR}
+              cost={rulesSpec.cost.ARMOR}
+              onChange={(v) => handleNumericChange("ARMOR", v)}
+              onBlur={() => handleNumericBlur("ARMOR")}
+              onDelta={(d) => handleDelta("ARMOR", d)}
+              isSmallStep={true}
+              className={(Number(form.ARMOR) || 0) === 0 ? "print-hide" : ""}
+            />
+            <StatCell
+              rulesSpec={rulesSpec}
+              label="Resiliance"
+              value={form.RES}
+              base={rulesSpec.base.RES}
+              cost={rulesSpec.cost.RES}
+              onChange={(v) => handleNumericChange("RES", v)}
+              onBlur={() => handleNumericBlur("RES")}
+              onDelta={(d) => handleDelta("RES", d)}
+              isSmallStep={true}
+              className={(Number(form.RES) || 0) === 0 ? "print-hide" : ""}
+            />
+            <ReadSmall label="Total XP" value={form.totalXP ?? 0} className="print-hide" />
+            <ReadSmall label="Used XP" value={form.usedXP ?? 0} className="print-hide" />
             <ReadSmall label="Level" value={form.level ?? 0} />
           </div>
           <div className="sheet-divider" aria-hidden="true"></div>
@@ -1161,8 +1192,12 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
                 const halfValue = Math.floor(numericValue / 2);
                 const fifthValue = Math.floor(numericValue / 5);
 
+                const isOther = def.key.toLowerCase().includes("other");
+                const hideInPrint = isOther && base !== undefined && numericValue === Number(base);
+                const containerClass = hideInPrint ? "print-hide" : "";
+
                 return (
-                  <div key={def.key} style={styles.field}>
+                  <div key={def.key} style={styles.field} className={containerClass}>
                     <div className="field-header" style={styles.fieldHeader} title={tooltipText}> 
                       <span style={{ ...styles.labelText, flex: 1 }}>
                         {def.label} <strong className="no-print">{labelWithBase.split(" ").pop()}</strong>
@@ -1447,6 +1482,7 @@ const styles = {
     borderRadius: "0.75rem",
     border: "1px solid #000000ff",
     marginLeft: "1rem",
+    marginRight: "1rem",
   },
   field: {
     display: "flex",
