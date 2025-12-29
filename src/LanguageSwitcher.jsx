@@ -57,6 +57,8 @@ const styles = {
     display: "flex",
     gap: "0.5rem",
     alignItems: "center",
+    position: "relative",
+    zIndex: 1,
   },
   button: {
     display: "flex",
@@ -87,6 +89,8 @@ const styles = {
     display: "flex",
     gap: "0.25rem",
     alignItems: "center",
+    position: "relative",
+    zIndex: 1,
   },
   compactButton: {
     display: "flex",

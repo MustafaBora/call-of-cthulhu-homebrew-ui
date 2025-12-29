@@ -843,7 +843,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
           background-size: auto 100%;
           -webkit-print-color-adjust: exact;
           print-color-adjust: exact;
-          z-index: 1;
+          z-index: 0;
         }
         .frame-top { top: 0; }
         .frame-bottom { bottom: 0; }
@@ -873,7 +873,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
           background-size: 100% auto;
           -webkit-print-color-adjust: exact;
           print-color-adjust: exact;
-          z-index: 1;
+          z-index: 0;
         }
         .frame-left { left: 0; }
         .frame-right { right: 0; }
@@ -910,11 +910,20 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
             opacity: 1 !important;
+            z-index: 0 !important;
           }
           .coc-corner {
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
             opacity: 1 !important;
+            z-index: 1 !important;
+          }
+          .frame-horizontal {
+            z-index: 0 !important;
+          }
+          .frame-left,
+          .frame-right {
+            z-index: 0 !important;
           }
           .print-bg-image {
             display: block !important;
@@ -954,7 +963,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
           strong { font-weight: normal !important; }
           .sheet-header .statRow { gap: 4px !important; }
           .sheet-header .statLabel { font-size: 9px !important; }
-          .avatarImg { filter: none !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+          .avatarImg { filter: none !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; z-index: 0 !important; position: relative !important; }
           .sheet-header input[type="number"],
           .sheet-header input[readOnly] {
             width: 48px !important;
@@ -1003,7 +1012,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
             />
           )}
           
-          <div className="no-print" style={{ display: "flex", justifyContent: "flex-end", marginBottom: "8px" }}>
+          <div className="no-print" style={{ display: "flex", justifyContent: "flex-end", marginBottom: "8px", position: "relative", zIndex: 1 }}>
             <LanguageSwitcher variant="compact" />
           </div>
           
@@ -1518,6 +1527,8 @@ const styles = {
     display: "flex",
     flexDirection: "row",
     gap: "0.2rem",
+    position: "relative",
+    zIndex: 2,
   },
   stepButton: {
     padding: "0.08rem 0.3rem",
@@ -1545,6 +1556,8 @@ const styles = {
     background: "linear-gradient(to top, rgba(0,0,0,0.15), rgba(0,0,0,0))",
     paddingTop: "0.5rem",
     paddingBottom: "0.25rem",
+    position: "relative",
+    zIndex: 2,
   },
   button: {
     padding: "0.45rem 0.8rem",
