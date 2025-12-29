@@ -34,9 +34,9 @@ const FIELD_DEFS = [
   { key: "FastTalk", label: "Fast Talk", type: "number" },
   { key: "FightingBrawl", label: "Fighting (Brawl)", type: "number" },
   { key: "FightingOther", label: "FO", type: "number" },
-  { key: "FirearmsHandgun", label: "Firearms (Handgun)", type: "number" },
+  { key: "FirearmsHandgun", label: "Firearms Handgun", type: "number" },
   { key: "FirearmsOther", label: "FA-O", type: "number" },
-  { key: "FirearmsRifleShotgun", label: "Firearms (Shotgun)", type: "number" },
+  { key: "FirearmsRifleShotgun", label: "Firearms Shotgun", type: "number" },
   { key: "FirstAid", label: "First Aid", type: "number" },
   { key: "History", label: "History", type: "number" },
   { key: "Intimidate", label: "Intimidate", type: "number" },
@@ -68,6 +68,9 @@ const FIELD_DEFS = [
   { key: "Swim", label: "Swim", type: "number" },
   { key: "Throw", label: "Throw", type: "number" },
   { key: "Track", label: "Track", type: "number" },
+  { key: "Other1", label: "O1", type: "number" },
+  { key: "Other2", label: "O2", type: "number" },
+  { key: "Other3", label: "O3", type: "number" },
 ];
 
 // Cost değerine göre renk döndürür
@@ -99,25 +102,25 @@ function getCostTextColor(cost) {
  * Belirli bir değerde 1 puan artırmanın maliyeti (multi-level threshold penaltileriyle)
  * Supports 5 penalty levels: 40->1.5x, 50->2x, 60->3x, 70->4x, 80->6x
  */
-function getCurrentCostPerPoint(rulesSpec, usage, value) {
+function getCurrentCostPerPoint(rulesSpec, costPerPoint, value) {
   if (!rulesSpec || !rulesSpec.penaltyRules) return 0;
-  if (usage === undefined || usage === null) return 0;
+  if (costPerPoint === undefined || costPerPoint === null) return 0;
   
   const { thresholds, multipliers } = rulesSpec.penaltyRules;
   
-  if (!thresholds || !multipliers || thresholds.length === 0) return usage;
+  if (!thresholds || !multipliers || thresholds.length === 0) return costPerPoint;
   
   // Find which multiplier applies to current value
   for (let i = 0; i < thresholds.length; i++) {
     if (value >= thresholds[i]) {
       // Check if we're in this bracket or a higher one
       if (i === thresholds.length - 1 || value < thresholds[i + 1]) {
-        return usage * multipliers[i];
+        return costPerPoint * multipliers[i];
       }
     }
   }
   
-  return usage; // Before first threshold: base cost (1x multiplier)
+  return costPerPoint; // Before first threshold: base cost (1x multiplier)
 }
 
 /**
@@ -127,17 +130,17 @@ function getCurrentCostPerPoint(rulesSpec, usage, value) {
 function getCostBetween(rulesSpec, skill, currentValue, targetValue) {
   if (!rulesSpec) return 0;
   
-  const usage = rulesSpec.usage[skill] ?? 0;
+  const cost = rulesSpec.cost[skill] ?? 0;
   const { thresholds, multipliers } = rulesSpec.penaltyRules;
 
   // Hiç iyileştirme yoksa maliyet sıfır
-  if (targetValue <= currentValue || usage === 0) {
+  if (targetValue <= currentValue || cost === 0) {
     return 0;
   }
 
   if (!thresholds || !multipliers || thresholds.length === 0) {
     // No penalty system, just linear cost
-    return (targetValue - currentValue) * usage;
+    return (targetValue - currentValue) * cost;
   }
 
   let totalCost = 0;
@@ -168,16 +171,16 @@ function getCostBetween(rulesSpec, skill, currentValue, targetValue) {
         if (current < threshold && end > threshold) {
           // Cost spans from before threshold to after - split it
           const diffBefore = threshold - current;
-          totalCost += diffBefore * usage * 1.0; // Before threshold: 1x
-          totalCost += (end - threshold) * usage * multiplier;
+          totalCost += diffBefore * cost * 1.0; // Before threshold: 1x
+          totalCost += (end - threshold) * cost * multiplier;
           current = end;
         } else if (end <= threshold) {
           // Entirely before threshold
-          totalCost += diff * usage * 1.0;
+          totalCost += diff * cost * 1.0;
           current = end;
         } else {
           // Entirely at or above threshold
-          totalCost += diff * usage * multiplier;
+          totalCost += diff * cost * multiplier;
           current = end;
         }
       }
@@ -188,7 +191,7 @@ function getCostBetween(rulesSpec, skill, currentValue, targetValue) {
   if (current < targetValue) {
     const lastMultiplier = multipliers[multipliers.length - 1];
     const diff = targetValue - current;
-    totalCost += diff * usage * lastMultiplier;
+    totalCost += diff * cost * lastMultiplier;
   }
 
   return Math.round(totalCost);
@@ -205,7 +208,7 @@ function computeUsedXP(rulesSpec, values) {
   let sum = 0;
   
   // Characteristics
-  const characteristics = ["APP", "BONUS", "BRV", "STA", "AGI", "EDU", "INT", "LUCK", "PER", "SPOT", "POW", "REP", "SAN", "SIZ", "ARMOR", "RES", "STR"];
+  const characteristics = ["APP", "BONUS", "BRV", "STA", "AGI", "EDU", "INT", "LUCK", "SENSE", "SPOT", "WILL", "STATUS", "SAN", "SIZ", "ARMOR", "RES", "STR"];
   console.log("--- Characteristics ---");
   for (const key of characteristics) {
     const v = Number(values[key]) || 0;
@@ -227,7 +230,8 @@ function computeUsedXP(rulesSpec, values) {
     "Language Other 3", "Language Own", "Law", "Library Use", "Listen", "Locksmith",
     "Mechanical Repair", "Medicine", "Natural World", "Navigate", "Occult", "Persuade",
     "Pilot", "Psychoanalysis", "Psychology", "Ride", "Science", "Science Other",
-    "Science Other 2", "Sleight Of Hand", "Stealth", "Survival", "Swim", "Throw", "Track"
+    "Science Other 2", "Sleight Of Hand", "Stealth", "Survival", "Swim", "Throw", "Track",
+    "Other1", "Other2", "Other3"
   ];
   console.log("--- Skills ---");
   
@@ -255,7 +259,10 @@ function computeUsedXP(rulesSpec, values) {
     "NaturalWorld": "Natural World",
     "ScienceOther": "Science Other",
     "ScienceOther2": "Science Other 2",
-    "SleightOfHand": "Sleight Of Hand"
+    "SleightOfHand": "Sleight Of Hand",
+    "Other1": "Other1",
+    "Other2": "Other2",
+    "Other3": "Other3"
   };
   
   // Calculate cost for each skill using FIELD_DEFS
@@ -284,7 +291,7 @@ function applyDerived(rulesSpec, values) {
   const updated = { ...values };
 
   updated.HP = Math.floor((v("STA") + v("SIZ")) / 10);
-  updated.MP = Math.floor(v("POW") / 5);
+  updated.MP = Math.floor(v("WILL") / 5);
 
   const sum = v("SIZ") + v("STR");
   if (sum > 164) {
@@ -451,6 +458,8 @@ function getInitialForm(rulesSpec, mode, player) {
       // Map backend CON/DEX to frontend STA/AGI for consistency in the UI
       STA: player?.CON ?? player?.STA ?? 0,
       AGI: player?.DEX ?? player?.AGI ?? 0,
+      SENSE: player?.SENSE ?? player?.PER ?? 0,
+      STATUS: player?.STATUS ?? player?.REP ?? 0,
       ARMOR: player?.ARMOR ?? player?.armor ?? 0,
       RES: player?.RES ?? player?.res ?? 0,
       avatar: player?.avatar || "",
@@ -458,7 +467,7 @@ function getInitialForm(rulesSpec, mode, player) {
   }
 }
 
-function StatCell({ rulesSpec, label, value, onChange, onBlur, onDelta, base, usage, readOnly = false, isSmallStep = false }) {
+function StatCell({ rulesSpec, label, value, onChange, onBlur, onDelta, base, cost, readOnly = false, isSmallStep = false }) {
   const handleChange = readOnly
     ? undefined
     : (e) => onChange && onChange(e.target.value);
@@ -468,7 +477,7 @@ function StatCell({ rulesSpec, label, value, onChange, onBlur, onDelta, base, us
     : () => onBlur && onBlur();
 
   const numericValue = Number(value) || 0;
-  const costNow = getCurrentCostPerPoint(rulesSpec, usage, numericValue);
+  const costNow = getCurrentCostPerPoint(rulesSpec, cost, numericValue);
   const costColor = getCostColor(costNow);
   const stepAmount = isSmallStep ? 1 : 5;
   const tooltipText = `${costNow * stepAmount} XP`;
@@ -560,7 +569,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
     if (!rulesSpec) return;
     const keys = [
       "APP", "BONUS", "BRV", "STA", "AGI", "EDU", "INT", "LUCK",
-      "PER", "SPOT", "POW", "REP", "SAN", "SIZ", "ARMOR", "RES", "STR"
+      "SENSE", "SPOT", "WILL", "STATUS", "SAN", "SIZ", "ARMOR", "RES", "STR"
     ];
     setForm((prev) => {
       const next = { ...prev };
@@ -1056,33 +1065,33 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
             <TextCell label="Occupation" value={form.occupation} onChange={(v) => handleTextChange("occupation", v)} />
 
             {/* Characteristics from rulesSpec */}
-            <StatCell rulesSpec={rulesSpec} label="Strength" value={form.STR} base={rulesSpec.base.STR} usage={rulesSpec.usage.STR} onChange={(v) => handleNumericChange("STR", v)} onBlur={() => handleNumericBlur("STR")} onDelta={(d) => handleDelta("STR", d)} />
-            <StatCell rulesSpec={rulesSpec} label="SIZE" value={form.SIZ} base={rulesSpec.base.SIZ} usage={rulesSpec.usage.SIZ} onChange={(v) => handleNumericChange("SIZ", v)} onBlur={() => handleNumericBlur("SIZ")} onDelta={(d) => handleDelta("SIZ", d)} />
+            <StatCell rulesSpec={rulesSpec} label="Strength" value={form.STR} base={rulesSpec.base.STR} cost={rulesSpec.cost.STR} onChange={(v) => handleNumericChange("STR", v)} onBlur={() => handleNumericBlur("STR")} onDelta={(d) => handleDelta("STR", d)} />
+            <StatCell rulesSpec={rulesSpec} label="Size" value={form.SIZ} base={rulesSpec.base.SIZ} cost={rulesSpec.cost.SIZ} onChange={(v) => handleNumericChange("SIZ", v)} onBlur={() => handleNumericBlur("SIZ")} onDelta={(d) => handleDelta("SIZ", d)} />
             <ReadSmall label="Hit Points" value={form.HP ?? 0} />
 
-            <StatCell rulesSpec={rulesSpec} label="Stamina" value={form.STA} base={rulesSpec.base.STA} usage={rulesSpec.usage.STA} onChange={(v) => handleNumericChange("STA", v)} onBlur={() => handleNumericBlur("STA")} onDelta={(d) => handleDelta("STA", d)} />
-            <StatCell rulesSpec={rulesSpec} label="POW" value={form.POW} base={rulesSpec.base.POW} usage={rulesSpec.usage.POW} onChange={(v) => handleNumericChange("POW", v)} onBlur={() => handleNumericBlur("POW")} onDelta={(d) => handleDelta("POW", d)} />
+            <StatCell rulesSpec={rulesSpec} label="Stamina" value={form.STA} base={rulesSpec.base.STA} cost={rulesSpec.cost.STA} onChange={(v) => handleNumericChange("STA", v)} onBlur={() => handleNumericBlur("STA")} onDelta={(d) => handleDelta("STA", d)} />
+            <StatCell rulesSpec={rulesSpec} label="Will" value={form.WILL} base={rulesSpec.base.WILL} cost={rulesSpec.cost.WILL} onChange={(v) => handleNumericChange("WILL", v)} onBlur={() => handleNumericBlur("WILL")} onDelta={(d) => handleDelta("WILL", d)} />
             <ReadSmall label="Magic Points" value={form.MP ?? 0} />
 
-            <StatCell rulesSpec={rulesSpec} label="Agility" value={form.AGI} base={rulesSpec.base.AGI} usage={rulesSpec.usage.AGI} onChange={(v) => handleNumericChange("AGI", v)} onBlur={() => handleNumericBlur("AGI")} onDelta={(d) => handleDelta("AGI", d)} />
-            <StatCell rulesSpec={rulesSpec} label="Education" value={form.EDU} base={rulesSpec.base.EDU} usage={rulesSpec.usage.EDU} onChange={(v) => handleNumericChange("EDU", v)} onBlur={() => handleNumericBlur("EDU")} onDelta={(d) => handleDelta("EDU", d)} />
-            <StatCell rulesSpec={rulesSpec} label="Luck" value={form.LUCK} base={rulesSpec.base.LUCK} usage={rulesSpec.usage.LUCK} onChange={(v) => handleNumericChange("LUCK", v)} onBlur={() => handleNumericBlur("LUCK")} onDelta={(d) => handleDelta("LUCK", d)} />
+            <StatCell rulesSpec={rulesSpec} label="Agility" value={form.AGI} base={rulesSpec.base.AGI} cost={rulesSpec.cost.AGI} onChange={(v) => handleNumericChange("AGI", v)} onBlur={() => handleNumericBlur("AGI")} onDelta={(d) => handleDelta("AGI", d)} />
+            <StatCell rulesSpec={rulesSpec} label="Education" value={form.EDU} base={rulesSpec.base.EDU} cost={rulesSpec.cost.EDU} onChange={(v) => handleNumericChange("EDU", v)} onBlur={() => handleNumericBlur("EDU")} onDelta={(d) => handleDelta("EDU", d)} />
+            <StatCell rulesSpec={rulesSpec} label="Luck" value={form.LUCK} base={rulesSpec.base.LUCK} cost={rulesSpec.cost.LUCK} onChange={(v) => handleNumericChange("LUCK", v)} onBlur={() => handleNumericBlur("LUCK")} onDelta={(d) => handleDelta("LUCK", d)} />
 
-            <StatCell rulesSpec={rulesSpec} label="Intellect" value={form.INT} base={rulesSpec.base.INT} usage={rulesSpec.usage.INT} onChange={(v) => handleNumericChange("INT", v)} onBlur={() => handleNumericBlur("INT")} onDelta={(d) => handleDelta("INT", d)} />
-            <StatCell rulesSpec={rulesSpec} label="Appeal" value={form.APP} base={rulesSpec.base.APP} usage={rulesSpec.usage.APP} onChange={(v) => handleNumericChange("APP", v)} onBlur={() => handleNumericBlur("APP")} onDelta={(d) => handleDelta("APP", d)} />
-            <StatCell rulesSpec={rulesSpec} label="Bonus" value={form.BONUS} base={rulesSpec.base.BONUS} usage={rulesSpec.usage.BONUS} onChange={(v) => handleNumericChange("BONUS", v)} onBlur={() => handleNumericBlur("BONUS")} onDelta={(d) => handleDelta("BONUS", d)} />
+            <StatCell rulesSpec={rulesSpec} label="Intellect" value={form.INT} base={rulesSpec.base.INT} cost={rulesSpec.cost.INT} onChange={(v) => handleNumericChange("INT", v)} onBlur={() => handleNumericBlur("INT")} onDelta={(d) => handleDelta("INT", d)} />
+            <StatCell rulesSpec={rulesSpec} label="Appeal" value={form.APP} base={rulesSpec.base.APP} cost={rulesSpec.cost.APP} onChange={(v) => handleNumericChange("APP", v)} onBlur={() => handleNumericBlur("APP")} onDelta={(d) => handleDelta("APP", d)} />
+            <StatCell rulesSpec={rulesSpec} label="Bonus" value={form.BONUS} base={rulesSpec.base.BONUS} cost={rulesSpec.cost.BONUS} onChange={(v) => handleNumericChange("BONUS", v)} onBlur={() => handleNumericBlur("BONUS")} onDelta={(d) => handleDelta("BONUS", d)} />
             
-            <StatCell rulesSpec={rulesSpec} label="Spot Hidden" value={form.SPOT} base={rulesSpec.base.SPOT} usage={rulesSpec.usage.SPOT} onChange={(v) => handleNumericChange("SPOT", v)} onBlur={() => handleNumericBlur("SPOT")} onDelta={(d) => handleDelta("SPOT", d)} />
-            <StatCell rulesSpec={rulesSpec} label="Perception" value={form.PER} base={rulesSpec.base.PER} usage={rulesSpec.usage.PER} onChange={(v) => handleNumericChange("PER", v)} onBlur={() => handleNumericBlur("PER")} onDelta={(d) => handleDelta("PER", d)} />
-            <StatCell rulesSpec={rulesSpec} label="Sanity" value={form.SAN} base={rulesSpec.base.SAN} usage={rulesSpec.usage.SAN} onChange={(v) => handleNumericChange("SAN", v)} onBlur={() => handleNumericBlur("SAN")} onDelta={(d) => handleDelta("SAN", d)} />
+            <StatCell rulesSpec={rulesSpec} label="Spot Hidden" value={form.SPOT} base={rulesSpec.base.SPOT} cost={rulesSpec.cost.SPOT} onChange={(v) => handleNumericChange("SPOT", v)} onBlur={() => handleNumericBlur("SPOT")} onDelta={(d) => handleDelta("SPOT", d)} />
+            <StatCell rulesSpec={rulesSpec} label="Sense" value={form.SENSE} base={rulesSpec.base.SENSE} cost={rulesSpec.cost.SENSE} onChange={(v) => handleNumericChange("SENSE", v)} onBlur={() => handleNumericBlur("SENSE")} onDelta={(d) => handleDelta("SENSE", d)} />
+            <StatCell rulesSpec={rulesSpec} label="Sanity" value={form.SAN} base={rulesSpec.base.SAN} cost={rulesSpec.cost.SAN} onChange={(v) => handleNumericChange("SAN", v)} onBlur={() => handleNumericBlur("SAN")} onDelta={(d) => handleDelta("SAN", d)} />
             <ReadSmall label="Build" value={form.Build ?? 0} />
 
-            <ReadSmall label="Reputation" value={form.REP ?? 0} />
-            <StatCell rulesSpec={rulesSpec} label="Bravery" value={form.BRV} base={rulesSpec.base.BRV} usage={rulesSpec.usage.BRV} onChange={(v) => handleNumericChange("BRV", v)} onBlur={() => handleNumericBlur("BRV")} onDelta={(d) => handleDelta("BRV", d)} />
+            <StatCell rulesSpec={rulesSpec} label="Status" value={form.STATUS} base={rulesSpec.base.STATUS} cost={rulesSpec.cost.STATUS} onChange={(v) => handleNumericChange("STATUS", v)} onBlur={() => handleNumericBlur("STATUS")} onDelta={(d) => handleDelta("STATUS", d)} />
+            <StatCell rulesSpec={rulesSpec} label="Bravery" value={form.BRV} base={rulesSpec.base.BRV} cost={rulesSpec.cost.BRV} onChange={(v) => handleNumericChange("BRV", v)} onBlur={() => handleNumericBlur("BRV")} onDelta={(d) => handleDelta("BRV", d)} />
             <ReadSmall label="Move" value={form.MOVE ?? 8} />
             <ReadSmall label="Damage Bonus" value={form.damageBonus ?? "0"} />
-            <StatCell rulesSpec={rulesSpec} label="Armor" value={form.ARMOR} base={rulesSpec.base.ARMOR} usage={rulesSpec.usage.ARMOR} onChange={(v) => handleNumericChange("ARMOR", v)} onBlur={() => handleNumericBlur("ARMOR")} onDelta={(d) => handleDelta("ARMOR", d)} isSmallStep={true} />
-            <StatCell rulesSpec={rulesSpec} label="Resiliance" value={form.RES} base={rulesSpec.base.RES} usage={rulesSpec.usage.RES} onChange={(v) => handleNumericChange("RES", v)} onBlur={() => handleNumericBlur("RES")} onDelta={(d) => handleDelta("RES", d)} isSmallStep={true} />
+            <StatCell rulesSpec={rulesSpec} label="Armor" value={form.ARMOR} base={rulesSpec.base.ARMOR} cost={rulesSpec.cost.ARMOR} onChange={(v) => handleNumericChange("ARMOR", v)} onBlur={() => handleNumericBlur("ARMOR")} onDelta={(d) => handleDelta("ARMOR", d)} isSmallStep={true} />
+            <StatCell rulesSpec={rulesSpec} label="Resiliance" value={form.RES} base={rulesSpec.base.RES} cost={rulesSpec.cost.RES} onChange={(v) => handleNumericChange("RES", v)} onBlur={() => handleNumericBlur("RES")} onDelta={(d) => handleDelta("RES", d)} isSmallStep={true} />
             <ReadSmall label="Total XP" value={form.totalXP ?? 0} />
             <ReadSmall label="Used XP" value={form.usedXP ?? 0} />
             <ReadSmall label="Level" value={form.level ?? 0} />
@@ -1116,25 +1125,28 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
                   "NaturalWorld": "Natural World",
                   "ScienceOther": "Science Other",
                   "ScienceOther2": "Science Other 2",
-                  "SleightOfHand": "Sleight Of Hand"
+                  "SleightOfHand": "Sleight Of Hand",
+                  "Other1": "Other1",
+                  "Other2": "Other2",
+                  "Other3": "Other3"
                 };
                 
                 const backendKey = skillKeyMap[def.key] || def.key;
                 const value = form[def.key] ?? "";
                 const base = rulesSpec.base[backendKey];
-                const usage = rulesSpec.usage[backendKey];
+                const cost = rulesSpec.cost[backendKey];
                 const isNumber = def.type === "number";
                 const labelWithBase = base !== undefined ? `${def.label} ${base}` : def.label;
 
                 const numericValue = Number(value) || 0;
-                const currentCost = getCurrentCostPerPoint(rulesSpec, usage, numericValue);
-                const totalCost = isNumber && usage !== undefined ? getCostBetween(rulesSpec, backendKey, base ?? 0, numericValue) : 0;
+                const currentCost = getCurrentCostPerPoint(rulesSpec, cost, numericValue);
+                const totalCost = isNumber && cost !== undefined ? getCostBetween(rulesSpec, backendKey, base ?? 0, numericValue) : 0;
                 const costColor = getCostColor(currentCost);
-                const tooltipText = isNumber && usage !== undefined ? `Spent: ${totalCost}` : "";
+                const tooltipText = isNumber && cost !== undefined ? `Spent: ${totalCost}` : "";
                 const deltaTooltipText = `${currentCost * 5} XP`;
 
                 const labelExtra =
-                  isNumber && (usage !== undefined)
+                  isNumber && (cost !== undefined)
                     ? ` (Cost: ${currentCost})`
                     : "";
                 const halfValue = Math.floor(numericValue / 2);
