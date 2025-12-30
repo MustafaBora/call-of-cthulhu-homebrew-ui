@@ -18,18 +18,23 @@ import LanguageSwitcher from "./LanguageSwitcher";
 
 const FIELD_DEFS = [
   { key: "Accounting", label: "Accounting", type: "number" },
+  { key: "AnimalHandling", label: "Animal Handling", type: "number" },
   { key: "Anthropology", label: "Anthropology", type: "number" },
   { key: "Appraise", label: "Appraise", type: "number" },
   { key: "Archeology", label: "Archeology", type: "number" },
   { key: "ArtCraft", label: "Art/Craft", type: "number" },
   { key: "ArtCraft2", label: "Art/Craft 2", type: "number" },
+  { key: "Artillery", label: "Artillery", type: "number" },
   { key: "Charm", label: "Charm", type: "number" },
   { key: "Climb", label: "Climb", type: "number" },
+  { key: "ComputerUse", label: "Computer Use", type: "number" },
   { key: "CreditRating", label: "Credit Rating", type: "number" },
   { key: "CthulhuMythos", label: "Cthulhu Mythos", type: "number" },
+  { key: "Demolitions", label: "Demolitions", type: "number" },
   { key: "Disguise", label: "Disguise", type: "number" },
   { key: "Dodge", label: "Dodge", type: "number" },
   { key: "DriveAuto", label: "Drive (Auto)", type: "number" },
+  { key: "Electronics", label: "Electronics", type: "number" },
   { key: "ElectricalRepair", label: "Electrical Repair", type: "number" },
   { key: "FastTalk", label: "Fast Talk", type: "number" },
   { key: "FightingBrawl", label: "Fighting (Brawl)", type: "number" },
@@ -39,6 +44,7 @@ const FIELD_DEFS = [
   { key: "FirearmsRifleShotgun", label: "Firearms Shotgun", type: "number" },
   { key: "FirstAid", label: "First Aid", type: "number" },
   { key: "History", label: "History", type: "number" },
+  { key: "Hypnosis", label: "Hypnosis", type: "number" },
   { key: "Intimidate", label: "Intimidate", type: "number" },
   { key: "Jump", label: "Jump", type: "number" },
   { key: "LanguageOther1", label: "LO1", type: "number" },
@@ -54,20 +60,25 @@ const FIELD_DEFS = [
   { key: "NaturalWorld", label: "Natural World", type: "number" },
   { key: "Navigate", label: "Navigate", type: "number" },
   { key: "Occult", label: "Occult", type: "number" },
+  { key: "OperateHeavyMachinery", label: "Operate Heavy Machinery", type: "number" },
   { key: "Persuade", label: "Persuade", type: "number" },
   { key: "Pilot", label: "Pilot", type: "number" },
   { key: "Psychoanalysis", label: "Psychoanalysis", type: "number" },
   { key: "Psychology", label: "Psychology", type: "number" },
+  { key: "ReadLips", label: "Read Lips", type: "number" },
   { key: "Ride", label: "Ride", type: "number" },
   { key: "Science", label: "Science", type: "number" },
   { key: "ScienceOther", label: "SO", type: "number" },
   { key: "ScienceOther2", label: "SO2", type: "number" },
+  { key: "SignLanguage", label: "Sign Language", type: "number" },
+  { key: "Deception", label: "Deception", type: "number" },
   { key: "SleightOfHand", label: "Sleight of Hand", type: "number" },
   { key: "Stealth", label: "Stealth", type: "number" },
   { key: "Survival", label: "Survival", type: "number" },
   { key: "Swim", label: "Swim", type: "number" },
   { key: "Throw", label: "Throw", type: "number" },
   { key: "Track", label: "Track", type: "number" },
+  { key: "UncommonLanguage", label: "Uncommon Language", type: "number" },
   { key: "Other1", label: "O1", type: "number" },
   { key: "Other2", label: "O2", type: "number" },
   { key: "Other3", label: "O3", type: "number" },
@@ -242,26 +253,31 @@ function computeUsedXP(rulesSpec, values) {
   
   // Skills - using backend key names (with spaces)
   const skills = [
-    "Accounting", "Anthropology", "Appraise", "Archeology", "Art Craft", "Art Craft 2",
-    "Charm", "Climb", "Credit Rating", "Cthulhu Mythos", "Disguise", "Dodge",
-    "Drive Auto", "Electrical Repair", "Fast Talk", "Fighting Brawl", "Fighting Other",
+    "Accounting", "Animal Handling", "Anthropology", "Appraise", "Archeology", "Art Craft", "Art Craft 2",
+    "Artillery", "Charm", "Climb", "Computer Use", "Credit Rating", "Cthulhu Mythos", "Demolitions",
+    "Disguise", "Dodge", "Drive Auto", "Electronics", "Electrical Repair", "Fast Talk", "Fighting Brawl", "Fighting Other",
     "Firearms Handgun", "Firearms Other", "Firearms Rifle Shotgun",
-    "First Aid", "History", "Intimidate", "Jump", "Language Other 1", "Language Other 2",
+    "First Aid", "History", "Hypnosis", "Intimidate", "Jump", "Language Other 1", "Language Other 2",
     "Language Other 3", "Language Own", "Law", "Library Use", "Listen", "Locksmith",
-    "Mechanical Repair", "Medicine", "Natural World", "Navigate", "Occult", "Persuade",
-    "Pilot", "Psychoanalysis", "Psychology", "Ride", "Science", "Science Other",
-    "Science Other 2", "Sleight Of Hand", "Stealth", "Survival", "Swim", "Throw", "Track",
-    "Other1", "Other2", "Other3"
+    "Mechanical Repair", "Medicine", "Natural World", "Navigate", "Occult", "Operate Heavy Machinery", "Persuade",
+    "Pilot", "Psychoanalysis", "Psychology", "Read Lips", "Ride", "Science", "Science Other",
+    "Science Other 2", "Sign Language", "Deception", "Sleight Of Hand", "Stealth", "Survival", "Swim", "Throw", "Track",
+    "Uncommon Language", "Other1", "Other2", "Other3"
   ];
   console.log("--- Skills ---");
   
   // Map frontend keys to backend keys for skills
   const skillKeyMap = {
+    "AnimalHandling": "Animal Handling",
     "ArtCraft": "Art Craft",
     "ArtCraft2": "Art Craft 2",
+    "Artillery": "Artillery",
+    "ComputerUse": "Computer Use",
     "CreditRating": "Credit Rating",
     "CthulhuMythos": "Cthulhu Mythos",
+    "Demolitions": "Demolitions",
     "DriveAuto": "Drive Auto",
+    "Electronics": "Electronics",
     "ElectricalRepair": "Electrical Repair",
     "FastTalk": "Fast Talk",
     "FightingBrawl": "Fighting Brawl",
@@ -270,6 +286,7 @@ function computeUsedXP(rulesSpec, values) {
     "FirearmsOther": "Firearms Other",
     "FirearmsRifleShotgun": "Firearms Rifle Shotgun",
     "FirstAid": "First Aid",
+    "Hypnosis": "Hypnosis",
     "LanguageOther1": "Language Other 1",
     "LanguageOther2": "Language Other 2",
     "LanguageOther3": "Language Other 3",
@@ -277,9 +294,14 @@ function computeUsedXP(rulesSpec, values) {
     "LibraryUse": "Library Use",
     "MechanicalRepair": "Mechanical Repair",
     "NaturalWorld": "Natural World",
+    "OperateHeavyMachinery": "Operate Heavy Machinery",
+    "ReadLips": "Read Lips",
     "ScienceOther": "Science Other",
     "ScienceOther2": "Science Other 2",
+    "SignLanguage": "Sign Language",
+    "Deception": "Deception",
     "SleightOfHand": "Sleight Of Hand",
+    "UncommonLanguage": "Uncommon Language",
     "Other1": "Other1",
     "Other2": "Other2",
     "Other3": "Other3"
@@ -364,11 +386,16 @@ function clampStat(rulesSpec, num, fieldName) {
   
   // Map frontend keys to backend keys
   const skillKeyMap = {
+    "AnimalHandling": "Animal Handling",
     "ArtCraft": "Art Craft",
     "ArtCraft2": "Art Craft 2",
+    "Artillery": "Artillery",
+    "ComputerUse": "Computer Use",
     "CreditRating": "Credit Rating",
     "CthulhuMythos": "Cthulhu Mythos",
+    "Demolitions": "Demolitions",
     "DriveAuto": "Drive Auto",
+    "Electronics": "Electronics",
     "ElectricalRepair": "Electrical Repair",
     "FastTalk": "Fast Talk",
     "FightingBrawl": "Fighting Brawl",
@@ -377,6 +404,7 @@ function clampStat(rulesSpec, num, fieldName) {
     "FirearmsOther": "Firearms Other",
     "FirearmsRifleShotgun": "Firearms Rifle Shotgun",
     "FirstAid": "First Aid",
+    "Hypnosis": "Hypnosis",
     "LanguageOther1": "Language Other 1",
     "LanguageOther2": "Language Other 2",
     "LanguageOther3": "Language Other 3",
@@ -384,9 +412,14 @@ function clampStat(rulesSpec, num, fieldName) {
     "LibraryUse": "Library Use",
     "MechanicalRepair": "Mechanical Repair",
     "NaturalWorld": "Natural World",
+    "OperateHeavyMachinery": "Operate Heavy Machinery",
+    "ReadLips": "Read Lips",
     "ScienceOther": "Science Other",
     "ScienceOther2": "Science Other 2",
-    "SleightOfHand": "Sleight Of Hand"
+    "SleightOfHand": "Sleight Of Hand",
+    "Deception": "Deception",
+    "SleightOfHand": "Sleight Of Hand",
+    "UncommonLanguage": "Uncommon Language"
   };
   
   const backendKey = skillKeyMap[fieldName] || fieldName;
@@ -405,11 +438,16 @@ function getInitialForm(rulesSpec, mode, player) {
   
   // Map frontend keys to backend keys
   const skillKeyMap = {
+    "AnimalHandling": "Animal Handling",
     "ArtCraft": "Art Craft",
     "ArtCraft2": "Art Craft 2",
+    "Artillery": "Artillery",
+    "ComputerUse": "Computer Use",
     "CreditRating": "Credit Rating",
     "CthulhuMythos": "Cthulhu Mythos",
+    "Demolitions": "Demolitions",
     "DriveAuto": "Drive Auto",
+    "Electronics": "Electronics",
     "ElectricalRepair": "Electrical Repair",
     "FastTalk": "Fast Talk",
     "FightingBrawl": "Fighting Brawl",
@@ -418,6 +456,7 @@ function getInitialForm(rulesSpec, mode, player) {
     "FirearmsOther": "Firearms Other",
     "FirearmsRifleShotgun": "Firearms Rifle Shotgun",
     "FirstAid": "First Aid",
+    "Hypnosis": "Hypnosis",
     "LanguageOther1": "Language Other 1",
     "LanguageOther2": "Language Other 2",
     "LanguageOther3": "Language Other 3",
@@ -425,9 +464,14 @@ function getInitialForm(rulesSpec, mode, player) {
     "LibraryUse": "Library Use",
     "MechanicalRepair": "Mechanical Repair",
     "NaturalWorld": "Natural World",
+    "OperateHeavyMachinery": "Operate Heavy Machinery",
+    "ReadLips": "Read Lips",
     "ScienceOther": "Science Other",
     "ScienceOther2": "Science Other 2",
-    "SleightOfHand": "Sleight Of Hand"
+    "SignLanguage": "Sign Language",
+    "Deception": "Deception",
+    "SleightOfHand": "Sleight Of Hand",
+    "UncommonLanguage": "Uncommon Language"
   };
   
   if (mode === "create") {
@@ -1176,11 +1220,16 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
               {FIELD_DEFS.map((def) => {
                 // Map frontend keys to backend keys
                 const skillKeyMap = {
+                  "AnimalHandling": "Animal Handling",
                   "ArtCraft": "Art Craft",
                   "ArtCraft2": "Art Craft 2",
+                  "Artillery": "Artillery",
+                  "ComputerUse": "Computer Use",
                   "CreditRating": "Credit Rating",
                   "CthulhuMythos": "Cthulhu Mythos",
+                  "Demolitions": "Demolitions",
                   "DriveAuto": "Drive Auto",
+                  "Electronics": "Electronics",
                   "ElectricalRepair": "Electrical Repair",
                   "FastTalk": "Fast Talk",
                   "FightingBrawl": "Fighting Brawl",
@@ -1189,6 +1238,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
                   "FirearmsOther": "Firearms Other",
                   "FirearmsRifleShotgun": "Firearms Rifle Shotgun",
                   "FirstAid": "First Aid",
+                  "Hypnosis": "Hypnosis",
                   "LanguageOther1": "Language Other 1",
                   "LanguageOther2": "Language Other 2",
                   "LanguageOther3": "Language Other 3",
@@ -1196,9 +1246,14 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
                   "LibraryUse": "Library Use",
                   "MechanicalRepair": "Mechanical Repair",
                   "NaturalWorld": "Natural World",
+                  "OperateHeavyMachinery": "Operate Heavy Machinery",
+                  "ReadLips": "Read Lips",
                   "ScienceOther": "Science Other",
                   "ScienceOther2": "Science Other 2",
+                  "SignLanguage": "Sign Language",
+                  "Deception": "Deception",
                   "SleightOfHand": "Sleight Of Hand",
+                  "UncommonLanguage": "Uncommon Language",
                   "Other1": "Other1",
                   "Other2": "Other2",
                   "Other3": "Other3"
