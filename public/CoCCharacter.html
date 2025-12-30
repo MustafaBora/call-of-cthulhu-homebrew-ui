@@ -1,3 +1,4 @@
+<unused/>
 <!doctype html>
 <html lang="tr">
 <head>
@@ -428,6 +429,13 @@
       .top, .mid, .skills, .bottom{ grid-template-columns: 1fr; }
       .portrait{ height: 220px; }
     }
+
+    /* Hide skills with values 10 or less in print mode, except Cthulhu Mythos */
+    @media print{
+      .skill.hide-in-print:not(.keep-visible){ 
+        display:none; 
+      }
+    }
   </style>
 </head>
 
@@ -748,7 +756,40 @@
       titleEl.textContent = data.name;
     }
 
-    // Fill other fields as needed
+    // Process skills: hide those with values <= 10 in print, except Cthulhu Mythos
+    document.querySelectorAll('.skill').forEach(skillEl => {
+      const nameEl = skillEl.querySelector('.name');
+      if (!nameEl) return;
+      
+      const skillName = nameEl.textContent.trim();
+      const baseMatch = skillName.match(/^([^(]+)/);
+      const baseName = baseMatch ? baseMatch[1].trim() : skillName;
+      
+      // Check if this skill has data
+      const skillData = data[baseName];
+      
+      if (skillData !== undefined && typeof skillData === 'number') {
+        // Fill the value cells
+        const cells = skillEl.querySelectorAll('.value .cell');
+        if (cells.length >= 1) {
+          cells[0].textContent = skillData;
+        }
+        
+        // Mark for hiding in print if value <= 10, except for Cthulhu Mythos
+        if (skillData <= 10) {
+          if (baseName.toLowerCase().includes('cthulhu mythos')) {
+            skillEl.classList.add('keep-visible');
+          } else {
+            skillEl.classList.add('hide-in-print');
+          }
+        }
+      } else {
+        // No data - hide if not Cthulhu Mythos
+        if (!baseName.toLowerCase().includes('cthulhu mythos')) {
+          skillEl.classList.add('hide-in-print');
+        }
+      }
+    });
   </script>
 </body>
 </html>

@@ -73,6 +73,26 @@ const FIELD_DEFS = [
   { key: "Other3", label: "O3", type: "number" },
 ];
 
+// Background questions (3 columns x 3 rows for now, can expand dynamically)
+const BACKGROUND_ROWS = [
+  [
+    { key: "bagSurface", label: "Bag Surface" },
+    { key: "significantPeople", label: "Significant People" },
+    { key: "injuriesScarsPhobiesManias", label: "Injuries, Scars, Phobies, Manias" },
+  ],
+  [
+    { key: "bagMiddle", label: "Bag Middle" },
+    { key: "treasuredPossessions", label: "Treasured Possesions" },
+    { key: "arcaneTomesSpellsArtifacts", label: "Arcane Tomes, Spells, Artifacts" },
+  ],
+  [
+    { key: "bagDeep", label: "Bag Deep" },
+    { key: "meaningfulLocations", label: "Meaningful Locations" },
+    { key: "encountersWithStrangeEntities", label: "Encounters with Strange Entities" },
+  ],
+];
+const BACKGROUND_KEYS = BACKGROUND_ROWS.flat().map((c) => c.key);
+
 // Cost değerine göre renk döndürür
 function getCostColor(cost) {
   // Daha geniş skala: ilk renk krem, son iki renk koyu gri ve siyah
@@ -435,6 +455,11 @@ function getInitialForm(rulesSpec, mode, player) {
       avatar: "",
     };
 
+    // Background fields
+    BACKGROUND_KEYS.forEach((k) => {
+      obj[k] = "";
+    });
+
     // Karakteristikler için BASE değerlerini başlangıç olarak ayarla
     for (const key of Object.keys(rulesSpec.base)) {
       obj[key] = rulesSpec.base[key] ?? obj[key];
@@ -453,7 +478,7 @@ function getInitialForm(rulesSpec, mode, player) {
     return applyDerived(rulesSpec, obj);
   } else {
     // Edit modu
-    return applyDerived(rulesSpec, {
+    const baseObj = applyDerived(rulesSpec, {
       ...player,
       // Map backend CON/DEX to frontend STA/AGI for consistency in the UI
       STA: player?.CON ?? player?.STA ?? 0,
@@ -464,6 +489,13 @@ function getInitialForm(rulesSpec, mode, player) {
       RES: player?.RES ?? player?.res ?? 0,
       avatar: player?.avatar || "",
     });
+
+    // Ensure background fields exist even if backend doesn't have them
+    BACKGROUND_KEYS.forEach((k) => {
+      if (baseObj[k] === undefined) baseObj[k] = "";
+    });
+
+    return baseObj;
   }
 }
 
@@ -594,7 +626,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
     const loadRulesSpec = async () => {
       try {
         setRulesLoading(true);
-        const response = await fetch("http://localhost:8080/players/rules");
+        const response = await fetch("http://localhost:2999/players/rules");
         if (!response.ok) {
           throw new Error("Rules specification yüklenemedi");
         }
@@ -710,7 +742,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
       let response;
 
       if (mode === "create") {
-        response = await fetch("http://localhost:8080/players", {
+        response = await fetch("http://localhost:2999/players", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -726,7 +758,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
         const created = await response.json();
         onCreated && onCreated(created, { stay: stayOnPage });
       } else {
-        response = await fetch(`http://localhost:8080/players/${player.id}`, {
+        response = await fetch(`http://localhost:2999/players/${player.id}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -766,7 +798,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
         return;
       }
 
-      const response = await fetch(`http://localhost:8080/players/${player.id}`, {
+      const response = await fetch(`http://localhost:2999/players/${player.id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -997,6 +1029,9 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
           .cell { background: transparent !important; }
           input[type="number"] { background: transparent !important; }
           input[readOnly] { background: transparent !important; }
+          /* Hide scrollbars in print */
+          ::-webkit-scrollbar { display: none !important; }
+          body { scrollbar-width: none !important; }
         }
       `}</style>
 
@@ -1136,8 +1171,6 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
             <ReadSmall label="Used XP" value={form.usedXP ?? 0} className="print-hide" />
             <ReadSmall label="Level" value={form.level ?? 0} />
           </div>
-          <div className="sheet-divider" aria-hidden="true"></div>
-
           <form onSubmit={(e) => handleSubmit(e, false)} style={styles.form}>
             <div className="sheet-grid" style={styles.grid}>
               {FIELD_DEFS.map((def) => {
@@ -1194,7 +1227,9 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
 
                 const isOther = def.key.toLowerCase().includes("other");
                 const hideInPrint = isOther && base !== undefined && numericValue === Number(base);
-                const containerClass = hideInPrint ? "print-hide" : "";
+                const isCthulhuMythos = def.key === "CthulhuMythos";
+                const hideSkillInPrint = !isCthulhuMythos && numericValue <= 10 && numericValue > 0;
+                const containerClass = (hideInPrint || hideSkillInPrint) ? "print-hide" : "";
 
                 return (
                   <div key={def.key} style={styles.field} className={containerClass}>
@@ -1264,6 +1299,28 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
             </div>
 
             {error && <div style={styles.error}>{error}</div>}
+
+            {/* Background questions */}
+            <div id="background" style={styles.backgroundSection}>
+              <div style={styles.backgroundGrid}>
+                {BACKGROUND_ROWS.map((row, rowIdx) => (
+                  <div key={`bg-row-${rowIdx}`} style={styles.backgroundRow}>
+                    {row.map((cell) => (
+                      <div key={cell.key} style={styles.backgroundCell}>
+                        <div style={styles.backgroundLabel}>{cell.label}</div>
+                        <textarea
+                          name={cell.key}
+                          value={form[cell.key] ?? ""}
+                          onChange={(e) => handleTextChange(cell.key, e.target.value)}
+                          style={styles.backgroundArea}
+                          rows={2}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
 
             <div className="update-buttons no-print" style={styles.buttonsBar}>
               <button
@@ -1660,6 +1717,45 @@ const styles = {
     textAlign: "center",
     fontSize: "12px",
     background: "#fff",
+  },
+  backgroundSection: {
+    margin: "4px 8px 6px 8px",
+    padding: "6px 8px",
+    border: "1px solid #111",
+    borderRadius: "8px",
+    background: "transparent",
+  },
+  backgroundGrid: {
+    display: "grid",
+    gridTemplateColumns: "1fr",
+    gap: "4px",
+  },
+  backgroundRow: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+    gap: "4px",
+  },
+  backgroundCell: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "2px",
+  },
+  backgroundLabel: {
+    fontSize: "10px",
+    fontWeight: 700,
+    color: "#111",
+  },
+  backgroundArea: {
+    width: "100%",
+    minHeight: "52px",
+    resize: "vertical",
+    border: "1px solid #111",
+    borderRadius: "6px",
+    padding: "4px 6px",
+    fontSize: "12px",
+    fontFamily: "inherit",
+    background: "transparent",
+    boxSizing: "border-box",
   },
 };
 

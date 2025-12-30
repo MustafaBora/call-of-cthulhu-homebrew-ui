@@ -45,6 +45,10 @@ function getTopSkills(playerData, count = 6) {
   return entries.slice(0, count);
 }
 
+function sortByIdDesc(arr) {
+  return [...arr].sort((a, b) => (b?.id ?? 0) - (a?.id ?? 0));
+}
+
 function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -65,7 +69,7 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
           return;
         }
 
-        const response = await fetch("http://localhost:8080/players", {
+        const response = await fetch("http://localhost:2999/players", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -78,7 +82,7 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
         }
 
         const data = await response.json();
-        setPlayers(data);
+        setPlayers(sortByIdDesc(data));
       } catch (err) {
         console.error(err);
         setError(err.message || "Bilinmeyen bir hata oluştu.");
@@ -108,7 +112,7 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
         return;
       }
 
-      const response = await fetch("http://localhost:8080/players", {
+      const response = await fetch("http://localhost:2999/players", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -122,7 +126,7 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
       }
 
       const newPlayer = await response.json();
-      setPlayers((prev) => [...prev, newPlayer]);
+      setPlayers((prev) => sortByIdDesc([...prev, newPlayer]));
       setImportStatus(t("players.importSuccess"));
       setTimeout(() => setImportStatus(""), 3000);
     } catch (err) {
@@ -258,7 +262,7 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
                   </div>
                   {/*}
                   <a
-                    href={`http://localhost:8080/players/${p.id}/sheet.html`}
+                    href={`http://localhost:2999/players/${p.id}/sheet.html`}
                     target="_blank"
                     rel="noreferrer"
                     style={{ ...styles.printButton, alignSelf: 'flex-start' }}
@@ -372,18 +376,16 @@ const styles = {
     fontWeight: 700,
     fontSize: "0.95rem",
   },
-  grid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
-    gap: "0.5rem 0.75rem",
-    maxHeight: "60vh",
-    overflowY: "auto",
-    padding: "0.5rem",
-    background: "#fefce8",
-    borderRadius: "0.75rem",
-    border: "1px solid #eab308",
-    fontSize: "0.75rem", // biraz küçülttük
-  },
+      grid: {
+        display: "grid",
+        gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+        gap: "0.5rem 0.75rem",
+        padding: "0.5rem",
+        background: "#fefce8",
+        borderRadius: "0.75rem",
+        border: "1px solid #eab308",
+        fontSize: "0.75rem", // biraz küçülttük
+      },
   card: {
     background: "#fefce8",
     borderRadius: "0.9rem",
