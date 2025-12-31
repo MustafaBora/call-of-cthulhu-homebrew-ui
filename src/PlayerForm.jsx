@@ -224,7 +224,6 @@ function getCostBetween(rulesSpec, skill, currentValue, targetValue) {
       
       const diff = end - current;
       if (diff > 0) {
-        const currentMultiplier = (current >= threshold) ? multiplier : 1.0;
         if (current < threshold && end > threshold) {
           // Cost spans from before threshold to after - split it
           const diffBefore = threshold - current;
@@ -261,36 +260,18 @@ function getCostBetween(rulesSpec, skill, currentValue, targetValue) {
 function computeUsedXP(rulesSpec, values) {
   if (!rulesSpec) return 0;
   
-  console.log("=== XP Calculation Debug ===");
   let sum = 0;
   
   // Characteristics
   const characteristics = ["APP", "BONUS", "BRV", "STA", "AGI", "EDU", "INT", "LUCK", "SENSE", "SPOT", "WILL", "STATUS", "SAN", "SIZ", "ARMOR", "RES", "STR"];
-  console.log("--- Characteristics ---");
   for (const key of characteristics) {
     const v = Number(values[key]) || 0;
     const baseValue = rulesSpec.base[key] ?? 0;
     const cost = getCostBetween(rulesSpec, key, baseValue, v);
-    if (v > 0 || cost > 0) {
-      console.log(`${key}: base=${baseValue}, value=${v}, cost=${cost}`);
-    }
     sum += cost;
   }
   
   // Skills - using backend key names (with spaces)
-  const skills = [
-    "Accounting", "Animal Handling", "Anthropology", "Appraise", "Archeology", "Art Craft", "Art Craft 2",
-    "Artillery", "Charm", "Climb", "Computer Use", "Credit Rating", "Cthulhu Mythos", "Demolitions",
-    "Disguise", "Dodge", "Drive Auto", "Electronics", "Electrical Repair", "Fast Talk", "Fighting Brawl", "Fighting Other",
-    "Firearms Handgun", "Firearms Other", "Firearms Rifle Shotgun",
-    "First Aid", "History", "Hypnosis", "Intimidate", "Jump", "Language Other 1", "Language Other 2",
-    "Language Other 3", "Language Own", "Law", "Library Use", "Listen", "Locksmith",
-    "Mechanical Repair", "Medicine", "Natural World", "Navigate", "Occult", "Operate Heavy Machinery", "Persuade",
-    "Pilot", "Psychoanalysis", "Psychology", "Read Lips", "Ride", "Science", "Science Other",
-    "Science Other 2", "Sign Language", "Deception", "Sleight Of Hand", "Stealth", "Survival", "Swim", "Throw", "Track",
-    "Uncommon Language", "Other1", "Other2", "Other3"
-  ];
-  console.log("--- Skills ---");
   
   // Map frontend keys to backend keys for skills
   const skillKeyMap = {
@@ -342,13 +323,8 @@ function computeUsedXP(rulesSpec, values) {
     const v = Number(values[frontendKey]) || 0;
     const baseValue = rulesSpec.base[backendKey] ?? 0;
     const cost = getCostBetween(rulesSpec, backendKey, baseValue, v);
-    if (v > 0 || cost > 0) {
-      console.log(`${frontendKey} (${backendKey}): base=${baseValue}, value=${v}, cost=${cost}`);
-    }
     sum += cost;
   }
-  
-  console.log(`--- Total Used XP: ${sum} ---`);
   return sum;
 }
 
@@ -1125,7 +1101,6 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
                 const halfValue = Math.floor(numericValue / 2);
                 const fifthValue = Math.floor(numericValue / 5);
 
-                const isOther = def.key.toLowerCase().includes("other");
                 const baseValue = Number(base ?? 0);
                 const gain = numericValue - baseValue;
                 const hideForSmallGain = gain < 4;

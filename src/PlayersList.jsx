@@ -3,16 +3,6 @@ import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "./LanguageSwitcher";
 import defaultAvatar from "./assets/default-avatar.png";
 
-function getInitials(text) {
-  if (!text) return "?";
-  return text
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((w) => w[0].toUpperCase())
-    .join("");
-}
-
 // Meta alanları ve listede göstermeyeceğimiz alanlar
 const IGNORED_KEYS = [
   "id",
