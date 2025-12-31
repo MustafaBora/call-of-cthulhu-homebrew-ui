@@ -44,6 +44,7 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [importStatus, setImportStatus] = useState("");
+  const [offlineMode, setOfflineMode] = useState(false);
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -51,10 +52,16 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
       setLoading(true);
       setError("");
 
+      const loadOffline = () => {
+        const stored = JSON.parse(localStorage.getItem("offlinePlayers") || "[]");
+        setPlayers(sortByIdDesc(stored));
+        setOfflineMode(true);
+      };
+
       try {
         const token = localStorage.getItem("token");
         if (!token) {
-          setError("Token bulunamadı. Lütfen tekrar giriş yap.");
+          loadOffline();
           setLoading(false);
           return;
         }
@@ -73,9 +80,11 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
 
         const data = await response.json();
         setPlayers(sortByIdDesc(data));
+        setOfflineMode(false);
       } catch (err) {
         console.error(err);
-        setError(err.message || "Bilinmeyen bir hata oluştu.");
+        setError("Sunucuya ulaşılamadı, yerel veriler gösteriliyor.");
+        loadOffline();
       } finally {
         setLoading(false);
       }
@@ -96,27 +105,31 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
       const data = JSON.parse(text);
 
       const token = localStorage.getItem("token");
-      if (!token) {
-        setError("Token bulunamadı. Lütfen tekrar giriş yap.");
-        setImportStatus("");
-        return;
+      const useBackend = !!token && !offlineMode;
+
+      if (!useBackend) {
+        const withId = { ...data, id: data?.id ?? Date.now() };
+        const stored = JSON.parse(localStorage.getItem("offlinePlayers") || "[]");
+        const next = sortByIdDesc([...stored, withId]);
+        localStorage.setItem("offlinePlayers", JSON.stringify(next));
+        setPlayers(next);
+      } else {
+        const response = await fetch("http://localhost:8080/players", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+          throw new Error(t("players.importFailed"));
+        }
+
+        const newPlayer = await response.json();
+        setPlayers((prev) => sortByIdDesc([...prev, newPlayer]));
       }
-
-      const response = await fetch("http://localhost:8080/players", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        throw new Error(t("players.importFailed"));
-      }
-
-      const newPlayer = await response.json();
-      setPlayers((prev) => sortByIdDesc([...prev, newPlayer]));
       setImportStatus(t("players.importSuccess"));
       setTimeout(() => setImportStatus(""), 3000);
     } catch (err) {
@@ -133,13 +146,18 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
     return <div style={styles.page}>{t("players.loading")}</div>;
   }
 
-  if (error) {
+  if (error && !offlineMode) {
     return <div style={styles.page}>{t("players.errorPrefix")}: {error}</div>;
   }
 
   return (
     <div style={styles.page}>
       <div style={styles.cardWrapper}>
+        {offlineMode && (
+          <div style={styles.offlineBanner}>
+            Offline mod: Sunucuya ulaşılamadı, veriler tarayıcıda saklanıyor.
+          </div>
+        )}
         <div style={styles.headerRow}>
           <h2 style={styles.title}>{t("players.title")}</h2>
           <div style={styles.buttonGroup}>
@@ -492,6 +510,14 @@ const styles = {
     fontSize: "0.85rem",
     cursor: "pointer",
     boxShadow: "0 4px 10px rgba(0,0,0,0.25)",
+  },
+  offlineBanner: {
+    background: "#7c2d12",
+    color: "#fecdd3",
+    padding: "0.6rem 0.9rem",
+    borderRadius: "0.6rem",
+    marginBottom: "0.9rem",
+    fontWeight: 700,
   },
   printButton: {
     display: "inline-block",

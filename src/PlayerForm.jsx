@@ -130,6 +130,169 @@ const BACKGROUND_ROWS = [
 ];
 const BACKGROUND_KEYS = BACKGROUND_ROWS.flat().map((c) => c.key);
 
+function createFallbackRulesSpec() {
+  const base = {
+    totalXP: 0,
+    usedXP: 0,
+    remainingXP: 0,
+    APP: 30,
+    BONUS: 0,
+    BRV: 45,
+    STA: 30,
+    AGI: 35,
+    EDU: 20,
+    INT: 30,
+    LUCK: 35,
+    SENSE: 0,
+    WILL: 30,
+    STATUS: 1,
+    SAN: 45,
+    SIZ: 31,
+    STR: 25,
+    ARMOR: 0,
+    RES: 0,
+    Accounting: 7,
+    Anthropology: 6,
+    Appraise: 8,
+    Archeology: 3,
+    "Art Craft": 15,
+    "Art Craft 2": 14,
+    Charm: 20,
+    Climb: 20,
+    "Credit Rating": 5,
+    "Cthulhu Mythos": 0,
+    Disguise: 5,
+    Dodge: 20,
+    "Drive Auto": 10,
+    "Electrical Repair": 15,
+    "Fast Talk": 14,
+    "Fighting Brawl": 30,
+    "Fighting Other": 30,
+    "Firearms Handgun": 30,
+    "Firearms Other": 30,
+    "Firearms Rifle Shotgun": 30,
+    "First Aid": 20,
+    History: 10,
+    Intimidate: 15,
+    Jump: 20,
+    "Language Other 1": 20,
+    "Language Other 2": 0,
+    "Language Other 3": 0,
+    "Language Own": 50,
+    Law: 5,
+    "Library Use": 20,
+    Listen: 30,
+    Locksmith: 10,
+    "Mechanical Repair": 15,
+    Medicine: 4,
+    "Natural World": 15,
+    Navigate: 15,
+    Occult: 4,
+    Persuade: 15,
+    Pilot: 1,
+    Psychoanalysis: 2,
+    Psychology: 10,
+    Ride: 10,
+    Science: 10,
+    "Science Other": 21,
+    "Science Other 2": 20,
+    "Sleight Of Hand": 10,
+    SPOT: 15,
+    Stealth: 20,
+    Survival: 11,
+    Swim: 22,
+    Throw: 20,
+    Track: 10,
+  };
+
+  const cost = {
+    totalXP: 0,
+    usedXP: 0,
+    remainingXP: 0,
+    APP: 15,
+    BONUS: 12,
+    BRV: 6,
+    STA: 8,
+    AGI: 4,
+    EDU: 46,
+    INT: 14,
+    LUCK: 3,
+    SENSE: 5,
+    WILL: 5,
+    STATUS: 14,
+    SAN: 3,
+    SIZ: 19,
+    STR: 11,
+    ARMOR: 1,
+    RES: 1,
+    Accounting: 50,
+    Anthropology: 50,
+    Appraise: 50,
+    Archeology: 50,
+    "Art Craft": 46,
+    "Art Craft 2": 46,
+    Charm: 10,
+    Climb: 20,
+    "Credit Rating": 11,
+    "Cthulhu Mythos": 6,
+    Disguise: 27,
+    Dodge: 6,
+    "Drive Auto": 16,
+    "Electrical Repair": 25,
+    "Fast Talk": 10,
+    "Fighting Brawl": 7,
+    "Fighting Other": 8,
+    "Firearms Handgun": 8,
+    "Firearms Other": 5,
+    "Firearms Rifle Shotgun": 5,
+    "First Aid": 12,
+    History: 22,
+    Intimidate: 12,
+    Jump: 15,
+    "Language Other 1": 40,
+    "Language Other 2": 60,
+    "Language Other 3": 80,
+    "Language Own": 60,
+    Law: 29,
+    "Library Use": 7,
+    Listen: 5,
+    Locksmith: 12,
+    "Mechanical Repair": 25,
+    Medicine: 28,
+    "Natural World": 21,
+    Navigate: 30,
+    Occult: 20,
+    Persuade: 7,
+    Pilot: 50,
+    Psychoanalysis: 50,
+    Psychology: 9,
+    Ride: 16,
+    Science: 30,
+    "Science Other": 44,
+    "Science Other 2": 44,
+    "Sleight Of Hand": 13,
+    SPOT: 5,
+    Stealth: 9,
+    Survival: 50,
+    Swim: 45,
+    Throw: 12,
+    Track: 27,
+  };
+
+  return {
+    base,
+    cost,
+    penaltyRules: {
+      thresholds: [40, 50, 60, 70, 80],
+      multipliers: [1.5, 2, 3, 4, 6],
+    },
+    levelRules: {
+      baseXP: 0,
+      xpPerLevel: 1000,
+    },
+  };
+}
+
 // Cost değerine göre renk döndürür
 function getCostColor(cost) {
   // Daha geniş skala: ilk renk krem, son iki renk koyu gri ve siyah
@@ -544,6 +707,29 @@ function getInitialForm(rulesSpec, mode, player) {
   }
 }
 
+function saveOfflinePlayer(payload, mode, player) {
+  const key = "offlinePlayers";
+  const list = JSON.parse(localStorage.getItem(key) || "[]");
+
+  if (mode === "create" || !player?.id) {
+    const record = { ...payload, id: Date.now() };
+    const next = [...list, record];
+    localStorage.setItem(key, JSON.stringify(next));
+    return record;
+  }
+
+  const next = list.map((p) => (p.id === player.id ? { ...payload, id: player.id } : p));
+  localStorage.setItem(key, JSON.stringify(next));
+  return { ...payload, id: player.id };
+}
+
+function deleteOfflinePlayer(id) {
+  const key = "offlinePlayers";
+  const list = JSON.parse(localStorage.getItem(key) || "[]");
+  const next = list.filter((p) => p.id !== id);
+  localStorage.setItem(key, JSON.stringify(next));
+}
+
 function StatCell({ rulesSpec, label, value, onChange, onBlur, onDelta, base, cost, readOnly = false, isSmallStep = false, className = "" }) {
   const handleChange = readOnly
     ? undefined
@@ -639,6 +825,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
   const [rulesSpec, setRulesSpec] = useState(null);
   const [rulesLoading, setRulesLoading] = useState(true);
   const [rulesError, setRulesError] = useState("");
+  const [offlineMode, setOfflineMode] = useState(false);
   const [form, setForm] = useState(() => getInitialForm(null, mode, player));
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -668,6 +855,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
   // Load rules spec from backend on mount
   useEffect(() => {
     const loadRulesSpec = async () => {
+      const fallbackSpec = createFallbackRulesSpec();
       try {
         setRulesLoading(true);
         const response = await fetch("http://localhost:8080/players/rules");
@@ -676,12 +864,16 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
         }
         const spec = await response.json();
         setRulesSpec(spec);
+        setOfflineMode(false);
         
         // Initialize form with loaded spec
         setForm(getInitialForm(spec, mode, player));
       } catch (err) {
         console.error("Rules yükleme hatası:", err);
-        setRulesError(err.message || "Rules yüklenirken bir hata oluştu");
+        setOfflineMode(true);
+        setRulesError("Sunucuya ulaşılamadı, varsayılan kurallar kullanılıyor.");
+        setRulesSpec(fallbackSpec);
+        setForm(getInitialForm(fallbackSpec, mode, player));
       } finally {
         setRulesLoading(false);
       }
@@ -760,11 +952,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
 
     try {
       const token = localStorage.getItem("token");
-      if (!token) {
-        setError("Token bulunamadı. Lütfen tekrar giriş yap.");
-        setIsSubmitting(false);
-        return;
-      }
+      const useBackend = !!token && !offlineMode;
 
       const payload = { ...form };
 
@@ -785,7 +973,14 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
 
       let response;
 
-      if (mode === "create") {
+      if (!useBackend) {
+        const saved = saveOfflinePlayer(payload, mode, player);
+        if (mode === "create") {
+          onCreated && onCreated(saved, { stay: stayOnPage });
+        } else {
+          onUpdated && onUpdated(saved, { stay: stayOnPage });
+        }
+      } else if (mode === "create") {
         response = await fetch("http://localhost:8080/players", {
           method: "POST",
           headers: {
@@ -837,8 +1032,11 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
 
     try {
       const token = localStorage.getItem("token");
-      if (!token) {
-        setError("Token bulunamadı. Lütfen tekrar giriş yap.");
+      const useBackend = !!token && !offlineMode;
+
+      if (!useBackend) {
+        deleteOfflinePlayer(player.id);
+        if (onCancel) onCancel();
         return;
       }
 
@@ -868,23 +1066,6 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
           <div className="loading-block">
             <p>{t("playerForm.rulesLoading")}</p>
           </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Show error if rules failed to load
-  if (rulesError) {
-    return (
-      <div className="page-wrapper">
-        <div className="player-page">
-          <div className="error" style={{ margin: "2rem" }}>
-            <p><strong>{t("playerForm.rulesErrorTitle")}:</strong> {rulesError}</p>
-            <p>{t("playerForm.rulesErrorHint")}</p>
-          </div>
-          <button onClick={onCancel} className="button" style={{ margin: "1rem", background: "#9ca3af" }}>
-            {t("playerForm.back")}
-          </button>
         </div>
       </div>
     );
@@ -927,6 +1108,18 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
           <div className="no-print toolbar-row">
             <LanguageSwitcher variant="compact" />
           </div>
+
+          {offlineMode && (
+            <div className="error" style={{ margin: "0 0 1rem 0", background: "#7c2d12" }}>
+              <strong>Offline:</strong> Sunucuya ulaşılamadı, varsayılan kurallarla çalışıyorsunuz. Değişiklikler tarayıcıya kaydedilecek.
+            </div>
+          )}
+
+          {rulesError && !offlineMode && (
+            <div className="error" style={{ margin: "0 0 1rem 0" }}>
+              <p><strong>{t("playerForm.rulesErrorTitle")}:</strong> {rulesError}</p>
+            </div>
+          )}
           
           <div className="sheet-header header-grid">
             {/* Row 1 */}
