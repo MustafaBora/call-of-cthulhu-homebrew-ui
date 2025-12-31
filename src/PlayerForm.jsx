@@ -38,7 +38,7 @@ const FIELD_DEFS = [
   { key: "Electronics", label: "Electronics", type: "number" },
   { key: "ElectricalRepair", label: "Electrical Repair", type: "number" },
   { key: "FastTalk", label: "Fast Talk", type: "number" },
-  { key: "FightingBrawl", label: "Fighting (Brawl)", type: "number" },
+  { key: "FightingBrawl", label: "Fighting Brawl", type: "number" },
   { key: "FightingOther", label: "FO", type: "number" },
   { key: "FirearmsHandgun", label: "Firearms Handgun", type: "number" },
   { key: "FirearmsOther", label: "FA-O", type: "number" },
@@ -51,7 +51,7 @@ const FIELD_DEFS = [
   { key: "LanguageOther1", label: "LO1", type: "number" },
   { key: "LanguageOther2", label: "LO2", type: "number" },
   { key: "LanguageOther3", label: "LO3", type: "number" },
-  { key: "LanguageOwn", label: "Language Own", type: "number" },
+  { key: "LanguageOwn", label: "Language", type: "number" },
   { key: "Law", label: "Law", type: "number" },
   { key: "LibraryUse", label: "Library Use", type: "number" },
   { key: "Listen", label: "Listen", type: "number" },
@@ -84,6 +84,31 @@ const FIELD_DEFS = [
   { key: "Other2", label: "O2", type: "number" },
   { key: "Other3", label: "O3", type: "number" },
 ];
+
+// Skills that must always remain visible in print, regardless of value
+const MUST_HAVE_SKILLS = new Set([
+  "Climb",
+  "CthulhuMythos",
+  "Dodge",
+  "LanguageOwn",
+  "Listen",
+  "Deception", // fallback if added later
+  "FastTalk",
+  "FirearmsHandgun",
+  "FirstAid",
+  "NaturalWorld",
+  "Swim",
+  "Charm",
+  "CreditRating",
+  "FightingBrawl",
+  "Jump",
+  "LibraryUse",
+  "Navigate",
+  "Persuade",
+  "Psychology",
+  "Stealth",
+  "Throw",
+]);
 
 // Background questions (3 columns x 3 rows for now, can expand dynamically)
 const BACKGROUND_ROWS = [
@@ -1105,7 +1130,11 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
                 const gain = numericValue - baseValue;
                 const hideForSmallGain = gain < 4;
                 const hideForLowValue = numericValue < 9;
-                const hideInPrint = hideForSmallGain || hideForLowValue;
+
+                // Keep must-have skills visible in print regardless of value
+                const isMustHave = MUST_HAVE_SKILLS.has(def.key);
+                const hideInPrint = !isMustHave && (hideForSmallGain || hideForLowValue);
+
                 const containerClass = [hideInPrint ? "print-hide" : "", "field"].filter(Boolean).join(" ");
 
                 return (
