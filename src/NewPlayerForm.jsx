@@ -441,7 +441,7 @@ function NewPlayerForm({ onCancel, onCreated }) {
         }
       });
 
-      const response = await fetch("http://localhost:2999/players", {
+      const response = await fetch("http://localhost:8080/players", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

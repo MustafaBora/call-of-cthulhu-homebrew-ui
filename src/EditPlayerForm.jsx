@@ -406,7 +406,7 @@ function EditPlayerForm({ player, onCancel, onUpdated }) {
         console.log("Gönderilen payload:", payload);
         // 🔴 ÖNEMLİ KISIM: BURASI POST DEĞİL PUT OLMALI
         const response = await fetch(
-        `http://localhost:2999/players/${player.id}`,
+        `http://localhost:8080/players/${player.id}`,
         {
             method: "PUT",
             headers: {

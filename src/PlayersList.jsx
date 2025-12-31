@@ -59,7 +59,7 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
           return;
         }
 
-        const response = await fetch("http://localhost:2999/players", {
+        const response = await fetch("http://localhost:8080/players", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -102,7 +102,7 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
         return;
       }
 
-      const response = await fetch("http://localhost:2999/players", {
+      const response = await fetch("http://localhost:8080/players", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -252,7 +252,7 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
                   </div>
                   {/*}
                   <a
-                    href={`http://localhost:2999/players/${p.id}/sheet.html`}
+                    href={`http://localhost:8080/players/${p.id}/sheet.html`}
                     target="_blank"
                     rel="noreferrer"
                     style={{ ...styles.printButton, alignSelf: 'flex-start' }}

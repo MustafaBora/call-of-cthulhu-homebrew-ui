@@ -670,7 +670,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
     const loadRulesSpec = async () => {
       try {
         setRulesLoading(true);
-        const response = await fetch("http://localhost:2999/players/rules");
+        const response = await fetch("http://localhost:8080/players/rules");
         if (!response.ok) {
           throw new Error("Rules specification yüklenemedi");
         }
@@ -786,7 +786,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
       let response;
 
       if (mode === "create") {
-        response = await fetch("http://localhost:2999/players", {
+        response = await fetch("http://localhost:8080/players", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -802,7 +802,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
         const created = await response.json();
         onCreated && onCreated(created, { stay: stayOnPage });
       } else {
-        response = await fetch(`http://localhost:2999/players/${player.id}`, {
+        response = await fetch(`http://localhost:8080/players/${player.id}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -842,7 +842,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
         return;
       }
 
-      const response = await fetch(`http://localhost:2999/players/${player.id}`, {
+      const response = await fetch(`http://localhost:8080/players/${player.id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
