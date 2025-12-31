@@ -51,7 +51,7 @@ const FIELD_DEFS = [
   { key: "LanguageOther1", label: "LO1", type: "number" },
   { key: "LanguageOther2", label: "LO2", type: "number" },
   { key: "LanguageOther3", label: "LO3", type: "number" },
-  { key: "LanguageOwn", label: "Language (Own)", type: "number" },
+  { key: "LanguageOwn", label: "Language Own", type: "number" },
   { key: "Law", label: "Law", type: "number" },
   { key: "LibraryUse", label: "Library Use", type: "number" },
   { key: "Listen", label: "Listen", type: "number" },
