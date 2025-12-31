@@ -1,0 +1,795 @@
+<unused/>
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>1920s Era Investigator Sheet (HTML)</title>
+  <style>
+    :root{
+      --ink:#222;
+      --line:#9a9a9a;
+      --lite:#d9d9d9;
+      --paper:#fff;
+      --gap:10px;
+      --font: "Georgia", "Times New Roman", serif;
+      --sans: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+
+    /* Page + print */
+    body{
+      margin:0;
+      background:#f3f3f3;
+      font-family:var(--font);
+      color:var(--ink);
+    }
+    .page{
+      width: 210mm;
+      min-height: 297mm;
+      margin: 14px auto;
+      background:var(--paper);
+      box-shadow: 0 10px 30px rgba(0,0,0,.12);
+      padding: 12mm;
+      box-sizing:border-box;
+      position:relative;
+    }
+    @media print{
+      body{ background:#fff; }
+      .page{
+        margin:0;
+        box-shadow:none;
+        width:auto;
+        min-height:auto;
+        padding: 10mm;
+      }
+      .no-print{ display:none; }
+    }
+
+    /* Decorative border (simple) */
+    .border{
+      position:absolute;
+      inset:7mm;
+      border: 2px solid var(--line);
+      pointer-events:none;
+    }
+    .corner{
+      position:absolute;
+      width:16mm; height:16mm;
+      border: 2px solid var(--line);
+      background: transparent;
+      transform: rotate(45deg);
+      pointer-events:none;
+    }
+    .corner.tl{ top:4mm; left:4mm; }
+    .corner.tr{ top:4mm; right:4mm; }
+    .corner.bl{ bottom:4mm; left:4mm; }
+    .corner.br{ bottom:4mm; right:4mm; }
+
+    /* Title */
+    .title-wrap{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      margin-top:2mm;
+      margin-bottom:4mm;
+      position:relative;
+      z-index:2;
+    }
+    .title{
+      font-variant: small-caps;
+      letter-spacing:.8px;
+      font-size: 20px;
+      border: 2px solid var(--line);
+      padding: 6px 14px;
+      background:#fff;
+    }
+
+    /* Top row layout */
+    .top{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--gap);
+      position:relative;
+      z-index:2;
+    }
+
+    /* Generic fields */
+    .fields{
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px 14px;
+      align-content:start;
+    }
+    .field{
+      display:grid;
+      grid-template-columns: auto 1fr;
+      gap: 6px;
+      align-items:end;
+      font-size: 13px;
+    }
+    
+    .top-left{
+      display:grid;
+      gap: 10px;
+    }
+    
+    .top-stats{
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px 14px;
+    }
+    
+    .top-stat-item{
+      display:grid;
+      grid-template-columns: auto 1fr;
+      gap: 6px;
+      align-items:end;
+      font-size: 13px;
+    }
+    
+    .top-stat-item .label{
+      font-family: var(--sans);
+      font-weight:700;
+      font-size: 12px;
+      white-space:nowrap;
+    }
+    
+    .top-stat-item .stat-cells{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+    }
+    
+    .top-stat-item .cell{ height: 16px; }
+    .line{
+      border-bottom: 1.8px solid var(--line);
+      height: 18px;
+    }
+
+    .portrait{
+      border: 2px solid var(--line);
+      height: 48mm;
+      position:relative;
+      background: #fff;
+    }
+    .logo{
+      position:absolute;
+      right:0;
+      bottom:-2px;
+      font-family: var(--sans);
+      font-weight: 800;
+      letter-spacing:.6px;
+      font-size: 20px;
+      opacity:.22;
+      user-select:none;
+      padding: 0 2px 2px 0;
+    }
+
+    /* Mid stats area */
+    .mid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--gap);
+      margin-top: 10px;
+      position:relative;
+      z-index:2;
+    }
+    .mid-right{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--gap);
+    }
+    .box{
+      border: 2px solid var(--line);
+      padding: 8px;
+    }
+    .box h3{
+      margin:0 0 6px 0;
+      font-size: 13px;
+      letter-spacing:.2px;
+      font-family: var(--sans);
+      text-transform: uppercase;
+      font-weight:700;
+    }
+
+    /* Characteristics table */
+    .char-grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .char-col{
+      display:grid;
+      gap: 6px;
+    }
+
+    .char-row{
+      display:grid;
+      grid-template-columns: 44px 1fr;
+      gap: 8px;
+      align-items:center;
+      font-size: 13px;
+    }
+    .stat{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 2px;
+    }
+    .stat .caps{
+      font-family: var(--sans);
+      font-weight:700;
+      letter-spacing:.3px;
+    }
+    .triple{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+    }
+    .small-labels{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+      font-size: 9px;
+      color:#555;
+      font-family: var(--sans);
+      margin-bottom:1px;
+    }
+    .cell{
+      border: 1.6px solid var(--line);
+      height: 16px;
+      background:#fff;
+    }
+    .note{
+      font-size: 10px;
+      color:#666;
+      font-family: var(--sans);
+      margin-left:2px;
+    }
+
+    /* Right stats */
+    .vitals{
+      display:grid;
+      gap: 8px;
+    }
+    .vital-row{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 4px;
+      align-items:start;
+      font-size: 11px;
+    }
+    .vital-row .vname{
+      font-family: var(--sans);
+      font-weight:700;
+      text-transform:uppercase;
+      font-size: 10px;
+      letter-spacing:.3px;
+    }
+    .vital-pair{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3px;
+      align-items:end;
+    }
+    .mini-label{
+      font-size: 7px;
+      color:#555;
+      font-family: var(--sans);
+      margin-bottom:1px;
+    }
+    .pair{
+      display:grid;
+      gap: 2px;
+    }
+
+    /* Checkbox strip */
+    .flags{
+      display:flex;
+      flex-wrap:wrap;
+      gap: 12px 16px;
+      align-items:center;
+      margin: 8px 0 10px 0;
+      font-family: var(--sans);
+      font-size: 11px;
+      position:relative;
+      z-index:2;
+    }
+    .chk{
+      display:flex;
+      align-items:center;
+      gap:6px;
+      white-space:nowrap;
+    }
+    .sq{
+      width: 12px;
+      height: 12px;
+      border: 1.6px solid var(--line);
+      display:inline-block;
+    }
+
+    /* Skills section */
+    .skills{
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: var(--gap);
+      position:relative;
+      z-index:2;
+    }
+    .skills .box{ padding: 8px; }
+    .skill-list{
+      display:grid;
+      gap: 6px;
+    }
+    .skill{
+      display:grid;
+      grid-template-columns: 14px 1fr 88px;
+      gap: 6px;
+      align-items:center;
+      font-size: 12px;
+    }
+    .tick{
+      width: 12px; height:12px;
+      border: 1.6px solid var(--line);
+      display:inline-block;
+    }
+    .skill .name{
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .skill .name .base{
+      color:#555;
+      font-family: var(--sans);
+      font-size: 10px;
+      margin-left:4px;
+    }
+    .skill .value{
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 3px;
+    }
+    .skill .value .cell{ height: 14px; }
+
+    .skill-head{
+      display:grid;
+      grid-template-columns: 14px 1fr 88px;
+      gap: 6px;
+      align-items:end;
+      margin-bottom: 6px;
+      color:#555;
+      font-family: var(--sans);
+      font-size: 10px;
+    }
+    .skill-head .labs{
+      display:grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 3px;
+    }
+
+    /* Bottom combat */
+    .bottom{
+      display:grid;
+      grid-template-columns: 2fr 1fr;
+      gap: var(--gap);
+      margin-top: 10px;
+      position:relative;
+      z-index:2;
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      font-size: 12px;
+    }
+    th, td{
+      border: 1.6px solid var(--line);
+      padding: 6px;
+      vertical-align:middle;
+    }
+    th{
+      font-family: var(--sans);
+      font-size: 11px;
+      text-transform:uppercase;
+      letter-spacing:.3px;
+      background:#fff;
+    }
+    .combat-title{
+      font-family: var(--sans);
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.4px;
+      margin-bottom:6px;
+      font-size: 12px;
+    }
+
+    .mini-stats{
+      border: 2px solid var(--line);
+      padding: 8px;
+      display:grid;
+      gap: 8px;
+    }
+    .mini-stats .row{
+      display:grid;
+      grid-template-columns: 90px 1fr;
+      gap: 8px;
+      align-items:center;
+      font-size: 12px;
+      font-family: var(--sans);
+    }
+    .mini-stats .row .cell{
+      height: 16px;
+      border: 1.6px solid var(--line);
+    }
+    .dodge-box .small-labels{ margin-bottom:2px; }
+    .dodge-box .triple .cell{ height: 16px; }
+
+    /* Responsive preview on phone (not print) */
+    @media (max-width: 860px){
+      .page{ width: 100%; min-height:auto; padding: 12px; }
+      .border,.corner{ display:none; }
+      .top, .mid, .skills, .bottom{ grid-template-columns: 1fr; }
+      .portrait{ height: 220px; }
+    }
+
+    /* Hide skills with values 10 or less in print mode, except Cthulhu Mythos */
+    @media print{
+      .skill.hide-in-print:not(.keep-visible){ 
+        display:none; 
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <!-- simple decoration -->
+    <div class="border"></div>
+    <div class="corner tl"></div><div class="corner tr"></div>
+    <div class="corner bl"></div><div class="corner br"></div>
+
+    <div class="title-wrap">
+      <div class="title">1920s Era Investigator</div>
+    </div>
+
+    <!-- TOP -->
+    <section class="top">
+      <div class="top-left">
+        <div class="fields">
+          <div class="field"><div>Name</div><div class="line" data-field="name"></div></div>
+          <div class="field"><div>Birthplace</div><div class="line"></div></div>
+          <div class="field"><div>Pronoun</div><div class="line"></div></div>
+
+          <div class="field"><div>Occupation</div><div class="line" data-field="occupation"></div></div>
+          <div class="field"><div>Residence</div><div class="line"></div></div>
+          <div class="field"><div>Age</div><div class="line"></div></div>
+        </div>
+
+        <div class="top-stats">
+          <div class="top-stat-item">
+            <div class="label">STR</div>
+            <div class="stat-cells"><div class="cell" data-field="STR"></div><div class="cell"></div><div class="cell"></div></div>
+          </div>
+          <div class="top-stat-item">
+            <div class="label">SIZ</div>
+            <div class="stat-cells"><div class="cell" data-field="SIZ"></div><div class="cell"></div><div class="cell"></div></div>
+          </div>
+          <div class="top-stat-item">
+            <div class="label">Hit Points</div>
+            <div class="stat-cells"><div class="cell"></div><div class="cell"></div></div>
+          </div>
+
+          <div class="top-stat-item">
+            <div class="label">CON</div>
+            <div class="stat-cells"><div class="cell" data-field="CON"></div><div class="cell"></div><div class="cell"></div></div>
+          </div>
+          <div class="top-stat-item">
+            <div class="label">POW</div>
+            <div class="stat-cells"><div class="cell" data-field="POW"></div><div class="cell"></div><div class="cell"></div></div>
+          </div>
+          <div class="top-stat-item">
+            <div class="label">Magic Points</div>
+            <div class="stat-cells"><div class="cell"></div><div class="cell"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="portrait">
+        <div class="logo">CALL OF CTHULHU</div>
+      </div>
+    </section>
+
+    <!-- MID -->
+    <section class="mid">
+      <div class="box">
+        <h3>Characteristics</h3>
+        <div class="char-grid">
+          <div class="char-col">
+            <!-- left column -->
+            <div class="char-row">
+              <div class="stat"><div class="caps">DEX</div></div>
+              <div>
+                <div class="small-labels"><div>Reg</div><div>Half</div><div>Fifth</div></div>
+                <div class="triple"><div class="cell" data-field="DEX"></div><div class="cell"></div><div class="cell"></div></div>
+              </div>
+            </div>
+            <div class="char-row">
+              <div class="stat">
+                <div class="caps">INT</div>
+                <div class="note">IDEA</div>
+              </div>
+              <div>
+                <div class="small-labels"><div>Reg</div><div>Half</div><div>Fifth</div></div>
+                <div class="triple"><div class="cell" data-field="INT"></div><div class="cell"></div><div class="cell"></div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="char-col">
+            <!-- right column -->
+            <div class="char-row">
+              <div class="stat"><div class="caps">APP</div></div>
+              <div>
+                <div class="small-labels"><div>Reg</div><div>Half</div><div>Fifth</div></div>
+                <div class="triple"><div class="cell" data-field="APP"></div><div class="cell"></div><div class="cell"></div></div>
+              </div>
+            </div>
+            <div class="char-row">
+              <div class="stat">
+                <div class="caps">EDU</div>
+                <div class="note">KNOW</div>
+              </div>
+              <div>
+                <div class="small-labels"><div>Reg</div><div>Half</div><div>Fifth</div></div>
+                <div class="triple"><div class="cell" data-field="EDU"></div><div class="cell"></div><div class="cell"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mid-right">
+        <div class="box">
+          <div class="vital-row">
+            <div class="vname">Hit Points</div>
+            <div class="vital-pair">
+              <div class="pair"><div class="mini-label">Maximum</div><div class="cell"></div></div>
+              <div class="pair"><div class="mini-label">Current</div><div class="cell"></div></div>
+            </div>
+          </div>
+
+          <div class="vital-row">
+            <div class="vname">Magic Points</div>
+            <div class="vital-pair">
+              <div class="pair"><div class="mini-label">Maximum</div><div class="cell"></div></div>
+              <div class="pair"><div class="mini-label">Current</div><div class="cell"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="box">
+          <div class="vital-row">
+            <div class="vname">Luck</div>
+            <div class="vital-pair">
+              <div class="pair"><div class="mini-label">Starting</div><div class="cell"></div></div>
+              <div class="pair"><div class="mini-label">Current</div><div class="cell"></div></div>
+            </div>
+          </div>
+
+          <div class="vital-row">
+            <div class="vname">Sanity</div>
+            <div class="vital-pair">
+              <div class="pair"><div class="mini-label">Starting</div><div class="cell"></div></div>
+              <div class="pair"><div class="mini-label">Current</div><div class="cell"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FLAGS -->
+    <div class="flags">
+      <div class="chk"><span>Max Sanity</span> <span class="sq"></span></div>
+      <div class="chk"><span>Temporary Insanity</span> <span class="sq"></span></div>
+      <div class="chk"><span>Indefinite Insanity</span> <span class="sq"></span></div>
+      <div class="chk"><span>Major Wound</span> <span class="sq"></span></div>
+      <div class="chk"><span>Unconscious</span> <span class="sq"></span></div>
+      <div class="chk"><span>Dying</span> <span class="sq"></span></div>
+    </div>
+
+    <!-- SKILLS (3 columns) -->
+    <section class="skills">
+      <div class="box">
+        <h3>Skills</h3>
+        <div class="skill-head">
+          <div></div>
+          <div>Skill</div>
+          <div class="labs"><div>Reg</div><div>Half</div><div>Fifth</div></div>
+        </div>
+        <div class="skill-list">
+          <!-- Left column sample (add/remove as you like) -->
+          <div class="skill"><span class="tick"></span><div class="name">Accounting <span class="base">(05%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">Anthropology <span class="base">(01%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">Appraise <span class="base">(05%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">Archaeology <span class="base">(01%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">Art/Craft <span class="base">(05%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">Charm <span class="base">(15%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">Climb <span class="base">(20%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">Credit Rating <span class="base">(00%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">Cthulhu Mythos <span class="base">(00%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">Disguise <span class="base">(05%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">Dodge <span class="base">(half DEX)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">Drive Auto <span class="base">(20%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">Electrical Repair <span class="base">(10%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">Fast Talk <span class="base">(05%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">Fighting (Brawl) <span class="base">(25%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">Firearms (Handgun) <span class="base">(20%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Skills</h3>
+        <div class="skill-head">
+          <div></div>
+          <div>Skill</div>
+          <div class="labs"><div>Reg</div><div>Half</div><div>Fifth</div></div>
+        </div>
+        <div class="skill-list">
+          <!-- Middle column sample -->
+          <div class="skill"><span class="tick"></span><div class="name">Firearms (Rifle/Shotgun) <span class="base">(25%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">First Aid <span class="base">(30%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">History <span class="base">(05%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">Intimidate <span class="base">(15%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">Jump <span class="base">(20%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">Language (Other) <span class="base">(01%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">Language (Own) <span class="base">(EDU)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">Law <span class="base">(05%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">Library Use <span class="base">(20%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">Listen <span class="base">(20%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">Locksmith <span class="base">(01%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">Mechanical Repair <span class="base">(10%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">Medicine <span class="base">(01%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">Natural World <span class="base">(10%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">Navigate <span class="base">(10%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">Occult <span class="base">(05%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>Skills</h3>
+        <div class="skill-head">
+          <div></div>
+          <div>Skill</div>
+          <div class="labs"><div>Reg</div><div>Half</div><div>Fifth</div></div>
+        </div>
+        <div class="skill-list">
+          <!-- Right column sample -->
+          <div class="skill"><span class="tick"></span><div class="name">Persuade <span class="base">(10%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">Pilot <span class="base">(01%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">Psychoanalysis <span class="base">(01%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">Psychology <span class="base">(10%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">Ride <span class="base">(05%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">Science <span class="base">(01%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">Sleight of Hand <span class="base">(10%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">Spot Hidden <span class="base">(25%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">Stealth <span class="base">(20%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">Survival <span class="base">(10%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">Swim <span class="base">(20%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">Throw <span class="base">(20%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">Track <span class="base">(10%)</span></div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <!-- blank lines like in the sheet -->
+          <div class="skill"><span class="tick"></span><div class="name">&nbsp;</div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+          <div class="skill"><span class="tick"></span><div class="name">&nbsp;</div><div class="value"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BOTTOM -->
+    <section class="bottom">
+      <div>
+        <div class="combat-title">Combat</div>
+        <table>
+          <thead>
+            <tr>
+              <th style="width:18%">Weapon</th>
+              <th style="width:16%">Skill</th>
+              <th style="width:14%">Damage</th>
+              <th style="width:14%"># Attacks</th>
+              <th style="width:14%">Range</th>
+              <th style="width:12%">Ammo</th>
+              <th style="width:12%">Malf.</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Brawl</td>
+              <td>&nbsp;</td>
+              <td>1D3 + DB</td>
+              <td>1</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mini-stats">
+        <div class="row"><div>Move</div><div class="cell"></div></div>
+        <div class="row"><div>Build</div><div class="cell"></div></div>
+
+        <div class="dodge-box">
+          <div class="row" style="grid-template-columns: 90px 1fr;">
+            <div>Dodge</div>
+            <div>
+              <div class="small-labels"><div>Reg</div><div>Half</div><div>Fifth</div></div>
+              <div class="triple"><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row"><div>Damage Bonus</div><div class="cell"></div></div>
+      </div>
+    </section>
+
+    <div class="no-print" style="margin-top:10px; font-family:var(--sans); font-size:12px; color:#666;">
+      İpucu: Yazdırmak için <b>Ctrl+P</b>. Telefonda düzgün görmek için sayfayı yatay çevir.
+    </div>
+  </div>
+
+  <script>
+    // Load character data from localStorage
+    const data = JSON.parse(localStorage.getItem('characterData') || '{}');
+
+    // Fill fields with data-field attributes
+    document.querySelectorAll('[data-field]').forEach(el => {
+      const field = el.dataset.field;
+      if (data[field]) {
+        el.textContent = data[field];
+      }
+    });
+
+    // Fill name - assuming the title is in .title
+    const titleEl = document.querySelector('.title');
+    if (titleEl && data.name) {
+      titleEl.textContent = data.name;
+    }
+
+    // Process skills: hide those with values <= 10 in print, except Cthulhu Mythos
+    document.querySelectorAll('.skill').forEach(skillEl => {
+      const nameEl = skillEl.querySelector('.name');
+      if (!nameEl) return;
+      
+      const skillName = nameEl.textContent.trim();
+      const baseMatch = skillName.match(/^([^(]+)/);
+      const baseName = baseMatch ? baseMatch[1].trim() : skillName;
+      
+      // Check if this skill has data
+      const skillData = data[baseName];
+      
+      if (skillData !== undefined && typeof skillData === 'number') {
+        // Fill the value cells
+        const cells = skillEl.querySelectorAll('.value .cell');
+        if (cells.length >= 1) {
+          cells[0].textContent = skillData;
+        }
+        
+        // Mark for hiding in print if value <= 10, except for Cthulhu Mythos
+        if (skillData <= 10) {
+          if (baseName.toLowerCase().includes('cthulhu mythos')) {
+            skillEl.classList.add('keep-visible');
+          } else {
+            skillEl.classList.add('hide-in-print');
+          }
+        }
+      } else {
+        // No data - hide if not Cthulhu Mythos
+        if (!baseName.toLowerCase().includes('cthulhu mythos')) {
+          skillEl.classList.add('hide-in-print');
+        }
+      }
+    });
+  </script>
+</body>
+</html>
