@@ -1101,10 +1101,12 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
                 const fifthValue = Math.floor(numericValue / 5);
 
                 const isOther = def.key.toLowerCase().includes("other");
-                const hideInPrint = isOther && base !== undefined && numericValue === Number(base);
-                const isCthulhuMythos = def.key === "CthulhuMythos";
-                const hideSkillInPrint = !isCthulhuMythos && numericValue <= 10 && numericValue > 0;
-                const containerClass = [hideInPrint || hideSkillInPrint ? "print-hide" : "", "field"].filter(Boolean).join(" ");
+                const baseValue = Number(base ?? 0);
+                const gain = numericValue - baseValue;
+                const hideForSmallGain = gain < 4;
+                const hideForLowValue = numericValue < 9;
+                const hideInPrint = hideForSmallGain || hideForLowValue;
+                const containerClass = [hideInPrint ? "print-hide" : "", "field"].filter(Boolean).join(" ");
 
                 return (
                   <div key={def.key} className={containerClass}>
