@@ -579,7 +579,7 @@ input[type="number"] {
     font-size: 10px !important;
     background: transparent !important;
   }
-  //media print
+  /* media print */
   .sheet-grid {
     gap: 0.5rem 0.9rem !important;
     background: transparent !important;
