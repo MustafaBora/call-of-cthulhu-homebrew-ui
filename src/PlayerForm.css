@@ -498,6 +498,8 @@ input[type="number"] {
   .sheet-page {
     padding: 0.75rem !important;
     position: relative !important;
+    transform: scaleY(0.90);
+    transform-origin: top left;
   }
 
   .frame-top,
