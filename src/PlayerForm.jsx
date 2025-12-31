@@ -725,6 +725,29 @@ function getInitialForm(rulesSpec, mode, player) {
       avatar: player?.avatar || "",
     });
 
+    // Missing fields: default to rules base values so minimums are visible
+    Object.entries(rulesSpec.base).forEach(([k, v]) => {
+      if (baseObj[k] === undefined) baseObj[k] = v;
+    });
+
+    // Ensure every FIELD_DEFS numeric exists
+    FIELD_DEFS.forEach((def) => {
+      if (def.type === "number" && baseObj[def.key] === undefined) {
+        const backendKey = def.key;
+        baseObj[def.key] = rulesSpec.base[backendKey] ?? 0;
+      }
+    });
+
+    // If player already had XP/level info (e.g., offline sample), keep it
+    if (player?.usedXP !== undefined) {
+      baseObj.usedXP = Number(player.usedXP) || 0;
+      const rem = player.remainingXP !== undefined ? Number(player.remainingXP) : baseObj.totalXP - baseObj.usedXP;
+      baseObj.remainingXP = rem;
+    }
+    if (player?.level !== undefined) {
+      baseObj.level = player.level;
+    }
+
     // Ensure background fields exist even if backend doesn't have them
     BACKGROUND_KEYS.forEach((k) => {
       if (baseObj[k] === undefined) baseObj[k] = "";

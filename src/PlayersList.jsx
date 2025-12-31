@@ -20,6 +20,91 @@ const IGNORED_KEYS = [
   "LanguageOwn",
 ];
 
+function getSampleOfflinePlayers() {
+  const now = Date.now();
+  const make = (idOffset, data) => ({
+    id: now + idOffset,
+    totalXP: 200000,
+    usedXP: 151000 + idOffset * 3000,
+    remainingXP: 200000 - (151000 + idOffset * 3000),
+    level: 5,
+    avatar: "",
+    ...data,
+  });
+
+  return [
+    make(1, {
+      player: "Keeper",
+      name: "Ada Blackwood",
+      occupation: "Antiquarian",
+      age: 32,
+      residence: "Arkham",
+      STA: 40,
+      AGI: 45,
+      EDU: 55,
+      INT: 60,
+      LUCK: 45,
+      SIZ: 31,
+      STR: 35,
+      WILL: 50,
+      STATUS: 15,
+      LibraryUse: 60,
+      History: 55,
+      Occult: 40,
+      Anthropology: 35,
+      Listen: 50,
+      Spot: 45,
+      SPOT: 45,
+    }),
+    make(2, {
+      player: "Keeper",
+      name: "Malik Farouq",
+      occupation: "Explorer",
+      age: 29,
+      residence: "Cairo",
+      STA: 50,
+      AGI: 55,
+      EDU: 40,
+      INT: 45,
+      LUCK: 35,
+      SIZ: 33,
+      STR: 45,
+      WILL: 40,
+      STATUS: 8,
+      Climb: 55,
+      Navigate: 50,
+      Survival: 45,
+      "Firearms Rifle Shotgun": 50,
+      "Drive Auto": 45,
+      Listen: 40,
+      SPOT: 42,
+    }),
+    make(3, {
+      player: "Keeper",
+      name: "Lena Torres",
+      occupation: "Detective",
+      age: 34,
+      residence: "Boston",
+      STA: 45,
+      AGI: 55,
+      EDU: 50,
+      INT: 55,
+      LUCK: 40,
+      SIZ: 32,
+      STR: 38,
+      WILL: 55,
+      STATUS: 12,
+      Persuade: 55,
+      Psychology: 50,
+      Stealth: 45,
+      "Firearms Handgun": 55,
+      FastTalk: 45,
+      Listen: 48,
+      SPOT: 50,
+    }),
+  ];
+}
+
 function formatLabel(key) {
   return key
     .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
@@ -54,7 +139,9 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
 
       const loadOffline = () => {
         const stored = JSON.parse(localStorage.getItem("offlinePlayers") || "[]");
-        setPlayers(sortByIdDesc(stored));
+        const next = stored.length ? stored : getSampleOfflinePlayers();
+        localStorage.setItem("offlinePlayers", JSON.stringify(next));
+        setPlayers(sortByIdDesc(next));
         setOfflineMode(true);
       };
 
