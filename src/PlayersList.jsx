@@ -294,33 +294,51 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
 
     try {
       const text = await file.text();
-      const data = JSON.parse(text);
+      const parsed = JSON.parse(text);
+      const list = Array.isArray(parsed)
+        ? parsed
+        : Array.isArray(parsed?.players)
+          ? parsed.players
+          : [parsed];
+
+      const cleaned = list
+        .filter(Boolean)
+        .map((p) => {
+          const { id, ...rest } = p;
+          return rest;
+        });
 
       const token = localStorage.getItem("token");
-      const useBackend = !!token && !offlineMode;
+      const useBackend = !offlineMode;
 
       if (!useBackend) {
-        const withId = { ...data, id: data?.id ?? Date.now() };
         const stored = JSON.parse(localStorage.getItem("offlinePlayers") || "[]");
-        const next = sortByIdDesc([...stored, withId]);
+        const now = Date.now();
+        const withIds = cleaned.map((p, idx) => ({ ...p, id: p.id ?? now + idx }));
+        const next = sortByIdDesc([...stored, ...withIds]);
         localStorage.setItem("offlinePlayers", JSON.stringify(next));
         setPlayers(next);
       } else {
-        const response = await fetch(`${API_BASE_URL}/players`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(data),
-        });
+        const createdPlayers = [];
+        for (const p of cleaned) {
+          const response = await fetch(`${API_BASE_URL}/players`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
+            body: JSON.stringify(p),
+          });
 
-        if (!response.ok) {
-          throw new Error(t("players.importFailed"));
+          if (!response.ok) {
+            throw new Error(t("players.importFailed"));
+          }
+
+          const newPlayer = await response.json();
+          createdPlayers.push(newPlayer);
         }
 
-        const newPlayer = await response.json();
-        setPlayers((prev) => sortByIdDesc([...prev, newPlayer]));
+        setPlayers((prev) => sortByIdDesc([...prev, ...createdPlayers]));
       }
       setImportStatus(t("players.importSuccess"));
       setTimeout(() => setImportStatus(""), 3000);

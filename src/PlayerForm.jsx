@@ -1035,7 +1035,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
 
     try {
       const token = localStorage.getItem("token");
-      const useBackend = !!token && !offlineMode;
+      const useBackend = !offlineMode;
 
       const payload = { ...form };
 
@@ -1068,7 +1068,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
           body: JSON.stringify(payload),
         });
@@ -1084,7 +1084,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
           body: JSON.stringify(payload),
         });
@@ -1115,7 +1115,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
 
     try {
       const token = localStorage.getItem("token");
-      const useBackend = !!token && !offlineMode;
+      const useBackend = !offlineMode;
 
       if (!useBackend) {
         deleteOfflinePlayer(player.id);
@@ -1125,9 +1125,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
 
       const response = await fetch(`${API_BASE_URL}/players/${player.id}`, {
         method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
 
       if (!response.ok) {
