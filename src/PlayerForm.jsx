@@ -1128,6 +1128,35 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
 
   return (
     <div className="page-wrapper">
+      {isSubmitting && (
+        <div style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: "rgba(0, 0, 0, 0.7)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 9999,
+          backdropFilter: "blur(4px)"
+        }}>
+          <div style={{
+            textAlign: "center",
+            color: "white"
+          }}>
+            <div style={{
+              fontSize: "2rem",
+              marginBottom: "1rem"
+            }}>⏳</div>
+            <div style={{
+              fontSize: "1.2rem",
+              fontWeight: "bold"
+            }}>Kaydediliyor...</div>
+          </div>
+        </div>
+      )}
       <div className="main-container">
         <div
           className="sheet-page player-page"
