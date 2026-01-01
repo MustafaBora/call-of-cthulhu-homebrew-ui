@@ -3,6 +3,13 @@ import { useTranslation } from "react-i18next";
 import { API_BASE_URL } from "./config";
 import LanguageSwitcher from "./LanguageSwitcher";
 import defaultAvatar from "./assets/default-avatar.png";
+import avatarDetective from "./assets/detective.jpg";
+import avatarDoctor from "./assets/doctor.jpg";
+import avatarProf from "./assets/prof.jpg";
+import avatarEngineer from "./assets/engineer.jpg";
+import avatarAntiquarian from "./assets/female-investigator.jpg";
+import avatarExplorer from "./assets/seamen.jpg";
+import avatarFemale3 from "./assets/female-3.jpg";
 
 // Meta alanları ve listede göstermeyeceğimiz alanlar
 const IGNORED_KEYS = [
@@ -23,40 +30,40 @@ const IGNORED_KEYS = [
 
 function getSampleOfflinePlayers() {
   const now = Date.now();
-  const make = (idOffset, data) => ({
+  const make = (idOffset, data, avatarSrc) => ({
     id: now + idOffset,
     totalXP: 200000,
     usedXP: 151000 + idOffset * 3000,
     remainingXP: 200000 - (151000 + idOffset * 3000),
     level: 5,
-    avatar: "",
+    avatar: avatarSrc || "",
     ...data,
   });
 
   return [
     make(1, {
       player: "Keeper",
-      name: "Ada Blackwood",
-      occupation: "Antiquarian",
-      age: 32,
-      residence: "Arkham",
-      STA: 40,
-      AGI: 45,
-      EDU: 55,
-      INT: 60,
-      LUCK: 45,
-      SIZ: 31,
-      STR: 35,
+      name: "Sarah Mitchell",
+      occupation: "Navy Officer",
+      age: 28,
+      residence: "Portsmouth",
+      STA: 60,
+      AGI: 55,
+      EDU: 45,
+      INT: 50,
+      LUCK: 40,
+      SIZ: 32,
+      STR: 45,
       WILL: 50,
       STATUS: 15,
-      LibraryUse: 60,
-      History: 55,
-      Occult: 40,
-      Anthropology: 35,
-      Listen: 50,
-      Spot: 45,
-      SPOT: 45,
-    }),
+      "Firearms Handgun": 60,
+      "Firearms Rifle Shotgun": 55,
+      Navigate: 65,
+      "Pilot Boat": 55,
+      Persuade: 45,
+      Command: 50,
+      Listen: 48,
+    }, avatarFemale3),
     make(2, {
       player: "Keeper",
       name: "Malik Farouq",
@@ -79,7 +86,7 @@ function getSampleOfflinePlayers() {
       "Drive Auto": 45,
       Listen: 40,
       SPOT: 42,
-    }),
+    }, avatarExplorer),
     make(3, {
       player: "Keeper",
       name: "Lena Torres",
@@ -102,7 +109,7 @@ function getSampleOfflinePlayers() {
       FastTalk: 45,
       Listen: 48,
       SPOT: 50,
-    }),
+    }, avatarDetective),
     make(4, {
       player: "Keeper",
       name: "Dr. Eleanor Vance",
@@ -125,7 +132,7 @@ function getSampleOfflinePlayers() {
       Listen: 45,
       CthulhuMythos: 35,
       Science: 40,
-    }),
+    }, avatarDoctor),
     make(5, {
       player: "Keeper",
       name: "Prof. James Whitmore",
@@ -148,7 +155,7 @@ function getSampleOfflinePlayers() {
       CthulhuMythos: 45,
       Listen: 40,
       SPOT: 35,
-    }),
+    }, avatarProf),
     make(6, {
       player: "Keeper",
       name: "Ivan Petrov",
@@ -171,7 +178,30 @@ function getSampleOfflinePlayers() {
       Demolitions: 40,
       "Firearms Other": 35,
       Listen: 42,
-    }),
+    }, avatarEngineer),
+    make(7, {
+      player: "Keeper",
+      name: "Ada Blackwood",
+      occupation: "Antiquarian",
+      age: 32,
+      residence: "Arkham",
+      STA: 40,
+      AGI: 45,
+      EDU: 55,
+      INT: 60,
+      LUCK: 45,
+      SIZ: 31,
+      STR: 35,
+      WILL: 50,
+      STATUS: 15,
+      LibraryUse: 60,
+      History: 55,
+      Occult: 40,
+      Anthropology: 35,
+      Listen: 50,
+      Spot: 45,
+      SPOT: 45,
+    }, avatarAntiquarian),
   ];
 }
 
@@ -386,7 +416,11 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
                   tabIndex={onEditPlayer ? 0 : undefined}
                 >
                   <img
-                    src={p.avatar ? `data:image/*;base64,${p.avatar}` : defaultAvatar}
+                    src={
+                      p.avatar && typeof p.avatar === "string" && p.avatar.startsWith("data:")
+                        ? p.avatar
+                        : p.avatar || defaultAvatar
+                    }
                     alt={p.name || p.player || "Avatar"}
                     style={styles.avatarImg}
                   />
