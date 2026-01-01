@@ -909,18 +909,22 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
       const fallbackSpec = createFallbackRulesSpec();
       try {
         setRulesLoading(true);
+        console.log(`[PlayerForm] Backend URL: ${API_BASE_URL}`);
         const response = await fetch(`${API_BASE_URL}/players/rules`);
+        console.log(`[PlayerForm] Response status: ${response.status}`);
         if (!response.ok) {
-          throw new Error("Rules specification yüklenemedi");
+          throw new Error(`HTTP ${response.status}: Rules specification yüklenemedi`);
         }
         const spec = await response.json();
+        console.log("[PlayerForm] Rules loaded from backend");
         setRulesSpec(spec);
         setOfflineMode(false);
         
         // Initialize form with loaded spec
         setForm(getInitialForm(spec, mode, player));
       } catch (err) {
-        console.error("Rules yükleme hatası:", err);
+        console.error("[PlayerForm] Rules yükleme hatası:", err.message);
+        console.error("[PlayerForm] Full error:", err);
         setOfflineMode(true);
         setRulesError("Sunucuya ulaşılamadı, varsayılan kurallar kullanılıyor.");
         setRulesSpec(fallbackSpec);
