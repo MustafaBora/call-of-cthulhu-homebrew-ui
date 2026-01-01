@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { API_BASE_URL } from "./config";
 import LanguageSwitcher from "./LanguageSwitcher";
 import defaultAvatar from "./assets/default-avatar.png";
 
@@ -153,7 +154,7 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
           return;
         }
 
-        const response = await fetch("http://localhost:8080/players", {
+        const response = await fetch(`${API_BASE_URL}/players`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -201,7 +202,7 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
         localStorage.setItem("offlinePlayers", JSON.stringify(next));
         setPlayers(next);
       } else {
-        const response = await fetch("http://localhost:8080/players", {
+        const response = await fetch(`${API_BASE_URL}/players`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -357,7 +358,7 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
                   </div>
                   {/*}
                   <a
-                    href={`http://localhost:8080/players/${p.id}/sheet.html`}
+                    href={`${API_BASE_URL}/players/${p.id}/sheet.html`}
                     target="_blank"
                     rel="noreferrer"
                     style={{ ...styles.printButton, alignSelf: 'flex-start' }}

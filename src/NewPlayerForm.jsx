@@ -1,5 +1,6 @@
 //UNUSED FILE
 import { useState } from "react";
+import { API_BASE_URL } from "./config";
 
 // Backend'deki BASE/MULT ile uyumlu skill tabloları (field isimleri entity ile aynı)
 const BASE = {
@@ -441,7 +442,7 @@ function NewPlayerForm({ onCancel, onCreated }) {
         }
       });
 
-      const response = await fetch("http://localhost:8080/players", {
+      const response = await fetch(`${API_BASE_URL}/players`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { API_BASE_URL } from "./config";
 import defaultAvatar from "./assets/default-avatar.png";
 import frameHorizontalShort from "./assets/horizontal-short.png";
 import frameVertical from "./assets/vertical.png";
@@ -908,7 +909,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
       const fallbackSpec = createFallbackRulesSpec();
       try {
         setRulesLoading(true);
-        const response = await fetch("http://localhost:8080/players/rules");
+        const response = await fetch(`${API_BASE_URL}/players/rules`);
         if (!response.ok) {
           throw new Error("Rules specification yüklenemedi");
         }
@@ -1031,7 +1032,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
           onUpdated && onUpdated(saved, { stay: stayOnPage });
         }
       } else if (mode === "create") {
-        response = await fetch("http://localhost:8080/players", {
+        response = await fetch(`${API_BASE_URL}/players`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -1047,7 +1048,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
         const created = await response.json();
         onCreated && onCreated(created, { stay: stayOnPage });
       } else {
-        response = await fetch(`http://localhost:8080/players/${player.id}`, {
+        response = await fetch(`${API_BASE_URL}/players/${player.id}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -1090,7 +1091,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
         return;
       }
 
-      const response = await fetch(`http://localhost:8080/players/${player.id}`, {
+      const response = await fetch(`${API_BASE_URL}/players/${player.id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { API_BASE_URL } from "./config";
 import PlayersList from "./PlayersList";
 import PlayerForm from "./PlayerForm";
 import CocCharacterForm from "./CocCharacterForm";
@@ -87,7 +88,7 @@ function LoginPage() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("http://localhost:8080/auth/login", {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -123,7 +124,7 @@ function LoginPage() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("http://localhost:8080/auth/register", {
+      const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
