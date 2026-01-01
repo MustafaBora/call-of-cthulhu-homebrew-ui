@@ -544,6 +544,8 @@ const styles = {
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: "1.5rem",
+    flexWrap: "wrap",
+    gap: "0.75rem",
   },
   title: {
     margin: 0,
@@ -554,6 +556,8 @@ const styles = {
     display: "flex",
     gap: "0.5rem",
     alignItems: "center",
+    flexWrap: "wrap",
+    justifyContent: "flex-end",
   },
   importButton: {
     padding: "0.5rem 0.9rem",
@@ -566,6 +570,8 @@ const styles = {
     cursor: "pointer",
     boxShadow: "0 4px 10px rgba(0,0,0,0.25)",
     display: "inline-block",
+    flex: "0 1 180px",
+    textAlign: "center",
   },
   fileInput: {
     display: "none",
@@ -589,6 +595,8 @@ const styles = {
     fontSize: "0.9rem",
     cursor: "pointer",
     boxShadow: "0 4px 10px rgba(0,0,0,0.25)",
+    flex: "0 1 160px",
+    textAlign: "center",
   },
   addCard: {
     display: "flex",
@@ -623,16 +631,16 @@ const styles = {
     fontWeight: 700,
     fontSize: "0.95rem",
   },
-      grid: {
-        display: "grid",
-        gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
-        gap: "0.5rem 0.75rem",
-        padding: "0.5rem",
-        background: "#fefce8",
-        borderRadius: "0.75rem",
-        border: "1px solid #eab308",
-        fontSize: "0.75rem", // biraz küçülttük
-      },
+  grid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+    gap: "0.5rem 0.75rem",
+    padding: "0.5rem",
+    background: "#fefce8",
+    borderRadius: "0.75rem",
+    border: "1px solid #eab308",
+    fontSize: "0.75rem", // biraz küçülttük
+  },
   card: {
     background: "#fefce8",
     borderRadius: "0.9rem",
@@ -643,7 +651,8 @@ const styles = {
   cardRow: {
     display: "flex",
     alignItems: "stretch",
-    gap: "1rem",
+    gap: "0.9rem",
+    flexWrap: "wrap",
   },
   contentCol: {
     display: "flex",
@@ -653,7 +662,9 @@ const styles = {
     minWidth: 0,
   },
   avatarWrapper: {
-    width: "200px",
+    width: "180px",
+    minWidth: "140px",
+    maxWidth: "240px",
     minHeight: "140px",
     borderRadius: "12px",
     overflow: "hidden",
@@ -662,7 +673,7 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    flexShrink: 0,
+    flex: "0 1 180px",
     alignSelf: "stretch",
   },
   avatarImg: {
@@ -714,7 +725,9 @@ const styles = {
   },
   cardFooter: {
     display: "flex",
-    justifyContent: "space-between",
+    justifyContent: "flex-start",
+    gap: "0.5rem",
+    flexWrap: "wrap",
     marginTop: "0.25rem",
   },
   editButton: {

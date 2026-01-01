@@ -55,8 +55,11 @@ input[type="number"] {
 }
 
 .avatar-box {
-  width: 182px;
-  height: 238px;
+  width: 100%;
+  max-width: 182px;
+  aspect-ratio: 3 / 4;
+  height: auto;
+  min-width: 0;
   border: 2px solid #111;
   border-radius: 4px;
   overflow: hidden;
@@ -178,6 +181,11 @@ input[type="number"] {
   margin-left: auto;
 }
 
+.value-row .input-inline {
+  margin-left: auto;
+  text-align: right;
+}
+
 .step-buttons {
   display: flex;
   flex-direction: row;
@@ -273,12 +281,15 @@ input[type="number"] {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .stat-input-row {
   display: flex;
   align-items: center;
   gap: 6px;
+  flex: 1 1 60px;
+  min-width: 60px;
 }
 
 .stat-label {
@@ -288,13 +299,21 @@ input[type="number"] {
 }
 
 .stat-box {
-  width: 70px;
+  width: 30%;
+  max-width: 70px;
+  min-width: 20px;
   height: 24px;
   border: 1px solid #111;
   border-radius: 3px;
   text-align: center;
   font-size: 12px;
   background: #fff;
+  margin-left: auto;
+}
+
+.stat-box-input {
+  text-align: right;
+  margin-left: auto;
 }
 
 .background-section {
