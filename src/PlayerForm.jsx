@@ -18,6 +18,9 @@ import "./PlayerForm.css";
  * Supports 5 penalty levels: 40(1.5x), 50(2x), 60(3x), 70(4x), 80(6x)
  */
 
+const RULES_CACHE_KEY = "rulesCache";
+const RULES_CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
+
 const FIELD_DEFS = [
   { key: "Accounting", label: "Accounting", type: "number" },
   { key: "AnimalHandling", label: "Animal Handling", type: "number" },
@@ -910,6 +913,25 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
       const fallbackSpec = createFallbackRulesSpec();
       try {
         setRulesLoading(true);
+        // Try cached rules first (10 min TTL)
+        const cachedRaw = localStorage.getItem(RULES_CACHE_KEY);
+        if (cachedRaw) {
+          try {
+            const cached = JSON.parse(cachedRaw);
+            const isFresh = cached?.timestamp && cached?.spec && (Date.now() - cached.timestamp < RULES_CACHE_TTL_MS);
+            if (isFresh) {
+              console.log("[PlayerForm] Using cached rules spec");
+              setRulesSpec(cached.spec);
+              setOfflineMode(false);
+              setForm(getInitialForm(cached.spec, mode, player));
+              return;
+            }
+          } catch (parseErr) {
+            console.warn("[PlayerForm] Failed to parse cached rules, clearing cache", parseErr);
+            localStorage.removeItem(RULES_CACHE_KEY);
+          }
+        }
+
         console.log(`[PlayerForm] Backend URL: ${API_BASE_URL}`);
         const response = await fetch(`${API_BASE_URL}/players/rules`);
         console.log(`[PlayerForm] Response status: ${response.status}`);
@@ -918,6 +940,10 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
         }
         const spec = await response.json();
         console.log("[PlayerForm] Rules loaded from backend");
+
+        // Cache the fresh rules
+        localStorage.setItem(RULES_CACHE_KEY, JSON.stringify({ timestamp: Date.now(), spec }));
+
         setRulesSpec(spec);
         setOfflineMode(false);
         
@@ -926,6 +952,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
       } catch (err) {
         console.error("[PlayerForm] Rules yükleme hatası:", err.message);
         console.error("[PlayerForm] Full error:", err);
+        localStorage.removeItem(RULES_CACHE_KEY);
         setOfflineMode(true);
         setRulesError("Sunucuya ulaşılamadı, varsayılan kurallar kullanılıyor.");
         setRulesSpec(fallbackSpec);
