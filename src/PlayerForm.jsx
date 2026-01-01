@@ -1196,7 +1196,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
 
           {offlineMode && (
             <div className="error" style={{ margin: "0 0 1rem 0", background: "#7c2d12" }}>
-              <strong>Offline:</strong> Sunucuya ulaşılamadı, varsayılan kurallarla çalışıyorsunuz. Değişiklikler tarayıcıya kaydedilecek.
+              {t("playerForm.offlineMessage")}
             </div>
           )}
 
