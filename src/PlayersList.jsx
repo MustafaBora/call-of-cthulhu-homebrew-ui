@@ -139,6 +139,7 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
       setError("");
 
       const loadOffline = () => {
+        console.log("[PlayersList] Offline mode'a geçiliyor");
         const stored = JSON.parse(localStorage.getItem("offlinePlayers") || "[]");
         const next = stored.length ? stored : getSampleOfflinePlayers();
         localStorage.setItem("offlinePlayers", JSON.stringify(next));
@@ -148,12 +149,16 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
 
       try {
         const token = localStorage.getItem("token");
+        console.log("[PlayersList] Token var mı?", !!token);
         if (!token) {
+          console.log("[PlayersList] Token yok, offline mod");
           loadOffline();
           setLoading(false);
           return;
         }
 
+        console.log(`[PlayersList] Backend URL: ${API_BASE_URL}`);
+        console.log("[PlayersList] Backend'den players listesi çekiliyor...");
         const response = await fetch(`${API_BASE_URL}/players`, {
           method: "GET",
           headers: {
@@ -162,15 +167,18 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
           },
         });
 
+        console.log(`[PlayersList] Response status: ${response.status}`);
         if (!response.ok) {
-          throw new Error("Oyuncu listesi alınamadı.");
+          throw new Error(`HTTP ${response.status}: Oyuncu listesi alınamadı.`);
         }
 
         const data = await response.json();
+        console.log("[PlayersList] Players başarıyla yüklendi:", data.length);
         setPlayers(sortByIdDesc(data));
         setOfflineMode(false);
       } catch (err) {
-        console.error(err);
+        console.error("[PlayersList] Hata:", err.message);
+        console.error("[PlayersList] Full error:", err);
         setError("Sunucuya ulaşılamadı, yerel veriler gösteriliyor.");
         loadOffline();
       } finally {
