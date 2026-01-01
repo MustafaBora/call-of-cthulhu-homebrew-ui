@@ -437,9 +437,16 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
                 >
                   <img
                     src={
-                      p.avatar && typeof p.avatar === "string" && p.avatar.startsWith("data:")
-                        ? p.avatar
-                        : p.avatar || defaultAvatar
+                      (() => {
+                        if (!p.avatar) return defaultAvatar;
+                        if (typeof p.avatar === "string" && p.avatar.startsWith("data:")) return p.avatar;
+                        // If we have a long-ish string without data: prefix, assume raw base64 and prepend header
+                        if (typeof p.avatar === "string" && p.avatar.length > 100) {
+                          return `data:image/*;base64,${p.avatar}`;
+                        }
+                        // Otherwise treat as a url/path
+                        return p.avatar || defaultAvatar;
+                      })()
                     }
                     alt={p.name || p.player || "Avatar"}
                     style={styles.avatarImg}
