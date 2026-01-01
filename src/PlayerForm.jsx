@@ -1470,7 +1470,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
                 disabled={isSubmitting}
                 onClick={(e) => handleSubmit(e, false)}
               >
-                {t("playerForm.saveReturn")}
+                {isSubmitting ? "Kaydediliyor..." : t("playerForm.saveReturn")}
               </button>
 
               <button
@@ -1480,7 +1480,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
                 disabled={isSubmitting}
                 onClick={(e) => handleSubmit(e, true)}
               >
-                {t("playerForm.saveStay")}
+                {isSubmitting ? "Kaydediliyor..." : t("playerForm.saveStay")}
               </button>
 
             
