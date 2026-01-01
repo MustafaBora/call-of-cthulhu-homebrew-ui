@@ -22,7 +22,7 @@ const FIELD_DEFS = [
   { key: "Accounting", label: "Accounting", type: "number" },
   { key: "AnimalHandling", label: "Animal Handling", type: "number" },
   { key: "Anthropology", label: "Anthropology", type: "number" },
-  { key: "Appraise", label: "Appraise", type: "number" },
+  { key: "Appraise", label: "Appearance", type: "number" },
   { key: "Archeology", label: "Archeology", type: "number" },
   { key: "ArtCraft", label: "Art/Craft", type: "number" },
   { key: "ArtCraft2", label: "Art/Craft 2", type: "number" },
@@ -40,18 +40,18 @@ const FIELD_DEFS = [
   { key: "ElectricalRepair", label: "Electrical Repair", type: "number" },
   { key: "FastTalk", label: "Fast Talk", type: "number" },
   { key: "FightingBrawl", label: "Fighting Brawl", type: "number" },
-  { key: "FightingOther", label: "FO", type: "number" },
-  { key: "FirearmsHandgun", label: "Firearms Handgun", type: "number" },
-  { key: "FirearmsOther", label: "FA-O", type: "number" },
+  { key: "FightingOther", label: "FO (___________)", type: "number" },
+  { key: "FirearmsHandgun", label: "Handgun", type: "number" },
+  { key: "FirearmsOther", label: "FA-O (___________)", type: "number" },
   { key: "FirearmsRifleShotgun", label: "Firearms Shotgun", type: "number" },
   { key: "FirstAid", label: "First Aid", type: "number" },
   { key: "History", label: "History", type: "number" },
   { key: "Hypnosis", label: "Hypnosis", type: "number" },
   { key: "Intimidate", label: "Intimidate", type: "number" },
   { key: "Jump", label: "Jump", type: "number" },
-  { key: "LanguageOther1", label: "LO1", type: "number" },
-  { key: "LanguageOther2", label: "LO2", type: "number" },
-  { key: "LanguageOther3", label: "LO3", type: "number" },
+  { key: "LanguageOther1", label: "LO1 (___________)", type: "number" },
+  { key: "LanguageOther2", label: "LO2 (___________)", type: "number" },
+  { key: "LanguageOther3", label: "LO3 (___________)", type: "number" },
   { key: "LanguageOwn", label: "Language", type: "number" },
   { key: "Law", label: "Law", type: "number" },
   { key: "LibraryUse", label: "Library Use", type: "number" },
@@ -70,8 +70,8 @@ const FIELD_DEFS = [
   { key: "ReadLips", label: "Read Lips", type: "number" },
   { key: "Ride", label: "Ride", type: "number" },
   { key: "Science", label: "Science", type: "number" },
-  { key: "ScienceOther", label: "SO", type: "number" },
-  { key: "ScienceOther2", label: "SO2", type: "number" },
+  { key: "ScienceOther", label: "SO (___________)", type: "number" },
+  { key: "ScienceOther2", label: "SO2 (___________)", type: "number" },
   { key: "SignLanguage", label: "Sign Language", type: "number" },
   { key: "Deception", label: "Deception", type: "number" },
   { key: "SleightOfHand", label: "Sleight of Hand", type: "number" },
@@ -81,9 +81,9 @@ const FIELD_DEFS = [
   { key: "Throw", label: "Throw", type: "number" },
   { key: "Track", label: "Track", type: "number" },
   { key: "UncommonLanguage", label: "Uncommon Language", type: "number" },
-  { key: "Other1", label: "O1", type: "number" },
-  { key: "Other2", label: "O2", type: "number" },
-  { key: "Other3", label: "O3", type: "number" },
+  { key: "Other1", label: "O1 (___________)", type: "number" },
+  { key: "Other2", label: "O2 (___________)", type: "number" },
+  { key: "Other3", label: "O3 (___________)", type: "number" },
 ];
 
 // Skills that must always remain visible in print, regardless of value
@@ -1280,7 +1280,6 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
               isSmallStep={true}
               className={(Number(form.RES) || 0) === 0 ? "print-hide" : ""}
             />
-            <ReadSmall label="Total XP" value={form.totalXP ?? 0} className="print-hide" />
             <ReadSmall label="Used XP" value={form.usedXP ?? 0} className="print-hide" />
             <ReadSmall label="Level" value={form.level ?? 0} />
           </div>
@@ -1484,16 +1483,16 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
                 {t("playerForm.saveStay")}
               </button>
 
-              {mode === "create" && (
-                <button
-                  type="button"
-                  className="button"
-                  style={{ background: "#0ea5e9" }}
-                  onClick={() => window.print()}
-                >
-                  {t("playerForm.print")}
-                </button>
-              )}
+            
+              <button
+                type="button"
+                className="button no-print"
+                style={{ background: "#0ea5e9" }}
+                onClick={() => window.print()}
+              >
+                {t("playerForm.print")}
+              </button>
+            
 
               <button
                 type="button"

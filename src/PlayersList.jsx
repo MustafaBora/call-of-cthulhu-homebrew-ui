@@ -149,16 +149,12 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
 
       try {
         const token = localStorage.getItem("token");
-        console.log("[PlayersList] Token var mı?", !!token);
         if (!token) {
-          console.log("[PlayersList] Token yok, offline mod");
           loadOffline();
           setLoading(false);
           return;
         }
 
-        console.log(`[PlayersList] Backend URL: ${API_BASE_URL}`);
-        console.log("[PlayersList] Backend'den players listesi çekiliyor...");
         const response = await fetch(`${API_BASE_URL}/players`, {
           method: "GET",
           headers: {
@@ -169,7 +165,7 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
 
         console.log(`[PlayersList] Response status: ${response.status}`);
         if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: Oyuncu listesi alınamadı.`);
+          throw new Error("Oyuncu listesi alınamadı.");
         }
 
         const data = await response.json();
@@ -177,8 +173,7 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
         setPlayers(sortByIdDesc(data));
         setOfflineMode(false);
       } catch (err) {
-        console.error("[PlayersList] Hata:", err.message);
-        console.error("[PlayersList] Full error:", err);
+        console.error(err);
         setError("Sunucuya ulaşılamadı, yerel veriler gösteriliyor.");
         loadOffline();
       } finally {
