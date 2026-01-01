@@ -6,6 +6,7 @@ function LanguageSwitcher({ variant = "default" }) {
   const languages = [
     { code: "en", label: "EN", flag: "EN" },
     { code: "de", label: "DE", flag: "DE" },
+    { code: "fr", label: "FR", flag: "FR" },
     { code: "tr", label: "TR", flag: "TR" },
   ];
 
