@@ -246,7 +246,7 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
       <div style={styles.cardWrapper}>
         {offlineMode && (
           <div style={styles.offlineBanner}>
-            Offline mod: Sunucuya ulaşılamadı, veriler tarayıcıda saklanıyor.
+            {t("players.offlineMode")}
           </div>
         )}
         <div style={styles.headerRow}>
@@ -278,7 +278,7 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
                 URL.revokeObjectURL(url);
               }}
             >
-              Listeyi İndir (JSON)
+              {t("players.downloadJson")}
             </button>
             {onNewPlayer && (
               <button

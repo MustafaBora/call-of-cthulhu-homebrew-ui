@@ -323,27 +323,28 @@ function createFallbackRulesSpec() {
 
 // Cost değerine göre renk döndürür
 function getCostColor(cost) {
-  // Daha geniş skala: ilk renk krem, son iki renk koyu gri ve siyah
-  if (cost < 50) return "#dee3a7";       // krem (en ucuz)
-  if (cost < 100) return "#a4dc76";      // lime
-  if (cost < 150) return "#20b961";      // açık yeşil
-  if (cost < 200) return "#72c53e";      // yeşil
-  if (cost < 250) return "#aab318";      // sarı
-  if (cost < 300) return "#f59e0b";      // amber
-  if (cost < 400) return "#f97316";      // turuncu
-  if (cost < 500) return "#ef4444";      // kırmızı
-  if (cost < 600) return "#dc2626";      // koyu kırmızı
-  if (cost < 800) return "#be123c";      // crimson
-  if (cost < 1000) return "#9333ea";     // mor
-  if (cost < 1500) return "#7c3aed";     // koyu mor
-  if (cost < 2000) return "#581c87";     // çok koyu mor
-  if (cost < 4000) return "#374151";     // koyu gri
-  return "#000000";                      // siyah (en pahalı)
+  // Smooth gradient: Light Green → Green → Yellow → Orange → Red → Dark Red → Purple → Black
+  if (cost < 10) return "#86efac";        // light green (1-9)
+  if (cost < 20) return "#22c55e";        // green (10-19)
+  if (cost < 30) return "#16a34a";        // dark green (20-29)
+  if (cost < 40) return "#eab308";        // yellow (30-39)
+  if (cost < 60) return "#f59e0b";        // amber (40-59)
+  if (cost < 80) return "#f97316";        // orange (60-79)
+  if (cost < 100) return "#ff6b6b";       // light red (80-99)
+  if (cost < 150) return "#ef4444";       // red (100-149)
+  if (cost < 200) return "#dc2626";       // dark red (150-199)
+  if (cost < 300) return "#991b1b";       // crimson (200-299)
+  if (cost < 400) return "#b91c1c";       // darker crimson (300-399)
+  if (cost < 600) return "#9333ea";       // purple (400-599)
+  if (cost < 1000) return "#7c3aed";      // dark purple (600-999)
+  if (cost < 2000) return "#6d28d9";      // darker purple (1000-1999)
+  if (cost < 5000) return "#374151";      // dark gray (2000-4999)
+  return "#111827";                       // almost black (5000+)
 }
 
-// Buton yazı rengi: kırmızı ve üzeri için beyaz, altı için siyah
+// Buton yazı rengi: sarı-turuncu renk ve üzeri için beyaz, altı için siyah
 function getCostTextColor(cost) {
-  return cost >= 400 ? "#fff" : "#000";
+  return cost >= 40 ? "#fff" : "#000";
 }
 
 /**
@@ -1153,7 +1154,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
             <div style={{
               fontSize: "1.2rem",
               fontWeight: "bold"
-            }}>Kaydediliyor...</div>
+            }}>{t("common.saving")}</div>
           </div>
         </div>
       )}

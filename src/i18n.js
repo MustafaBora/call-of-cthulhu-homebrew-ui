@@ -14,6 +14,7 @@ const resources = {
         exportJson: "Export to JSON",
         saveReturn: "Save and go back",
         saveStay: "Save and stay on page",
+        saving: "Saving...",
       },
       login: {
         titleLogin: "D100 Login",
@@ -44,6 +45,8 @@ const resources = {
         unknownPlayer: "No player name",
         edit: "Edit",
         errorPrefix: "Error",
+        offlineMode: "Offline mode: Server unreachable, data is stored locally.",
+        downloadJson: "Download List (JSON)",
       },
       playerForm: {
         rulesLoading: "Loading rules...",
@@ -72,6 +75,7 @@ const resources = {
         exportJson: "JSON'a Aktar",
         saveReturn: "Kaydet ve geri dön",
         saveStay: "Kaydet ve sayfada kal",
+        saving: "Kaydediliyor...",
       },
       login: {
         titleLogin: "D100 Giriş",
@@ -101,6 +105,8 @@ const resources = {
         unnamed: "İsimsiz karakter",
         unknownPlayer: "Oyuncu adı yok",
         edit: "Düzenle",
+        offlineMode: "Offline mod: Sunucuya ulaşılamadı, veriler tarayıcıda saklanıyor.",
+        downloadJson: "Listeyi İndir (JSON)",
         errorPrefix: "Hata",
       },
       playerForm: {
