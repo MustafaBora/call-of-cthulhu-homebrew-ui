@@ -248,22 +248,24 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
 
       try {
         const token = localStorage.getItem("token");
-        if (!token) {
+        /*if (!token) {
           loadOffline();
           setLoading(false);
           return;
-        }
+        }*/
 
         const response = await fetch(`${API_BASE_URL}/players`, {
           method: "GET",
-          headers: {
+          /*headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
-          },
+          },*/
         });
 
+        setLoading(false);
         console.log(`[PlayersList] Response status: ${response.status}`);
         if (!response.ok) {
+          loadOffline();
           throw new Error("Oyuncu listesi alınamadı.");
         }
 
