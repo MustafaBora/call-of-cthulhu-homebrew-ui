@@ -1452,7 +1452,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
                           type={def.type}
                           name={def.key}
                           value={def.type === "number" && numericValue === 0 ? "" : value}
-                          style={{ textAlign: "right" }}
+                          style={{ textAlign: "center" }}
                           onChange={(e) =>
                             def.type === "number"
                               ? handleNumericChange(def.key, e.target.value)
