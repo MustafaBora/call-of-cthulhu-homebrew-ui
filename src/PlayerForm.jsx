@@ -1166,7 +1166,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
     return (
       <div className="page-wrapper">
         <div className="player-page">
-          <div className="loading-block" style={{ color: "#8bc34a", textShadow: "0 0 10px rgba(139, 195, 74, 0.4)" }}>
+          <div className="loading-block" style={{ color: "#b8860b", textShadow: "0 0 10px rgba(218, 165, 32, 0.3)" }}>
             <p>{t("playerForm.rulesLoading")}</p>
           </div>
         </div>
@@ -1242,7 +1242,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
           </div>
 
           {offlineMode && (
-            <div className="error" style={{ margin: "0 0 1rem 0", background: "linear-gradient(135deg, #1e3a2e, #2e4a3e)", border: "2px solid #4caf50", boxShadow: "0 0 15px rgba(76, 175, 80, 0.3)" }}>
+            <div className="error" style={{ margin: "0 0 1rem 0", background: "linear-gradient(135deg, #d4d0b8, #c5c1a8)", border: "2px solid #8b7d6b", boxShadow: "0 0 15px rgba(139, 125, 107, 0.2)", color: "#3e3a2f" }}>
               {t("playerForm.offlineMessage")}
             </div>
           )}
@@ -1534,7 +1534,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
               <button
                 type="button"
                 className="button"
-                style={{ background: "linear-gradient(135deg, #455a64, #607d8b)", border: "2px solid #546e7a" }}
+                style={{ background: "linear-gradient(135deg, #9a8f7e, #8b7d6b)", border: "2px solid #7a6a56", color: "#f5f3e8" }}
                 onClick={onCancel}
                 disabled={isSubmitting}
               >
@@ -1544,7 +1544,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
               <button
                 type="submit"
                 className="button"
-                style={{ background: "linear-gradient(135deg, #2e7d4e, #4caf50)", border: "2px solid #4caf50", boxShadow: "0 4px 10px rgba(0,0,0,0.5), 0 0 20px rgba(76, 175, 80, 0.4)" }}
+                style={{ background: "linear-gradient(135deg, #daa520, #b8860b)", border: "2px solid #b8860b", boxShadow: "0 4px 10px rgba(0,0,0,0.3), 0 0 20px rgba(218, 165, 32, 0.3)", color: "#f5f3e8" }}
                 disabled={isSubmitting}
                 onClick={(e) => handleSubmit(e, false)}
               >
@@ -1554,7 +1554,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
               <button
                 type="button"
                 className="button"
-                style={{ background: "linear-gradient(135deg, #388e3c, #66bb6a)", border: "2px solid #66bb6a", boxShadow: "0 4px 10px rgba(0,0,0,0.5), 0 0 20px rgba(102, 187, 106, 0.4)" }}
+                style={{ background: "linear-gradient(135deg, #b8860b, #9a7509)", border: "2px solid #9a7509", boxShadow: "0 4px 10px rgba(0,0,0,0.3), 0 0 20px rgba(184, 134, 11, 0.3)", color: "#f5f3e8" }}
                 disabled={isSubmitting}
                 onClick={(e) => handleSubmit(e, true)}
               >
@@ -1565,7 +1565,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
               <button
                 type="button"
                 className="button no-print"
-                style={{ background: "linear-gradient(135deg, #00695c, #00897b)", border: "2px solid #00897b", boxShadow: "0 4px 10px rgba(0,0,0,0.5), 0 0 15px rgba(0, 137, 123, 0.3)" }}
+                style={{ background: "linear-gradient(135deg, #7a6a56, #6d5d4b)", border: "2px solid #6d5d4b", boxShadow: "0 4px 10px rgba(0,0,0,0.3), 0 0 15px rgba(122, 106, 86, 0.2)", color: "#f5f3e8" }}
                 onClick={() => window.print()}
               >
                 {t("playerForm.print")}
@@ -1575,7 +1575,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
               <button
                 type="button"
                 className="button"
-                style={{ background: "linear-gradient(135deg, #5e35b1, #7e57c2)", border: "2px solid #7e57c2", boxShadow: "0 4px 10px rgba(0,0,0,0.5), 0 0 15px rgba(126, 87, 194, 0.3)" }}
+                style={{ background: "linear-gradient(135deg, #8b7d6b, #7a6a56)", border: "2px solid #7a6a56", boxShadow: "0 4px 10px rgba(0,0,0,0.3), 0 0 15px rgba(122, 106, 86, 0.2)", color: "#f5f3e8" }}
                 onClick={handleExportJSON}
               >
                 {t("playerForm.exportJson")}
@@ -1584,7 +1584,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
               <button
                 type="button"
                 className="button"
-                style={{ background: "linear-gradient(135deg, #a5d6a7, #c8e6c9)", color: "#1b5e20", border: "2px solid #81c784" }}
+                style={{ background: "linear-gradient(135deg, #f5f3e8, #e8e4d0)", color: "#5a4a3a", border: "2px solid #d4d0b8" }}
                 onClick={() => handleSetAll(10)}
               >
                 All 10
@@ -1593,7 +1593,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
               <button
                 type="button"
                 className="button"
-                style={{ background: "linear-gradient(135deg, #81c784, #a5d6a7)", color: "#1b5e20", border: "2px solid #66bb6a" }}
+                style={{ background: "linear-gradient(135deg, #e8e4d0, #dbdabd)", color: "#5a4a3a", border: "2px solid #c5c1a8" }}
                 onClick={() => handleSetAll(15)}
               >
                 All 15
@@ -1602,7 +1602,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
               <button
                 type="button"
                 className="button"
-                style={{ background: "linear-gradient(135deg, #66bb6a, #81c784)", color: "#0d1e15", border: "2px solid #4caf50" }}
+                style={{ background: "linear-gradient(135deg, #dbdabd, #d4d0b8)", color: "#3e3a2f", border: "2px solid #b8b5a0" }}
                 onClick={() => handleSetAll(20)}
               >
                 All 20
@@ -1611,7 +1611,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
               <button
                 type="button"
                 className="button"
-                style={{ background: "linear-gradient(135deg, #4caf50, #66bb6a)", color: "#0d1e15", border: "2px solid #388e3c" }}
+                style={{ background: "linear-gradient(135deg, #c5c1a8, #b8b5a0)", color: "#3e3a2f", border: "2px solid #a89f8d" }}
                 onClick={() => handleSetAll(25)}
               >
                 All 25
@@ -1620,7 +1620,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
               <button
                 type="button"
                 className="button"
-                style={{ background: "linear-gradient(135deg, #388e3c, #4caf50)", color: "#e0e7d5", border: "2px solid #2e7d32" }}
+                style={{ background: "linear-gradient(135deg, #a89f8d, #9a8f7e)", color: "#f5f3e8", border: "2px solid #8b7d6b" }}
                 onClick={() => handleSetAll(30)}
               >
                 All 30
@@ -1629,7 +1629,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
               <button
                 type="button"
                 className="button"
-                style={{ background: "linear-gradient(135deg, #2e7d32, #388e3c)", color: "#e0e7d5", border: "2px solid #1b5e20" }}
+                style={{ background: "linear-gradient(135deg, #8b7d6b, #7a6a56)", color: "#f5f3e8", border: "2px solid #6d5d4b" }}
                 onClick={() => handleSetAll(35)}
               >
                 All 35
@@ -1638,7 +1638,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
               <button
                 type="button"
                 className="button"
-                style={{ background: "linear-gradient(135deg, #1b5e20, #2e7d32)", color: "#e0e7d5", border: "2px solid #0d3d15" }}
+                style={{ background: "linear-gradient(135deg, #6d5d4b, #5a4a3a)", color: "#f5f3e8", border: "2px solid #4d3f30" }}
                 onClick={() => handleSetAll(40)}
               >
                 All 40
@@ -1647,7 +1647,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
               <button
                 type="button"
                 className="button"
-                style={{ background: "linear-gradient(135deg, #00695c, #00897b)", color: "#e0e7d5", border: "2px solid #004d40" }}
+                style={{ background: "linear-gradient(135deg, #5a4a3a, #4d3f30)", color: "#f5f3e8", border: "2px solid #3e3228" }}
                 onClick={() => handleSetAll(45)}
               >
                 All 45
@@ -1656,7 +1656,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
               <button
                 type="button"
                 className="button"
-                style={{ background: "linear-gradient(135deg, #004d40, #00695c)", color: "#e0e7d5", border: "2px solid #003d33" }}
+                style={{ background: "linear-gradient(135deg, #4d3f30, #3e3228)", color: "#f5f3e8", border: "2px solid #2f2620" }}
                 onClick={() => handleSetAll(50)}
               >
                 All 50
@@ -1666,7 +1666,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
                 <button
                   type="button"
                   className="button"
-                  style={{ background: "linear-gradient(135deg, #c62828, #e53935)", color: "#ffebee", border: "2px solid #d32f2f", boxShadow: "0 4px 10px rgba(0,0,0,0.5), 0 0 15px rgba(229, 57, 53, 0.3)" }}
+                  style={{ background: "linear-gradient(135deg, #c45a5a, #a84848)", color: "#fff5f5", border: "2px solid #a84848", boxShadow: "0 4px 10px rgba(0,0,0,0.3), 0 0 15px rgba(196, 90, 90, 0.2)" }}
                   onClick={handleDelete}
                   disabled={isSubmitting}
                 >
