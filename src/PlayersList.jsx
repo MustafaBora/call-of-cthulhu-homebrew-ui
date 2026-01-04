@@ -361,8 +361,26 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
   }
 
   return (
-    <div style={styles.page}>
-      <div style={styles.cardWrapper}>
+    <>
+      <style>{`
+        @media (max-width: 640px) {
+          .players-grid {
+            grid-template-columns: repeat(1, 1fr);
+          }
+        }
+        @media (min-width: 641px) and (max-width: 1024px) {
+          .players-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
+        @media (min-width: 1025px) {
+          .players-grid {
+            grid-template-columns: repeat(3, 1fr);
+          }
+        }
+      `}</style>
+      <div style={styles.page}>
+        <div style={styles.cardWrapper}>
         {offlineMode && (
           <div style={styles.offlineBanner}>
             {t("players.offlineMode")}
@@ -414,7 +432,7 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
           <div style={styles.importStatus}>{importStatus}</div>
         )}
 
-        <div style={styles.grid}>
+        <div style={styles.grid} className="players-grid">
           {onNewPlayer && (
             <button
               type="button"
@@ -465,6 +483,12 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
                         <>
                           <span style={styles.dot}>•</span>
                           <span style={styles.occupation}>{p.occupation}</span>
+                        </>
+                      )}
+                      {p.level && (
+                        <>
+                          <span style={styles.dot}>•</span>
+                          <span style={styles.level}>Level {p.level}</span>
                         </>
                       )}
                     </div>
@@ -522,8 +546,9 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
             </div>
           ))}
         </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -633,7 +658,7 @@ const styles = {
   },
   grid: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+    gridTemplateColumns: "repeat(2, 1fr)",
     gap: "0.5rem 0.75rem",
     padding: "0.5rem",
     background: "#fefce8",
@@ -715,6 +740,11 @@ const styles = {
   },
   occupation: {
     fontStyle: "italic",
+  },
+  level: {
+    fontWeight: 600,
+    color: "#7c2d12",
+    fontSize: "2.4rem",
   },
   statsRow: {
     display: "flex",

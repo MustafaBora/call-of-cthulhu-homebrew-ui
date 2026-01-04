@@ -25,7 +25,7 @@ const FIELD_DEFS = [
   { key: "Accounting", label: "Accounting", type: "number" },
   { key: "AnimalHandling", label: "Animal Handling", type: "number" },
   { key: "Anthropology", label: "Anthropology", type: "number" },
-  { key: "Appraise", label: "Appearance", type: "number" },
+  { key: "Appraise", label: "Appraise", type: "number" },
   { key: "Archeology", label: "Archeology", type: "number" },
   { key: "ArtCraft", label: "Art/Craft", type: "number" },
   { key: "ArtCraft2", label: "Art/Craft 2", type: "number" },
@@ -1299,7 +1299,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
             <StatCell rulesSpec={rulesSpec} label="Luck" value={form.LUCK} base={rulesSpec.base.LUCK} cost={rulesSpec.cost.LUCK} onChange={(v) => handleNumericChange("LUCK", v)} onBlur={() => handleNumericBlur("LUCK")} onDelta={(d) => handleDelta("LUCK", d)} />
 
             <StatCell rulesSpec={rulesSpec} label="Intellect" value={form.INT} base={rulesSpec.base.INT} cost={rulesSpec.cost.INT} onChange={(v) => handleNumericChange("INT", v)} onBlur={() => handleNumericBlur("INT")} onDelta={(d) => handleDelta("INT", d)} />
-            <StatCell rulesSpec={rulesSpec} label="Appeal" value={form.APP} base={rulesSpec.base.APP} cost={rulesSpec.cost.APP} onChange={(v) => handleNumericChange("APP", v)} onBlur={() => handleNumericBlur("APP")} onDelta={(d) => handleDelta("APP", d)} />
+            <StatCell rulesSpec={rulesSpec} label="Appearance" value={form.APP} base={rulesSpec.base.APP} cost={rulesSpec.cost.APP} onChange={(v) => handleNumericChange("APP", v)} onBlur={() => handleNumericBlur("APP")} onDelta={(d) => handleDelta("APP", d)} />
             <StatCell rulesSpec={rulesSpec} label="Bonus" value={form.BONUS} base={rulesSpec.base.BONUS} cost={rulesSpec.cost.BONUS} onChange={(v) => handleNumericChange("BONUS", v)} onBlur={() => handleNumericBlur("BONUS")} onDelta={(d) => handleDelta("BONUS", d)} />
             
             <StatCell rulesSpec={rulesSpec} label="Spot Hidden" value={form.SPOT} base={rulesSpec.base.SPOT} cost={rulesSpec.cost.SPOT} onChange={(v) => handleNumericChange("SPOT", v)} onBlur={() => handleNumericBlur("SPOT")} onDelta={(d) => handleDelta("SPOT", d)} />
