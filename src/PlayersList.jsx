@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { API_BASE_URL } from "./config";
 import LanguageSwitcher from "./LanguageSwitcher";
 import defaultAvatar from "./assets/default-avatar.png";
+/*
 import avatarDetective from "./assets/characters/Detective.jpg";
 import avatarDoctor from "./assets/characters/doctor.jpg";
 import avatarProf from "./assets/characters/Proffesor.jpg";
@@ -26,7 +27,7 @@ import avatarPaul from "./assets/characters/Paul.png";
 import avatarPriest from "./assets/characters/Priest.jpg";
 import avatarRosa from "./assets/characters/Rosa.jpg";
 import avatarSteve from "./assets/characters/Steve.png";
-import avatarThief from "./assets/characters/thief.png";
+import avatarThief from "./assets/characters/thief.png";*/
 import dbCharacters from "./assets/DB.json";
 
 // Meta alanları ve listede göstermeyeceğimiz alanlar
@@ -40,6 +41,7 @@ const IGNORED_KEYS = [
   "residence",
   "birthplace",
   "avatar",
+  "avatarLink",
   "totalXP",
   "usedXP",
   "remainingXP",
@@ -53,6 +55,7 @@ function getSampleOfflinePlayers() {
   const dbChars = dbCharacters.map((char, index) => ({
     ...char,
     id: now + index + 1000, // Offset to avoid ID collision
+    avatarLink: char.avatarLink, // allow pre-generated avatars delivered via link
     // Map CON/DEX to STA/AGI for frontend consistency
     STA: char.CON || char.STA || 30,
     AGI: char.DEX || char.AGI || 35,
@@ -254,6 +257,23 @@ function getTopSkills(playerData, count = 6) {
 
 function sortByIdDesc(arr) {
   return [...arr].sort((a, b) => (b?.id ?? 0) - (a?.id ?? 0));
+}
+
+function resolveAvatarSrc(player) {
+  const normalize = (src) => {
+    if (!src) return null;
+    if (typeof src === "string" && src.startsWith("data:")) return src;
+    if (typeof src === "string" && src.length > 100) return `data:image/*;base64,${src}`;
+    if (typeof src === "string") {
+      const publicBase = process.env.PUBLIC_URL || "";
+      if (src.startsWith("http://") || src.startsWith("https://")) return src;
+      if (src.startsWith("/")) return `${publicBase}${src}`;
+      return `${publicBase}/${src}`;
+    }
+    return src;
+  };
+
+  return normalize(player?.avatar) || normalize(player?.avatarLink) || defaultAvatar;
 }
 
 function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
@@ -486,18 +506,7 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
                   tabIndex={onEditPlayer ? 0 : undefined}
                 >
                   <img
-                    src={
-                      (() => {
-                        if (!p.avatar) return defaultAvatar;
-                        if (typeof p.avatar === "string" && p.avatar.startsWith("data:")) return p.avatar;
-                        // If we have a long-ish string without data: prefix, assume raw base64 and prepend header
-                        if (typeof p.avatar === "string" && p.avatar.length > 100) {
-                          return `data:image/*;base64,${p.avatar}`;
-                        }
-                        // Otherwise treat as a url/path
-                        return p.avatar || defaultAvatar;
-                      })()
-                    }
+                    src={resolveAvatarSrc(p)}
                     alt={p.name || p.player || "Avatar"}
                     style={styles.avatarImg}
                   />
