@@ -3,13 +3,30 @@ import { useTranslation } from "react-i18next";
 import { API_BASE_URL } from "./config";
 import LanguageSwitcher from "./LanguageSwitcher";
 import defaultAvatar from "./assets/default-avatar.png";
-import avatarDetective from "./assets/characters/detective.jpg";
+import avatarDetective from "./assets/characters/Detective.jpg";
 import avatarDoctor from "./assets/characters/doctor.jpg";
-import avatarProf from "./assets/characters/prof.jpg";
-import avatarEngineer from "./assets/characters/portrait-girl.jpg";
-import avatarAntiquarian from "./assets/characters/female-investigator.jpg";
-import avatarExplorer from "./assets/characters/seamen.jpg";
-import avatarFemale3 from "./assets/characters/journalist.png";
+import avatarProf from "./assets/characters/Proffesor.jpg";
+import avatarEngineer from "./assets/characters/Criminal Girl.jpg";
+import avatarAntiquarian from "./assets/characters/Eva.jpg";
+import avatarExplorer from "./assets/characters/Seaman.jpg";
+import avatarFemale3 from "./assets/characters/Journalist.png";
+import avatarArthur from "./assets/characters/Arthur.jpg";
+import avatarBilly from "./assets/characters/Billy.jpg";
+import avatarBlond from "./assets/characters/blond.png";
+import avatarCecilia from "./assets/characters/Cecilia.jpg";
+import avatarDikkenek from "./assets/characters/Dikkenek.jpg";
+import avatarDomenic from "./assets/characters/Domenic.jpg";
+import avatarEleven from "./assets/characters/Eleven.png";
+import avatarEvilPriest from "./assets/characters/evil-priest.jpg";
+import avatarHughes from "./assets/characters/Hughes.jpg";
+import avatarJason from "./assets/characters/Jason.jpg";
+import avatarLottie from "./assets/characters/Lottie.jpg";
+import avatarNavyOfficer from "./assets/characters/Navy Officer.jpg";
+import avatarPaul from "./assets/characters/Paul.png";
+import avatarPriest from "./assets/characters/Priest.jpg";
+import avatarRosa from "./assets/characters/Rosa.jpg";
+import avatarSteve from "./assets/characters/Steve.png";
+import avatarThief from "./assets/characters/thief.png";
 import dbCharacters from "./assets/DB.json";
 
 // Meta alanları ve listede göstermeyeceğimiz alanlar
@@ -41,7 +58,9 @@ function getSampleOfflinePlayers() {
     AGI: char.DEX || char.AGI || 35,
   }));
 
-  const make = (idOffset, data, avatarSrc) => ({
+
+/*
+    const make = (idOffset, data, avatarSrc) => ({
     id: now + idOffset,
     totalXP: 200000,
     usedXP: 151000 + idOffset * 3000,
@@ -50,7 +69,6 @@ function getSampleOfflinePlayers() {
     avatar: avatarSrc || "",
     ...data,
   });
-
   const sampleChars = [
     make(1, {
       player: "Keeper",
@@ -214,9 +232,9 @@ function getSampleOfflinePlayers() {
       SPOT: 45,
     }, avatarAntiquarian),
   ];
-
+*/
   // Return DB characters + sample characters
-  return [...dbChars, ...sampleChars];
+  return [...dbChars];//, ...sampleChars];
 }
 
 function formatLabel(key) {
@@ -594,24 +612,25 @@ const styles = {
   },
   buttonGroup: {
     display: "flex",
-    gap: "0.5rem",
+    gap: "0.35rem",
     alignItems: "center",
     flexWrap: "wrap",
     justifyContent: "flex-end",
   },
   importButton: {
-    padding: "0.5rem 0.9rem",
+    padding: "0.4rem 0.7rem",
     borderRadius: "0.5rem",
     border: "1px solid #7c2d12",
     background: "#8b5cf6",
     color: "#fff",
     fontWeight: 700,
-    fontSize: "0.9rem",
+    fontSize: "0.8rem",
     cursor: "pointer",
     boxShadow: "0 4px 10px rgba(0,0,0,0.25)",
     display: "inline-block",
-    flex: "0 1 180px",
+    flex: "0 1 auto",
     textAlign: "center",
+    whiteSpace: "nowrap",
   },
   fileInput: {
     display: "none",
@@ -626,17 +645,18 @@ const styles = {
     textAlign: "center",
   },
   newPlayerButton: {
-    padding: "0.5rem 0.9rem",
+    padding: "0.4rem 0.7rem",
     borderRadius: "0.5rem",
     border: "1px solid #92400e",
     background: "#fbbf24",
     color: "#451a03",
     fontWeight: 700,
-    fontSize: "0.9rem",
+    fontSize: "0.8rem",
     cursor: "pointer",
     boxShadow: "0 4px 10px rgba(0,0,0,0.25)",
-    flex: "0 1 160px",
+    flex: "0 1 auto",
     textAlign: "center",
+    whiteSpace: "nowrap",
   },
   addCard: {
     display: "flex",
