@@ -1,28 +1,21 @@
 {
   "files": {
-    "main.css": "/call-of-cthulhu-homebrew-ui/static/css/main.36489f78.css",
-    "main.js": "/call-of-cthulhu-homebrew-ui/static/js/main.3566392e.js",
+    "main.css": "/call-of-cthulhu-homebrew-ui/static/css/main.7f480763.css",
+    "main.js": "/call-of-cthulhu-homebrew-ui/static/js/main.bb8335ae.js",
     "static/js/453.605d7dd8.chunk.js": "/call-of-cthulhu-homebrew-ui/static/js/453.605d7dd8.chunk.js",
-    "static/media/female-investigator.jpg": "/call-of-cthulhu-homebrew-ui/static/media/female-investigator.4ede73a318d20ef6cb9f.jpg",
-    "static/media/journalist.png": "/call-of-cthulhu-homebrew-ui/static/media/journalist.53c54fe2a53606f4f3eb.png",
-    "static/media/detective.jpg": "/call-of-cthulhu-homebrew-ui/static/media/detective.b08b2c99bfa93acd219e.jpg",
     "static/media/default-avatar.png": "/call-of-cthulhu-homebrew-ui/static/media/default-avatar.345d24e2ec9462361531.png",
-    "static/media/prof.jpg": "/call-of-cthulhu-homebrew-ui/static/media/prof.8db3d88f594886bb1672.jpg",
-    "static/media/seamen.jpg": "/call-of-cthulhu-homebrew-ui/static/media/seamen.47c9798a4cc2fe2ec91a.jpg",
-    "static/media/doctor.jpg": "/call-of-cthulhu-homebrew-ui/static/media/doctor.d3d88fea1bcfa88107df.jpg",
     "static/media/vertical.png": "/call-of-cthulhu-homebrew-ui/static/media/vertical.32dacdfc9184962a1dcb.png",
-    "static/media/portrait-girl.jpg": "/call-of-cthulhu-homebrew-ui/static/media/portrait-girl.fc279e9e9512472aca6c.jpg",
     "static/media/signs-1.png": "/call-of-cthulhu-homebrew-ui/static/media/signs-1.e6244bb561e46e23d884.png",
     "static/media/signs-2.png": "/call-of-cthulhu-homebrew-ui/static/media/signs-2.f2f7e61bab1135e82f07.png",
     "static/media/signs-3.png": "/call-of-cthulhu-homebrew-ui/static/media/signs-3.6e8a07cc82402094301d.png",
     "static/media/signs-4.png": "/call-of-cthulhu-homebrew-ui/static/media/signs-4.c7875d7e5523d65543c0.png",
     "index.html": "/call-of-cthulhu-homebrew-ui/index.html",
-    "main.36489f78.css.map": "/call-of-cthulhu-homebrew-ui/static/css/main.36489f78.css.map",
-    "main.3566392e.js.map": "/call-of-cthulhu-homebrew-ui/static/js/main.3566392e.js.map",
+    "main.7f480763.css.map": "/call-of-cthulhu-homebrew-ui/static/css/main.7f480763.css.map",
+    "main.bb8335ae.js.map": "/call-of-cthulhu-homebrew-ui/static/js/main.bb8335ae.js.map",
     "453.605d7dd8.chunk.js.map": "/call-of-cthulhu-homebrew-ui/static/js/453.605d7dd8.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.36489f78.css",
-    "static/js/main.3566392e.js"
+    "static/css/main.7f480763.css",
+    "static/js/main.bb8335ae.js"
   ]
 }
