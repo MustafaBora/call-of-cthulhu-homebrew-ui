@@ -7,6 +7,7 @@ function LanguageSwitcher({ variant = "default" }) {
     { code: "en", label: "EN", flag: "EN" },
     { code: "de", label: "DE", flag: "DE" },
     { code: "fr", label: "FR", flag: "FR" },
+    { code: "nl", label: "NL", flag: "NL" },
     { code: "tr", label: "TR", flag: "TR" },
   ];
 
