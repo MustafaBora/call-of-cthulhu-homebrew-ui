@@ -489,6 +489,7 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
                         <>
                           <span style={styles.dot}>•</span>
                           <span style={styles.level}>Level {p.level}</span>
+                          <span style={styles.dot}>•</span>
                         </>
                       )}
                     </div>
@@ -658,7 +659,6 @@ const styles = {
   },
   grid: {
     display: "grid",
-    gridTemplateColumns: "repeat(2, 1fr)",
     gap: "0.5rem 0.75rem",
     padding: "0.5rem",
     background: "#fefce8",
@@ -742,9 +742,9 @@ const styles = {
     fontStyle: "italic",
   },
   level: {
-    fontWeight: 600,
+    fontWeight: 400,
     color: "#7c2d12",
-    fontSize: "2.4rem",
+    fontSize: "1.4rem",
   },
   statsRow: {
     display: "flex",
