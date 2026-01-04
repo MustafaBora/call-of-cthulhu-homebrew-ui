@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import './App.css';
 import PlayersList from './PlayersList';
 import PlayerForm from "./PlayerForm";
@@ -7,6 +8,11 @@ import CocCharacterForm from "./CocCharacterForm";
 function App() {
   const [mode, setMode] = useState("list"); // "list" | "new" | "edit" | "characterForm"
   const [editingPlayer, setEditingPlayer] = useState(null);
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    document.title = i18n.t("app.title");
+  }, [i18n.language, i18n]);
 
   if (mode === "list") {
     return (

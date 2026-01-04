@@ -5,6 +5,9 @@ import LanguageDetector from "i18next-browser-languagedetector";
 const resources = {
   en: {
     translation: {
+      app: {
+        title: "Bora's Call of Cthulhu Homebrew",
+      },
       common: {
         loading: "Loading...",
         error: "Error",
@@ -67,6 +70,9 @@ const resources = {
   },
   tr: {
     translation: {
+      app: {
+        title: "Bora'nın Ev Yapımı Call of Cthulhu Karakterleri",
+      },
       common: {
         loading: "Yükleniyor...",
         error: "Hata",

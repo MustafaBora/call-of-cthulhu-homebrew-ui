@@ -3,13 +3,13 @@ import { useTranslation } from "react-i18next";
 import { API_BASE_URL } from "./config";
 import LanguageSwitcher from "./LanguageSwitcher";
 import defaultAvatar from "./assets/default-avatar.png";
-import avatarDetective from "./assets/detective.jpg";
-import avatarDoctor from "./assets/doctor.jpg";
-import avatarProf from "./assets/prof.jpg";
-import avatarEngineer from "./assets/engineer.jpg";
-import avatarAntiquarian from "./assets/female-investigator.jpg";
-import avatarExplorer from "./assets/seamen.jpg";
-import avatarFemale3 from "./assets/female-3.jpg";
+import avatarDetective from "./assets/characters/detective.jpg";
+import avatarDoctor from "./assets/characters/doctor.jpg";
+import avatarProf from "./assets/characters/prof.jpg";
+import avatarEngineer from "./assets/characters/portrait-girl.jpg";
+import avatarAntiquarian from "./assets/characters/female-investigator.jpg";
+import avatarExplorer from "./assets/characters/seamen.jpg";
+import avatarFemale3 from "./assets/characters/journalist.png";
 import dbCharacters from "./assets/DB.json";
 
 // Meta alanları ve listede göstermeyeceğimiz alanlar
