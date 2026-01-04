@@ -629,6 +629,23 @@ function clampStat(rulesSpec, num, fieldName) {
   return n;
 }
 
+function resolveAvatarSrc(player) {
+  const normalize = (src) => {
+    if (!src) return null;
+    if (typeof src === "string" && src.startsWith("data:")) return src;
+    if (typeof src === "string" && src.length > 100) return `data:image/*;base64,${src}`;
+    if (typeof src === "string") {
+      const publicBase = process.env.PUBLIC_URL || "";
+      if (src.startsWith("http://") || src.startsWith("https://")) return src;
+      if (src.startsWith("/")) return `${publicBase}${src}`;
+      return `${publicBase}/${src}`;
+    }
+    return src;
+  };
+
+  return normalize(player?.avatar) || normalize(player?.avatarLink) || defaultAvatar;
+}
+
 function getInitialForm(rulesSpec, mode, player) {
   if (!rulesSpec) return {};
   
@@ -693,6 +710,7 @@ function getInitialForm(rulesSpec, mode, player) {
       ARMOR: 0,
       RES: 0,
       avatar: "",
+      avatarLink: "",
     };
 
     // Background fields
@@ -728,6 +746,7 @@ function getInitialForm(rulesSpec, mode, player) {
       ARMOR: player?.ARMOR ?? player?.armor ?? 0,
       RES: player?.RES ?? player?.res ?? 0,
       avatar: player?.avatar || "",
+      avatarLink: player?.avatarLink || "",
     });
 
     // Missing fields: default to rules base values so minimums are visible
@@ -886,6 +905,9 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { t } = useTranslation();
 
+  const avatarSrc = resolveAvatarSrc(form);
+  const hasAvatar = Boolean(form.avatar || form.avatarLink);
+
   const handleSetAll = (value) => {
     if (!rulesSpec) return;
     const keys = [
@@ -993,7 +1015,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
     reader.onloadend = () => {
       const result = reader.result || "";
       const base64 = String(result).split(",")[1] || "";
-      setForm((prev) => ({ ...prev, avatar: base64 }));
+      setForm((prev) => ({ ...prev, avatar: base64, avatarLink: "" }));
     };
     reader.readAsDataURL(file);
   };
@@ -1206,9 +1228,9 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
           <div className="coc-corner corner-tr" aria-hidden="true"></div>
           <div className="coc-corner corner-bl" aria-hidden="true"></div>
           <div className="coc-corner corner-br" aria-hidden="true"></div>
-          {form.avatar && (
+          {hasAvatar && (
             <img
-              src={`data:image/*;base64,${form.avatar}`}
+              src={avatarSrc}
               alt=""
               className="print-bg-image"
               aria-hidden="true"
@@ -1241,7 +1263,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
             <div className="avatarCol avatar-col">
               <div className="avatarBox avatar-box" onClick={() => document.getElementById('avatar-upload').click()} title={t("playerForm.uploadImageTooltip")}>
                 <img
-                  src={form.avatar ? `data:image/*;base64,${form.avatar}` : defaultAvatar}
+                  src={avatarSrc}
                   alt={form.name || "avatar"}
                   className="avatar-img"
                 />
