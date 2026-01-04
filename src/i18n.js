@@ -135,6 +135,9 @@ const resources = {
   },
   de: {
     translation: {
+      app: {
+        title: "Bora's Call of Cthulhu Homebrew",
+      },
       common: {
         loading: "Laden...",
         error: "Fehler",
@@ -197,6 +200,9 @@ const resources = {
   },
   fr: {
     translation: {
+      app: {
+        title: "Call of Cthulhu Maison de Bora",
+      },
       common: {
         loading: "Chargement...",
         error: "Erreur",
@@ -254,6 +260,71 @@ const resources = {
         setAll40: "Définir toutes les caractéristiques et compétences à 40",
         offlineMessage: "Hors ligne: Serveur inaccessible, fonctionnement avec les règles par défaut. Les modifications seront enregistrées dans votre navigateur.",
         uploadImageTooltip: "Pour une meilleure mise en page, utilisez une image au format A4 (√2:1 ou 1:1.414)",
+      },
+    },
+  },
+  nl: {
+    translation: {
+      app: {
+        title: "Bora's Call of Cthulhu Homebrew",
+      },
+      common: {
+        loading: "Laden...",
+        error: "Fout",
+        back: "Terug",
+        delete: "Verwijderen",
+        print: "Afdrukken",
+        exportJson: "Exporteren naar JSON",
+        saveReturn: "Opslaan en terug",
+        saveStay: "Opslaan en op pagina blijven",
+        saving: "Bezig met opslaan...",
+      },
+      login: {
+        titleLogin: "D100 Inloggen",
+        titleRegister: "D100 Registreren",
+        subtitleLogin: "Log in om door te gaan",
+        subtitleRegister: "Voer uw gegevens in om een account aan te maken",
+        email: "E-mail",
+        password: "Wachtwoord",
+        placeholderEmail: "bora@asd.com",
+        placeholderPassword: "••••••",
+        submittingLogin: "Bezig met inloggen...",
+        submittingRegister: "Bezig met registreren...",
+        submitLogin: "Inloggen",
+        submitRegister: "Registreren",
+        toggleToRegister: "Geen account? Registreren",
+        toggleToLogin: "Hebt u al een account? Inloggen",
+      },
+      players: {
+        loading: "Laden...",
+        title: "Spelerslijst",
+        importJson: "Importeren uit JSON",
+        newPlayer: "Nieuwe speler",
+        addNew: "Nieuwe speler",
+        importing: "Bezig met importeren...",
+        importSuccess: "✓ Succesvol geïmporteerd!",
+        importFailed: "Kon speler niet importeren.",
+        unnamed: "Naamloos karakter",
+        unknownPlayer: "Geen spelernaam",
+        edit: "Bewerken",
+        errorPrefix: "Fout",
+        offlineMode: "Offline modus: Server niet bereikbaar, gegevens worden lokaal opgeslagen.",
+        downloadJson: "Lijst downloaden (JSON)",
+      },
+      playerForm: {
+        rulesLoading: "Regels laden...",
+        rulesErrorTitle: "Fout",
+        rulesErrorHint: "Zorg ervoor dat de server actief is.",
+        back: "Terug",
+        saveReturn: "Opslaan en terug",
+        saveStay: "Opslaan en op pagina blijven",
+        print: "Afdrukken",
+        exportJson: "Exporteren naar JSON",
+        delete: "Verwijderen",
+        uploadImage: "Afbeelding uploaden",
+        setAll40: "Stel alle kenmerken en vaardigheden in op 40",
+        uploadImageTooltip: "Gebruik voor optimale indeling een afbeelding met A4-verhouding (√2:1 of 1:1.414)",
+        offlineMessage: "Offline: Server niet bereikbaar, werkt met standaardregels. Wijzigingen worden in uw browser opgeslagen.",
       },
     },
   },
