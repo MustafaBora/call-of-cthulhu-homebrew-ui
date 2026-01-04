@@ -81,6 +81,7 @@ const FIELD_DEFS = [
   { key: "SignLanguage", label: "Sign Language", type: "number" },
   { key: "Deception", label: "Deception", type: "number" },
   { key: "SleightOfHand", label: "Sleight of Hand", type: "number" },
+  { key: "Status", label: "Status", type: "number" },
   { key: "Stealth", label: "Stealth", type: "number" },
   { key: "Survival", label: "Survival", type: "number" },
   { key: "Swim", label: "Swim", type: "number" },
@@ -145,7 +146,7 @@ function createFallbackRulesSpec() {
     APP: 30,
     BONUS: 0,
     BRV: 45,
-    STA: 30,
+    CON: 30,
     AGI: 35,
     EDU: 20,
     INT: 30,
@@ -232,7 +233,7 @@ function createFallbackRulesSpec() {
     APP: 60,
     BONUS: 150,
     BRV: 110,
-    STA: 140,
+    CON: 140,
     AGI: 180,
     EDU: 50,
     INT: 65,
@@ -461,7 +462,7 @@ function computeUsedXP(rulesSpec, values) {
   let sum = 0;
   
   // Characteristics
-  const characteristics = ["APP", "BONUS", "BRV", "STA", "AGI", "EDU", "INT", "LUCK", "SENSE", "SPOT", "WILL", "STATUS", "SAN", "SIZ", "ARMOR", "RES", "STR"];
+  const characteristics = ["APP", "BONUS", "BRV", "CON", "AGI", "EDU", "INT", "LUCK", "SENSE", "SPOT", "WILL", "SAN", "SIZ", "ARMOR", "RES", "STR"];
   for (const key of characteristics) {
     const v = Number(values[key]) || 0;
     const baseValue = rulesSpec.base[key] ?? 0;
@@ -506,6 +507,7 @@ function computeUsedXP(rulesSpec, values) {
     "SignLanguage": "Sign Language",
     "Deception": "Deception",
     "SleightOfHand": "Sleight Of Hand",
+    "Status": "Status",
     "UncommonLanguage": "Uncommon Language",
     "Other1": "Other1",
     "Other2": "Other2",
@@ -532,7 +534,7 @@ function applyDerived(rulesSpec, values) {
   const v = (k) => Number(values[k]) || 0;
   const updated = { ...values };
 
-  updated.HP = Math.floor((v("STA") + v("SIZ")) / 10);
+  updated.HP = Math.floor((v("CON") + v("SIZ")) / 10);
   updated.MP = Math.floor(v("WILL") / 5);
 
   const sum = v("SIZ") + v("STR");
@@ -618,6 +620,7 @@ function clampStat(rulesSpec, num, fieldName) {
     "ScienceOther2": "Science Other 2",
     "SleightOfHand": "Sleight Of Hand",
     "Deception": "Deception",
+    "Status": "Status",
     "UncommonLanguage": "Uncommon Language"
   };
   
@@ -687,6 +690,7 @@ function getInitialForm(rulesSpec, mode, player) {
     "SignLanguage": "Sign Language",
     "Deception": "Deception",
     "SleightOfHand": "Sleight Of Hand",
+    "Status": "STATUS",
     "UncommonLanguage": "Uncommon Language"
   };
   
@@ -741,11 +745,11 @@ function getInitialForm(rulesSpec, mode, player) {
     // Edit modu
     const baseObj = applyDerived(rulesSpec, {
       ...player,
-      // Map backend CON/DEX to frontend STA/AGI for consistency in the UI
-      STA: player?.CON ?? player?.STA ?? 0,
+      // Map backend CON/DEX to frontend CON/AGI for consistency in the UI
+      CON: player?.CON ?? 0,
       AGI: player?.DEX ?? player?.AGI ?? 0,
       SENSE: player?.SENSE ?? player?.PER ?? 0,
-      STATUS: player?.STATUS ?? player?.REP ?? 0,
+      Status: player?.Status ?? player?.STATUS ?? player?.REP ?? 0,
       ARMOR: player?.ARMOR ?? player?.armor ?? 0,
       RES: player?.RES ?? player?.res ?? 0,
       avatar: player?.avatar || "",
@@ -914,8 +918,8 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
   const handleSetAll = (value) => {
     if (!rulesSpec) return;
     const keys = [
-      "APP", "BONUS", "BRV", "STA", "AGI", "EDU", "INT", "LUCK",
-      "SENSE", "SPOT", "WILL", "STATUS", "SAN", "SIZ", "ARMOR", "RES", "STR"
+      "APP", "BONUS", "BRV", "CON", "AGI", "EDU", "INT", "LUCK",
+      "SENSE", "SPOT", "WILL", "SAN", "SIZ", "ARMOR", "RES", "STR"
     ];
     setForm((prev) => {
       const next = { ...prev };
@@ -1332,10 +1336,9 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
             <StatCell rulesSpec={rulesSpec} label="Sanity" value={form.SAN} base={rulesSpec.base.SAN} cost={rulesSpec.cost.SAN} onChange={(v) => handleNumericChange("SAN", v)} onBlur={() => handleNumericBlur("SAN")} onDelta={(d) => handleDelta("SAN", d)} />
             <ReadSmall label="Build" value={form.Build ?? 0} />
 
-            <StatCell rulesSpec={rulesSpec} label="Status" value={form.STATUS} base={rulesSpec.base.STATUS} cost={rulesSpec.cost.STATUS} onChange={(v) => handleNumericChange("STATUS", v)} onBlur={() => handleNumericBlur("STATUS")} onDelta={(d) => handleDelta("STATUS", d)} />
             <StatCell rulesSpec={rulesSpec} label="Bravery" value={form.BRV} base={rulesSpec.base.BRV} cost={rulesSpec.cost.BRV} onChange={(v) => handleNumericChange("BRV", v)} onBlur={() => handleNumericBlur("BRV")} onDelta={(d) => handleDelta("BRV", d)} />
             <ReadSmall label="Move" value={form.MOVE ?? 8} />
-            <ReadSmall label="Damage Bonus" value={form.damageBonus ?? "0"} />
+            <ReadSmall label="Damage Add" value={form.damageBonus ?? "0"} />
             <StatCell
               rulesSpec={rulesSpec}
               label="Armor"
