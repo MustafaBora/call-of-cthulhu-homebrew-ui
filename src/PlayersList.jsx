@@ -10,6 +10,7 @@ import avatarEngineer from "./assets/engineer.jpg";
 import avatarAntiquarian from "./assets/female-investigator.jpg";
 import avatarExplorer from "./assets/seamen.jpg";
 import avatarFemale3 from "./assets/female-3.jpg";
+import dbCharacters from "./assets/DB.json";
 
 // Meta alanları ve listede göstermeyeceğimiz alanlar
 const IGNORED_KEYS = [
@@ -30,6 +31,16 @@ const IGNORED_KEYS = [
 
 function getSampleOfflinePlayers() {
   const now = Date.now();
+  
+  // Use characters from DB.json with unique IDs
+  const dbChars = dbCharacters.map((char, index) => ({
+    ...char,
+    id: now + index + 1000, // Offset to avoid ID collision
+    // Map CON/DEX to STA/AGI for frontend consistency
+    STA: char.CON || char.STA || 30,
+    AGI: char.DEX || char.AGI || 35,
+  }));
+
   const make = (idOffset, data, avatarSrc) => ({
     id: now + idOffset,
     totalXP: 200000,
@@ -40,7 +51,7 @@ function getSampleOfflinePlayers() {
     ...data,
   });
 
-  return [
+  const sampleChars = [
     make(1, {
       player: "Keeper",
       name: "Sarah Mitchell",
@@ -203,6 +214,9 @@ function getSampleOfflinePlayers() {
       SPOT: 45,
     }, avatarAntiquarian),
   ];
+
+  // Return DB characters + sample characters
+  return [...dbChars, ...sampleChars];
 }
 
 function formatLabel(key) {
