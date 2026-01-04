@@ -12,6 +12,9 @@ import cornerBR from "./assets/signs-4.png";
 import LanguageSwitcher from "./LanguageSwitcher";
 import "./PlayerForm.css";
 
+// Debug mode kontrolü - All X butonlarını göstermek için true yapın
+const DEBUGMODE = false;
+
 /**
  * Updated PlayerForm.jsx to use backend RulesSpec with multi-level penalties
  * Loads rules from GET /api/rules instead of hardcoding them
@@ -1581,86 +1584,90 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
                 {t("playerForm.exportJson")}
               </button>
 
-              <button
-                type="button"
-                className="button"
-                style={{ background: "linear-gradient(135deg, #f5f3e8, #e8e4d0)", color: "#5a4a3a", border: "2px solid #d4d0b8" }}
-                onClick={() => handleSetAll(10)}
-              >
-                All 10
-              </button>
+              {DEBUGMODE && (
+                <>
+                  <button
+                    type="button"
+                    className="button"
+                    style={{ background: "linear-gradient(135deg, #f5f3e8, #e8e4d0)", color: "#5a4a3a", border: "2px solid #d4d0b8" }}
+                    onClick={() => handleSetAll(10)}
+                  >
+                    All 10
+                  </button>
 
-              <button
-                type="button"
-                className="button"
-                style={{ background: "linear-gradient(135deg, #e8e4d0, #dbdabd)", color: "#5a4a3a", border: "2px solid #c5c1a8" }}
-                onClick={() => handleSetAll(15)}
-              >
-                All 15
-              </button>
+                  <button
+                    type="button"
+                    className="button"
+                    style={{ background: "linear-gradient(135deg, #e8e4d0, #dbdabd)", color: "#5a4a3a", border: "2px solid #c5c1a8" }}
+                    onClick={() => handleSetAll(15)}
+                  >
+                    All 15
+                  </button>
 
-              <button
-                type="button"
-                className="button"
-                style={{ background: "linear-gradient(135deg, #dbdabd, #d4d0b8)", color: "#3e3a2f", border: "2px solid #b8b5a0" }}
-                onClick={() => handleSetAll(20)}
-              >
-                All 20
-              </button>
+                  <button
+                    type="button"
+                    className="button"
+                    style={{ background: "linear-gradient(135deg, #dbdabd, #d4d0b8)", color: "#3e3a2f", border: "2px solid #b8b5a0" }}
+                    onClick={() => handleSetAll(20)}
+                  >
+                    All 20
+                  </button>
 
-              <button
-                type="button"
-                className="button"
-                style={{ background: "linear-gradient(135deg, #c5c1a8, #b8b5a0)", color: "#3e3a2f", border: "2px solid #a89f8d" }}
-                onClick={() => handleSetAll(25)}
-              >
-                All 25
-              </button>
+                  <button
+                    type="button"
+                    className="button"
+                    style={{ background: "linear-gradient(135deg, #c5c1a8, #b8b5a0)", color: "#3e3a2f", border: "2px solid #a89f8d" }}
+                    onClick={() => handleSetAll(25)}
+                  >
+                    All 25
+                  </button>
 
-              <button
-                type="button"
-                className="button"
-                style={{ background: "linear-gradient(135deg, #a89f8d, #9a8f7e)", color: "#f5f3e8", border: "2px solid #8b7d6b" }}
-                onClick={() => handleSetAll(30)}
-              >
-                All 30
-              </button>
+                  <button
+                    type="button"
+                    className="button"
+                    style={{ background: "linear-gradient(135deg, #a89f8d, #9a8f7e)", color: "#f5f3e8", border: "2px solid #8b7d6b" }}
+                    onClick={() => handleSetAll(30)}
+                  >
+                    All 30
+                  </button>
 
-              <button
-                type="button"
-                className="button"
-                style={{ background: "linear-gradient(135deg, #8b7d6b, #7a6a56)", color: "#f5f3e8", border: "2px solid #6d5d4b" }}
-                onClick={() => handleSetAll(35)}
-              >
-                All 35
-              </button>
+                  <button
+                    type="button"
+                    className="button"
+                    style={{ background: "linear-gradient(135deg, #8b7d6b, #7a6a56)", color: "#f5f3e8", border: "2px solid #6d5d4b" }}
+                    onClick={() => handleSetAll(35)}
+                  >
+                    All 35
+                  </button>
 
-              <button
-                type="button"
-                className="button"
-                style={{ background: "linear-gradient(135deg, #6d5d4b, #5a4a3a)", color: "#f5f3e8", border: "2px solid #4d3f30" }}
-                onClick={() => handleSetAll(40)}
-              >
-                All 40
-              </button>
+                  <button
+                    type="button"
+                    className="button"
+                    style={{ background: "linear-gradient(135deg, #6d5d4b, #5a4a3a)", color: "#f5f3e8", border: "2px solid #4d3f30" }}
+                    onClick={() => handleSetAll(40)}
+                  >
+                    All 40
+                  </button>
 
-              <button
-                type="button"
-                className="button"
-                style={{ background: "linear-gradient(135deg, #5a4a3a, #4d3f30)", color: "#f5f3e8", border: "2px solid #3e3228" }}
-                onClick={() => handleSetAll(45)}
-              >
-                All 45
-              </button>
+                  <button
+                    type="button"
+                    className="button"
+                    style={{ background: "linear-gradient(135deg, #5a4a3a, #4d3f30)", color: "#f5f3e8", border: "2px solid #3e3228" }}
+                    onClick={() => handleSetAll(45)}
+                  >
+                    All 45
+                  </button>
 
-              <button
-                type="button"
-                className="button"
-                style={{ background: "linear-gradient(135deg, #4d3f30, #3e3228)", color: "#f5f3e8", border: "2px solid #2f2620" }}
-                onClick={() => handleSetAll(50)}
-              >
-                All 50
-              </button>
+                  <button
+                    type="button"
+                    className="button"
+                    style={{ background: "linear-gradient(135deg, #4d3f30, #3e3228)", color: "#f5f3e8", border: "2px solid #2f2620" }}
+                    onClick={() => handleSetAll(50)}
+                  >
+                    All 50
+                  </button>
+                </>
+              )}
 
               {mode !== "create" && (
                 <button

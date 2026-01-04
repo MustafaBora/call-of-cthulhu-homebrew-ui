@@ -540,6 +540,12 @@ input[type="number"] {
     margin: 8mm;
   }
 
+  /* Print'te tüm yazılar siyah olsun */
+  * {
+    color: #000 !important;
+    text-shadow: none !important;
+  }
+
   .sheet-page {
     padding: 0.75rem !important;
     position: relative !important;
