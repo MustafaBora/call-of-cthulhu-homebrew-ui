@@ -902,6 +902,244 @@ function TextCell({ label, value, onChange }) {
   );
 }
 
+// Action buttons component to be reused at top and bottom of the form
+function ActionButtons({ 
+  t, 
+  mode, 
+  isSubmitting, 
+  handleSubmit, 
+  handleDelete, 
+  handleExportJSON, 
+  handleSetAll,
+  onCancel
+}) {
+  return (
+    <div className="button-row" style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem", alignItems: "center", justifyContent: "center" }}>
+      <button
+        type="button"
+        className="button"
+        style={{ background: "linear-gradient(135deg, #9a8f7e, #8b7d6b)", border: "2px solid #7a6a56", color: "#f5f3e8", padding: "0.6rem 1.2rem", fontWeight: "500" }}
+        onClick={onCancel}
+        disabled={isSubmitting}
+      >
+        Ana Sayfa
+      </button>
+      <button
+        type="submit"
+        className="button"
+        style={{ background: "linear-gradient(135deg, #daa520, #b8860b)", border: "2px solid #b8860b", boxShadow: "0 4px 10px rgba(0,0,0,0.3), 0 0 20px rgba(218, 165, 32, 0.3)", color: "#f5f3e8", padding: "0.6rem 1.2rem", fontWeight: "500" }}
+        disabled={isSubmitting}
+        onClick={(e) => handleSubmit(e, false)}
+      >
+        {isSubmitting ? "Kaydediliyor..." : t("playerForm.saveReturn")}
+      </button>
+
+      <button
+        type="button"
+        className="button"
+        style={{ background: "linear-gradient(135deg, #b8860b, #9a7509)", border: "2px solid #9a7509", boxShadow: "0 4px 10px rgba(0,0,0,0.3), 0 0 20px rgba(184, 134, 11, 0.3)", color: "#f5f3e8", padding: "0.6rem 1.2rem", fontWeight: "500" }}
+        disabled={isSubmitting}
+        onClick={(e) => handleSubmit(e, true)}
+      >
+        {isSubmitting ? "Kaydediliyor..." : t("playerForm.saveStay")}
+      </button>
+
+      <button
+        type="button"
+        className="button no-print"
+        style={{ background: "linear-gradient(135deg, #7a6a56, #6d5d4b)", border: "2px solid #6d5d4b", boxShadow: "0 4px 10px rgba(0,0,0,0.3), 0 0 15px rgba(122, 106, 86, 0.2)", color: "#f5f3e8", padding: "0.6rem 1.2rem", fontWeight: "500" }}
+        onClick={() => window.print()}
+      >
+        {t("playerForm.print")}
+      </button>
+
+      <button
+        type="button"
+        className="button"
+        style={{ background: "linear-gradient(135deg, #8b7d6b, #7a6a56)", border: "2px solid #7a6a56", boxShadow: "0 4px 10px rgba(0,0,0,0.3), 0 0 15px rgba(122, 106, 86, 0.2)", color: "#f5f3e8", padding: "0.6rem 1.2rem", fontWeight: "500" }}
+        onClick={handleExportJSON}
+      >
+        {t("playerForm.exportJson")}
+      </button>
+
+      {DEBUGMODE && (
+        <>
+          <button
+            type="button"
+            className="button"
+            style={{ background: "linear-gradient(135deg, #f5f3e8, #e8e4d0)", color: "#5a4a3a", border: "2px solid #d4d0b8" }}
+            onClick={() => handleSetAll(10)}
+          >
+            All 10
+          </button>
+
+          <button
+            type="button"
+            className="button"
+            style={{ background: "linear-gradient(135deg, #e8e4d0, #dbdabd)", color: "#5a4a3a", border: "2px solid #c5c1a8" }}
+            onClick={() => handleSetAll(15)}
+          >
+            All 15
+          </button>
+
+          <button
+            type="button"
+            className="button"
+            style={{ background: "linear-gradient(135deg, #dbdabd, #d4d0b8)", color: "#3e3a2f", border: "2px solid #b8b5a0" }}
+            onClick={() => handleSetAll(20)}
+          >
+            All 20
+          </button>
+
+          <button
+            type="button"
+            className="button"
+            style={{ background: "linear-gradient(135deg, #c5c1a8, #b8b5a0)", color: "#3e3a2f", border: "2px solid #a89f8d" }}
+            onClick={() => handleSetAll(25)}
+          >
+            All 25
+          </button>
+
+          <button
+            type="button"
+            className="button"
+            style={{ background: "linear-gradient(135deg, #a89f8d, #9a8f7e)", color: "#f5f3e8", border: "2px solid #8b7d6b" }}
+            onClick={() => handleSetAll(30)}
+          >
+            All 30
+          </button>
+
+          <button
+            type="button"
+            className="button"
+            style={{ background: "linear-gradient(135deg, #8b7d6b, #7a6a56)", color: "#f5f3e8", border: "2px solid #6d5d4b" }}
+            onClick={() => handleSetAll(35)}
+          >
+            All 35
+          </button>
+
+          <button
+            type="button"
+            className="button"
+            style={{ background: "linear-gradient(135deg, #6d5d4b, #5a4a3a)", color: "#f5f3e8", border: "2px solid #4d3f30" }}
+            onClick={() => handleSetAll(40)}
+          >
+            All 40
+          </button>
+
+          <button
+            type="button"
+            className="button"
+            style={{ background: "linear-gradient(135deg, #5a4a3a, #4d3f30)", color: "#f5f3e8", border: "2px solid #3e3228" }}
+            onClick={() => handleSetAll(45)}
+          >
+            All 45
+          </button>
+
+          <button
+            type="button"
+            className="button"
+            style={{ background: "linear-gradient(135deg, #4d3f30, #3e3228)", color: "#f5f3e8", border: "2px solid #2f2620" }}
+            onClick={() => handleSetAll(50)}
+          >
+            All 50
+          </button>
+        </>
+      )}
+
+      {mode !== "create" && (
+        <button
+          type="button"
+          className="button"
+          style={{ background: "linear-gradient(135deg, #c45a5a, #a84848)", color: "#fff5f5", border: "2px solid #a84848", boxShadow: "0 4px 10px rgba(0,0,0,0.3), 0 0 15px rgba(196, 90, 90, 0.2)", padding: "0.6rem 1.2rem", fontWeight: "500" }}
+          onClick={handleDelete}
+          disabled={isSubmitting}
+        >
+          {t("playerForm.delete")}
+        </button>
+      )}
+    </div>
+  );
+}
+
+// Custom Alert Modal Component
+function CustomAlert({ message, onClose }) {
+  if (!message) return null;
+
+  return (
+    <div 
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: "rgba(0, 0, 0, 0.75)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 10000,
+        backdropFilter: "blur(4px)",
+        animation: "fadeIn 0.2s ease-out"
+      }}
+      onClick={onClose}
+    >
+      <div 
+        style={{
+          background: "linear-gradient(135deg, #e8e4d0, #dbdabd)",
+          border: "3px solid #8b7d6b",
+          borderRadius: "12px",
+          padding: "2rem",
+          maxWidth: "450px",
+          minWidth: "300px",
+          boxShadow: "0 10px 40px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(218, 165, 32, 0.1)",
+          animation: "slideIn 0.3s ease-out",
+          position: "relative"
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div style={{
+          fontSize: "1.1rem",
+          color: "#3e3a2f",
+          marginBottom: "1.5rem",
+          lineHeight: "1.6",
+          fontFamily: "'Georgia', 'Garamond', serif",
+          textAlign: "center"
+        }}>
+          {message}
+        </div>
+        <button
+          onClick={onClose}
+          style={{
+            width: "100%",
+            padding: "0.75rem 1.5rem",
+            background: "linear-gradient(135deg, #daa520, #b8860b)",
+            border: "2px solid #b8860b",
+            borderRadius: "6px",
+            color: "#f5f3e8",
+            fontSize: "1rem",
+            fontWeight: "600",
+            cursor: "pointer",
+            transition: "all 0.2s ease",
+            boxShadow: "0 4px 10px rgba(0,0,0,0.3), 0 0 20px rgba(218, 165, 32, 0.3)",
+            fontFamily: "'Georgia', 'Garamond', serif"
+          }}
+          onMouseOver={(e) => {
+            e.target.style.transform = "translateY(-2px)";
+            e.target.style.boxShadow = "0 6px 15px rgba(0,0,0,0.4), 0 0 25px rgba(218, 165, 32, 0.4)";
+          }}
+          onMouseOut={(e) => {
+            e.target.style.transform = "translateY(0)";
+            e.target.style.boxShadow = "0 4px 10px rgba(0,0,0,0.3), 0 0 20px rgba(218, 165, 32, 0.3)";
+          }}
+        >
+          Tamam
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpdated }) {
   const [rulesSpec, setRulesSpec] = useState(null);
   const [rulesLoading, setRulesLoading] = useState(true);
@@ -910,6 +1148,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
   const [form, setForm] = useState(() => getInitialForm(null, mode, player));
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
   const { t } = useTranslation();
 
   const avatarSrc = resolveAvatarSrc(form);
@@ -1059,6 +1298,13 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
 
   const handleSubmit = async (e, stayOnPage = false) => {
     e.preventDefault();
+    
+    // Check if player is readonly
+    if (player?.readonly) {
+      setAlertMessage("Bu oyuncu salt okunurdur. Güncelleme yapılamaz.");
+      return;
+    }
+    
     setError("");
     setIsSubmitting(true);
 
@@ -1139,6 +1385,13 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
 
   const handleDelete = async () => {
     if (!player || !player.id) return;
+    
+    // Check if player is readonly
+    if (player?.readonly) {
+      setAlertMessage("Bu oyuncu salt okunurdur. Silme işlemi yapılamaz.");
+      return;
+    }
+    
     const confirmed = window.confirm("Bu oyuncuyu silmek istediğinize emin misiniz?");
     if (!confirmed) return;
 
@@ -1183,6 +1436,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
 
   return (
     <div className="page-wrapper">
+      <CustomAlert message={alertMessage} onClose={() => setAlertMessage("")} />
       {isSubmitting && (
         <div style={{
           position: "fixed",
@@ -1259,6 +1513,20 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
               <p><strong>{t("playerForm.rulesErrorTitle")}:</strong> {rulesError}</p>
             </div>
           )}
+          
+          {/* Action buttons at the top */}
+          <div className="no-print" style={{ marginBottom: "1.5rem" }}>
+            <ActionButtons 
+              t={t}
+              mode={mode}
+              isSubmitting={isSubmitting}
+              handleSubmit={handleSubmit}
+              handleDelete={handleDelete}
+              handleExportJSON={handleExportJSON}
+              handleSetAll={handleSetAll}
+              onCancel={onCancel}
+            />
+          </div>
           
           <div className="sheet-header header-grid">
             {/* Row 1 */}
@@ -1537,152 +1805,16 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
             </div>
 
             <div className="update-buttons no-print buttons-bar">
-              <button
-                type="button"
-                className="button"
-                style={{ background: "linear-gradient(135deg, #9a8f7e, #8b7d6b)", border: "2px solid #7a6a56", color: "#f5f3e8" }}
-                onClick={onCancel}
-                disabled={isSubmitting}
-              >
-                {t("playerForm.back")}
-              </button>
-
-              <button
-                type="submit"
-                className="button"
-                style={{ background: "linear-gradient(135deg, #daa520, #b8860b)", border: "2px solid #b8860b", boxShadow: "0 4px 10px rgba(0,0,0,0.3), 0 0 20px rgba(218, 165, 32, 0.3)", color: "#f5f3e8" }}
-                disabled={isSubmitting}
-                onClick={(e) => handleSubmit(e, false)}
-              >
-                {isSubmitting ? "Kaydediliyor..." : t("playerForm.saveReturn")}
-              </button>
-
-              <button
-                type="button"
-                className="button"
-                style={{ background: "linear-gradient(135deg, #b8860b, #9a7509)", border: "2px solid #9a7509", boxShadow: "0 4px 10px rgba(0,0,0,0.3), 0 0 20px rgba(184, 134, 11, 0.3)", color: "#f5f3e8" }}
-                disabled={isSubmitting}
-                onClick={(e) => handleSubmit(e, true)}
-              >
-                {isSubmitting ? "Kaydediliyor..." : t("playerForm.saveStay")}
-              </button>
-
-            
-              <button
-                type="button"
-                className="button no-print"
-                style={{ background: "linear-gradient(135deg, #7a6a56, #6d5d4b)", border: "2px solid #6d5d4b", boxShadow: "0 4px 10px rgba(0,0,0,0.3), 0 0 15px rgba(122, 106, 86, 0.2)", color: "#f5f3e8" }}
-                onClick={() => window.print()}
-              >
-                {t("playerForm.print")}
-              </button>
-            
-
-              <button
-                type="button"
-                className="button"
-                style={{ background: "linear-gradient(135deg, #8b7d6b, #7a6a56)", border: "2px solid #7a6a56", boxShadow: "0 4px 10px rgba(0,0,0,0.3), 0 0 15px rgba(122, 106, 86, 0.2)", color: "#f5f3e8" }}
-                onClick={handleExportJSON}
-              >
-                {t("playerForm.exportJson")}
-              </button>
-
-              {DEBUGMODE && (
-                <>
-                  <button
-                    type="button"
-                    className="button"
-                    style={{ background: "linear-gradient(135deg, #f5f3e8, #e8e4d0)", color: "#5a4a3a", border: "2px solid #d4d0b8" }}
-                    onClick={() => handleSetAll(10)}
-                  >
-                    All 10
-                  </button>
-
-                  <button
-                    type="button"
-                    className="button"
-                    style={{ background: "linear-gradient(135deg, #e8e4d0, #dbdabd)", color: "#5a4a3a", border: "2px solid #c5c1a8" }}
-                    onClick={() => handleSetAll(15)}
-                  >
-                    All 15
-                  </button>
-
-                  <button
-                    type="button"
-                    className="button"
-                    style={{ background: "linear-gradient(135deg, #dbdabd, #d4d0b8)", color: "#3e3a2f", border: "2px solid #b8b5a0" }}
-                    onClick={() => handleSetAll(20)}
-                  >
-                    All 20
-                  </button>
-
-                  <button
-                    type="button"
-                    className="button"
-                    style={{ background: "linear-gradient(135deg, #c5c1a8, #b8b5a0)", color: "#3e3a2f", border: "2px solid #a89f8d" }}
-                    onClick={() => handleSetAll(25)}
-                  >
-                    All 25
-                  </button>
-
-                  <button
-                    type="button"
-                    className="button"
-                    style={{ background: "linear-gradient(135deg, #a89f8d, #9a8f7e)", color: "#f5f3e8", border: "2px solid #8b7d6b" }}
-                    onClick={() => handleSetAll(30)}
-                  >
-                    All 30
-                  </button>
-
-                  <button
-                    type="button"
-                    className="button"
-                    style={{ background: "linear-gradient(135deg, #8b7d6b, #7a6a56)", color: "#f5f3e8", border: "2px solid #6d5d4b" }}
-                    onClick={() => handleSetAll(35)}
-                  >
-                    All 35
-                  </button>
-
-                  <button
-                    type="button"
-                    className="button"
-                    style={{ background: "linear-gradient(135deg, #6d5d4b, #5a4a3a)", color: "#f5f3e8", border: "2px solid #4d3f30" }}
-                    onClick={() => handleSetAll(40)}
-                  >
-                    All 40
-                  </button>
-
-                  <button
-                    type="button"
-                    className="button"
-                    style={{ background: "linear-gradient(135deg, #5a4a3a, #4d3f30)", color: "#f5f3e8", border: "2px solid #3e3228" }}
-                    onClick={() => handleSetAll(45)}
-                  >
-                    All 45
-                  </button>
-
-                  <button
-                    type="button"
-                    className="button"
-                    style={{ background: "linear-gradient(135deg, #4d3f30, #3e3228)", color: "#f5f3e8", border: "2px solid #2f2620" }}
-                    onClick={() => handleSetAll(50)}
-                  >
-                    All 50
-                  </button>
-                </>
-              )}
-
-              {mode !== "create" && (
-                <button
-                  type="button"
-                  className="button"
-                  style={{ background: "linear-gradient(135deg, #c45a5a, #a84848)", color: "#fff5f5", border: "2px solid #a84848", boxShadow: "0 4px 10px rgba(0,0,0,0.3), 0 0 15px rgba(196, 90, 90, 0.2)" }}
-                  onClick={handleDelete}
-                  disabled={isSubmitting}
-                >
-                  {t("playerForm.delete")}
-                </button>
-              )}
+              <ActionButtons 
+                t={t}
+                mode={mode}
+                isSubmitting={isSubmitting}
+                handleSubmit={handleSubmit}
+                handleDelete={handleDelete}
+                handleExportJSON={handleExportJSON}
+                handleSetAll={handleSetAll}
+                onCancel={onCancel}
+              />
             </div>
           </form>
         </div>
