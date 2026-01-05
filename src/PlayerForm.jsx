@@ -43,54 +43,54 @@ const FIELD_DEFS = [
   { key: "Dodge", label: "Dodge", type: "number" },
   { key: "DriveAuto", label: "Drive (Auto)", type: "number" },
   { key: "Electronics", label: "Electronics", type: "number" },
-  { key: "ElectricalRepair", label: "Electrical Repair", type: "number" },
+  { key: "ElectricalRepair", label: "Electrics", type: "number" },
   { key: "FastTalk", label: "Fast Talk", type: "number" },
   { key: "FightingBrawl", label: "Fighting Brawl", type: "number" },
-  { key: "FightingOther", label: "FO (___________)", type: "number" },
+  { key: "FightingOther", label: "FO__________", type: "number" },
   { key: "FirearmsHandgun", label: "Handgun", type: "number" },
-  { key: "FirearmsOther", label: "FA-O (___________)", type: "number" },
+  { key: "FirearmsOther", label: "FA-O________", type: "number" },
   { key: "FirearmsRifleShotgun", label: "Firearms Shotgun", type: "number" },
   { key: "FirstAid", label: "First Aid", type: "number" },
   { key: "History", label: "History", type: "number" },
   { key: "Hypnosis", label: "Hypnosis", type: "number" },
   { key: "Intimidate", label: "Intimidate", type: "number" },
   { key: "Jump", label: "Jump", type: "number" },
-  { key: "LanguageOther1", label: "LO1 (___________)", type: "number" },
-  { key: "LanguageOther2", label: "LO2 (___________)", type: "number" },
-  { key: "LanguageOther3", label: "LO3 (___________)", type: "number" },
+  { key: "LanguageOther1", label: "LO1_________", type: "number" },
+  { key: "LanguageOther2", label: "LO2_________", type: "number" },
+  { key: "LanguageOther3", label: "LO3_________", type: "number" },
   { key: "LanguageOwn", label: "Language", type: "number" },
   { key: "Law", label: "Law", type: "number" },
   { key: "LibraryUse", label: "Library Use", type: "number" },
   { key: "Listen", label: "Listen", type: "number" },
   { key: "Locksmith", label: "Locksmith", type: "number" },
-  { key: "MechanicalRepair", label: "Mechanical Repair", type: "number" },
+  { key: "MechanicalRepair", label: "Mechanics", type: "number" },
   { key: "Medicine", label: "Medicine", type: "number" },
   { key: "NaturalWorld", label: "Natural World", type: "number" },
   { key: "Navigate", label: "Navigate", type: "number" },
   { key: "Occult", label: "Occult", type: "number" },
-  { key: "OperateHeavyMachinery", label: "Operate Heavy Machinery", type: "number" },
+  { key: "OperateHeavyMachinery", label: "Operate Heavy", type: "number" },
   { key: "Persuade", label: "Persuade", type: "number" },
   { key: "Pilot", label: "Pilot", type: "number" },
   { key: "Psychoanalysis", label: "Psychoanalysis", type: "number" },
   { key: "Psychology", label: "Psychology", type: "number" },
   { key: "ReadLips", label: "Read Lips", type: "number" },
   { key: "Ride", label: "Ride", type: "number" },
-  { key: "Science", label: "Science", type: "number" },
-  { key: "ScienceOther", label: "SO (___________)", type: "number" },
-  { key: "ScienceOther2", label: "SO2 (___________)", type: "number" },
+  { key: "Science", label: "Science_______", type: "number" },
+  { key: "ScienceOther", label: "SO __________", type: "number" },
+  { key: "ScienceOther2", label: "SO2 ________", type: "number" },
   { key: "SignLanguage", label: "Sign Language", type: "number" },
   { key: "Deception", label: "Deception", type: "number" },
   { key: "SleightOfHand", label: "Sleight of Hand", type: "number" },
   { key: "Status", label: "Status", type: "number" },
   { key: "Stealth", label: "Stealth", type: "number" },
-  { key: "Survival", label: "Survival", type: "number" },
+  { key: "Survival", label: "Survival_______", type: "number" },
   { key: "Swim", label: "Swim", type: "number" },
   { key: "Throw", label: "Throw", type: "number" },
   { key: "Track", label: "Track", type: "number" },
   { key: "UncommonLanguage", label: "Uncommon Language", type: "number" },
-  { key: "Other1", label: "O1 (___________)", type: "number" },
-  { key: "Other2", label: "O2 (___________)", type: "number" },
-  { key: "Other3", label: "O3 (___________)", type: "number" },
+  { key: "Other1", label: "O1__________", type: "number" },
+  { key: "Other2", label: "O2__________", type: "number" },
+  { key: "Other3", label: "O3__________", type: "number" },
 ];
 
 // Skills that must always remain visible in print, regardless of value
@@ -328,29 +328,33 @@ function createFallbackRulesSpec() {
   };
 }
 
-// Cost değerine göre renk döndürür - Cthulhu teması: Yeşil tonları
+// Cost değerine göre renk döndürür - Yeşil → Sarı → Kırmızı → Mor → Siyah
 function getCostColor(cost) {
-  // Smooth gradient: Light Green → Green → Teal → Dark Green → Dark Teal → Purple → Dark Purple
-  if (cost < 40) return "#a5d6a7";        // light green (1-39)
-  if (cost < 80) return "#66bb6a";        // green (40-79)
-  if (cost < 120) return "#4caf50";       // medium green (80-119)
-  if (cost < 160) return "#388e3c";       // dark green (120-159)
-  if (cost < 220) return "#2e7d32";       // darker green (160-219)
-  if (cost < 300) return "#26a69a";       // teal (220-299)
-  if (cost < 400) return "#00897b";       // dark teal (300-399)
-  if (cost < 550) return "#004d40";       // darkest teal (550-749)
-  if (cost < 800) return "#1b5e20";      // forest green (750-999)
-  if (cost < 1200) return "#7e57c2";      // purple (1000-1399)
-  if (cost < 2000) return "#673ab7";      // dark purple (1400-1999)
-  if (cost < 3000) return "#5e35b1";      // darker purple (2000-2999)
-  if (cost < 5000) return "#512da8";      // darkest purple (3000-3999)
-  if (cost < 10000) return "#311b92";      // deep purple (4000-4999)
-  return "#1a237e";                       // indigo (5000+)
+  // Smooth gradient: Light Green → Green → Yellow → Orange → Red → Dark Red → Purple → Black
+  if (cost < 40) return "#c8e6c9";        // very light green (0-39)
+  if (cost < 80) return "#a5d6a7";        // light green (40-79)
+  if (cost < 120) return "#81c784";       // mild green (80-119)
+  if (cost < 160) return "#66bb6a";       // medium green (120-159)
+  if (cost < 220) return "#4caf50";       // decent green (160-219)
+  if (cost < 280) return "#43a047";       // strong green (220-279)
+  if (cost < 420) return "#fbc02d";       // yellow (340-399)
+  if (cost < 560) return "#fb8c00";       // orange (480-559)
+  if (cost < 660) return "#f57c00";       // dark orange (560-659)
+  if (cost < 800) return "#e64a19";       // orange-red (660-799)
+  if (cost < 1300) return "#d32f2f";      // dark red (1000-1299)
+  if (cost < 1700) return "#c62828";      // darker red (1300-1699)
+  if (cost < 2200) return "#ae248a";      // purple (1700-2199)
+  if (cost < 2800) return "#6a1b9a";      // dark purple (2200-2799)
+  if (cost < 3500) return "#4a148c";      // darker purple (2800-3499)
+  if (cost < 5000) return "#2c2c2c";      // very dark gray (3500-4999)
+  return "#0a0a0a";                       // black (5000+)
 }
 
-// Buton yazı rengi: Koyu yeşil tonları ve üzeri için açık, altı için koyu
+// Buton yazı rengi: Sarı durumlarda siyah, koyu kırmızı ve sonrası açık, başta koyu
 function getCostTextColor(cost) {
-  return cost >= 300 ? "#e0e7d5" : "#0d1e15";
+  if (cost >= 280 && cost < 400) return "#1a1a1a";  // sarı durumlarda siyah
+  if (cost >= 400) return "#e0e7d5";                // kırmızı, mor, siyahta açık
+  return "#0d1e15";                                 // yeşil durumlarda koyu
 }
 
 /**
