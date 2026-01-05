@@ -10,6 +10,27 @@ input[type="number"] {
   appearance: textfield;
 }
 
+/* Animations for custom alert modal */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
 .page-wrapper {
   display: flex;
   flex-direction: column;
@@ -85,7 +106,7 @@ input[type="number"] {
 }
 
 .player-form {
-  margin-top: 0.5rem;
+  margin-top: 0.1rem;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
@@ -98,7 +119,7 @@ input[type="number"] {
   background: rgba(235, 230, 215, 0.5);
   border-radius: 0.75rem;
   border: 2px solid #8b7d6b;
-  margin: 1rem 1.7rem;
+  margin: 0.1rem 1.7rem;
   box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.08), 0 0 20px rgba(218, 165, 32, 0.1);
 }
 
@@ -229,7 +250,7 @@ input[type="number"] {
   margin-top: 0.5rem;
   display: flex;
   gap: 0.5rem;
-  justify-content: flex-end;
+  justify-content: center;
   background: linear-gradient(to top, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0));
   padding-top: 0.5rem;
   padding-bottom: 0.25rem;
@@ -256,8 +277,9 @@ input[type="number"] {
   border: 2px solid #8b7d6b;
   border-radius: 8px;
   padding: 8px;
-  margin: 28px;
-  margin-bottom: 12px;
+  margin-left: 28px;
+  margin-right: 28px;
+  margin-bottom: 2px;
   align-items: stretch;
   background: rgba(245, 243, 230, 0.4);
   box-shadow: 0 0 20px rgba(218, 165, 32, 0.1);
@@ -339,8 +361,8 @@ input[type="number"] {
 }
 
 .background-section {
-  margin: 4px 28px 28px 28px;
-  padding: 6px 8px;
+  margin: 1px 28px 28px 28px;
+  padding: 1px 8px;
   border: 2px solid #8b7d6b;
   border-radius: 8px;
   background: rgba(245, 243, 230, 0.5);
@@ -597,6 +619,11 @@ input[type="number"] {
     z-index: 2 !important;
   }
 
+  .player-form {
+    margin-top: 0.05rem !important;
+    gap: 0 !important;
+  }
+
   .avatarBox,
   .avatar-box {
     background: transparent !important;
@@ -618,6 +645,7 @@ input[type="number"] {
     background: transparent !important;
     border: 1px solid #111 !important;
     border-radius: 8px !important;
+    margin-bottom: 0 !important;
   }
 
   .sheet-header .cell {
@@ -637,7 +665,7 @@ input[type="number"] {
     background: transparent !important;
     border: 1px solid #111 !important;
     border-radius: 12px !important;
-    margin: 12px 28px !important;
+    margin: 0.3rem 1.7rem 0 1.7rem !important;
   }
 
   .sheet-grid .field-header > span:first-child {
@@ -729,7 +757,11 @@ input[type="number"] {
     background: transparent !important;
   }
 
-  .stat-cell,
+  .background-section {
+    margin: 0.3rem 28px 0.3rem 28px !important;
+    padding: 6px 8px !important;
+    background: transparent !important;
+  }
   .read-small,
   .stat-box-input,
   .text-cell,
@@ -738,7 +770,12 @@ input[type="number"] {
   .age-input,
   .cell,
   input[type="number"],
-  input[readOnly] {
+  input[readOnly],
+  .background-area,
+  .background-section,
+  .background-grid,
+  .background-cell,
+  textarea {
     background: transparent !important;
   }
 
