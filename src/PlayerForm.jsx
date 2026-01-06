@@ -23,6 +23,18 @@ const DEBUGMODE = false;
 
 const RULES_CACHE_KEY = "rulesCache";
 const RULES_CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
+const DEFAULT_FETCH_TIMEOUT_MS = 4000;
+
+const fetchWithTimeout = async (url, options = {}, timeoutMs = DEFAULT_FETCH_TIMEOUT_MS) => {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const resp = await fetch(url, { ...options, signal: controller.signal, cache: "no-store" });
+    return resp;
+  } finally {
+    clearTimeout(id);
+  }
+};
 
 const FIELD_DEFS = [
   { key: "Accounting", label: "Accounting", type: "number" },
@@ -1204,7 +1216,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
         }
 
         console.log(`[PlayerForm] Backend URL: ${API_BASE_URL}`);
-        const response = await fetch(`${API_BASE_URL}/players/rules`);
+        const response = await fetchWithTimeout(`${API_BASE_URL}/players/rules`, {}, DEFAULT_FETCH_TIMEOUT_MS);
         console.log(`[PlayerForm] Response status: ${response.status}`);
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}: Rules specification yüklenemedi`);

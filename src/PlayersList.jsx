@@ -282,7 +282,45 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
   const [error, setError] = useState("");
   const [importStatus, setImportStatus] = useState("");
   const [offlineMode, setOfflineMode] = useState(false);
+  const [backendAvailable, setBackendAvailable] = useState(false);
+  const [showBackendPrompt, setShowBackendPrompt] = useState(false);
   const { t } = useTranslation();
+
+  const DEFAULT_FETCH_TIMEOUT_MS = 4000;
+  const BACKEND_POLL_INTERVAL_MS = 30000;
+  const PROMPT_COOLDOWN_MS = 10 * 60 * 1000;
+  const PROMPT_COOLDOWN_KEY = "backendPromptCooldownUntil";
+
+  const fetchWithTimeout = async (url, options = {}, timeoutMs = DEFAULT_FETCH_TIMEOUT_MS) => {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const resp = await fetch(url, { ...options, signal: controller.signal, cache: "no-store" });
+      return resp;
+    } finally {
+      clearTimeout(id);
+    }
+  };
+
+  const refetchFromBackend = async () => {
+    try {
+      setLoading(true);
+      setError("");
+      const resp = await fetchWithTimeout(`${API_BASE_URL}/players`, { method: "GET" }, DEFAULT_FETCH_TIMEOUT_MS);
+      if (!resp.ok) {
+        throw new Error("Oyuncu listesi alınamadı.");
+      }
+      const data = await resp.json();
+      setPlayers(sortByIdDesc(data));
+      setOfflineMode(false);
+      setBackendAvailable(true);
+    } catch (e) {
+      // Stay offline if backend still not ready
+      console.warn("[PlayersList] Backend still not available:", e?.message || e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     const fetchPlayers = async () => {
@@ -306,13 +344,13 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
           return;
         }*/
 
-        const response = await fetch(`${API_BASE_URL}/players`, {
+        const response = await fetchWithTimeout(`${API_BASE_URL}/players`, {
           method: "GET",
           /*headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },*/
-        });
+        }, DEFAULT_FETCH_TIMEOUT_MS);
 
         setLoading(false);
         console.log(`[PlayersList] Response status: ${response.status}`);
@@ -325,6 +363,7 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
         console.log("[PlayersList] Players başarıyla yüklendi:", data.length);
         setPlayers(sortByIdDesc(data));
         setOfflineMode(false);
+        setBackendAvailable(true);
       } catch (err) {
         console.error(err);
         setError("Sunucuya ulaşılamadı, yerel veriler gösteriliyor.");
@@ -336,6 +375,26 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
 
     fetchPlayers();
   }, []);
+
+  // While in offline mode, periodically check if backend is back
+  useEffect(() => {
+    if (!offlineMode) return;
+    const intervalId = setInterval(async () => {
+      try {
+        const resp = await fetchWithTimeout(`${API_BASE_URL}/players`, { method: "GET" }, 2000);
+        if (resp.ok) {
+          setBackendAvailable(true);
+          const cooldownUntil = Number(localStorage.getItem(PROMPT_COOLDOWN_KEY) || "0");
+          if (Date.now() > cooldownUntil) {
+            setShowBackendPrompt(true);
+          }
+        }
+      } catch (e) {
+        // still offline or timeout
+      }
+    }, BACKEND_POLL_INTERVAL_MS);
+    return () => clearInterval(intervalId);
+  }, [offlineMode]);
 
   const handleImportJSON = async (event) => {
     const file = event.target.files?.[0];
@@ -436,6 +495,37 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
         {offlineMode && (
           <div style={styles.offlineBanner}>
             {t("players.offlineMode")}
+          </div>
+        )}
+        {showBackendPrompt && (
+          <div style={styles.promptOverlay} role="dialog" aria-modal="true">
+            <div style={styles.promptCard}>
+              <div style={styles.promptTitle}>{t("players.backendAvailableTitle", "Backend available")}</div>
+              <div style={styles.promptMessage}>{t("players.backendAvailableMessage", "The server is back online. Switch to backend?")}</div>
+              <div style={styles.promptButtons}>
+                <button
+                  type="button"
+                  style={styles.promptPrimary}
+                  onClick={async () => {
+                    setShowBackendPrompt(false);
+                    await refetchFromBackend();
+                  }}
+                >
+                  {t("players.useBackend", "Use Backend")}
+                </button>
+                <button
+                  type="button"
+                  style={styles.promptSecondary}
+                  onClick={() => {
+                    const until = Date.now() + PROMPT_COOLDOWN_MS;
+                    localStorage.setItem(PROMPT_COOLDOWN_KEY, String(until));
+                    setShowBackendPrompt(false);
+                  }}
+                >
+                  {t("players.stayOffline", "Stay Offline")}
+                </button>
+              </div>
+            </div>
           </div>
         )}
         <div style={styles.headerRow}>
@@ -861,6 +951,63 @@ const styles = {
     fontWeight: 700,
     border: "2px solid #b8860b",
     boxShadow: "0 0 15px rgba(218, 165, 32, 0.2)",
+  },
+  promptOverlay: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: "rgba(0,0,0,0.35)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 1000,
+    padding: "1rem",
+  },
+  promptCard: {
+    background: "#fdfaf3",
+    borderRadius: "0.75rem",
+    border: "2px solid #8b7d6b",
+    boxShadow: "0 20px 40px rgba(0,0,0,0.35)",
+    maxWidth: "520px",
+    width: "100%",
+    padding: "1rem",
+    color: "#3e3a2f",
+  },
+  promptTitle: {
+    fontSize: "1.1rem",
+    fontWeight: 800,
+    marginBottom: "0.5rem",
+    color: "#5a4a3a",
+  },
+  promptMessage: {
+    fontSize: "0.95rem",
+    marginBottom: "0.75rem",
+  },
+  promptButtons: {
+    display: "flex",
+    gap: "0.5rem",
+    justifyContent: "flex-end",
+    flexWrap: "wrap",
+  },
+  promptPrimary: {
+    padding: "0.45rem 0.9rem",
+    borderRadius: "0.35rem",
+    border: "2px solid #6d5d4b",
+    background: "linear-gradient(135deg, #7a6a56, #6d5d4b)",
+    color: "#f5f3e8",
+    fontWeight: 700,
+    cursor: "pointer",
+  },
+  promptSecondary: {
+    padding: "0.45rem 0.9rem",
+    borderRadius: "0.35rem",
+    border: "2px solid #b8860b",
+    background: "linear-gradient(135deg, #daa520 0%, #b8860b 100%)",
+    color: "#3e3a2f",
+    fontWeight: 700,
+    cursor: "pointer",
   },
   printButton: {
     display: "inline-block",

@@ -50,6 +50,10 @@ const resources = {
         errorPrefix: "Error",
         offlineMode: "Offline mode: Server unreachable, data is stored locally.",
         downloadJson: "Download List (JSON)",
+        backendAvailableTitle: "Backend available",
+        backendAvailableMessage: "The server is back online. Switch to backend?",
+        useBackend: "Use Backend",
+        stayOffline: "Stay Offline",
       },
       playerForm: {
         rulesLoading: "Loading rules...",
@@ -115,6 +119,10 @@ const resources = {
         offlineMode: "Offline mod: Sunucuya ulaşılamadı, veriler tarayıcıda saklanıyor.",
         downloadJson: "Listeyi İndir (JSON)",
         errorPrefix: "Hata",
+        backendAvailableTitle: "Backend kullanılabilir",
+        backendAvailableMessage: "Sunucu tekrar çevrimiçi. Backend'e geçmek ister misiniz?",
+        useBackend: "Backend'i Kullan",
+        stayOffline: "Offline Kal",
       },
       playerForm: {
         rulesLoading: "Rules yükleniyor...",
@@ -180,6 +188,10 @@ const resources = {
         errorPrefix: "Fehler",
         offlineMode: "Offline-Modus: Server nicht erreichbar, Daten werden lokal gespeichert.",
         downloadJson: "Liste herunterladen (JSON)",
+        backendAvailableTitle: "Backend verfügbar",
+        backendAvailableMessage: "Der Server ist wieder online. Zum Backend wechseln?",
+        useBackend: "Backend verwenden",
+        stayOffline: "Offline bleiben",
       },
       playerForm: {
         rulesLoading: "Regeln werden geladen...",
@@ -310,6 +322,10 @@ const resources = {
         errorPrefix: "Fout",
         offlineMode: "Offline modus: Server niet bereikbaar, gegevens worden lokaal opgeslagen.",
         downloadJson: "Lijst downloaden (JSON)",
+        backendAvailableTitle: "Backend beschikbaar",
+        backendAvailableMessage: "De server is weer online. Overschakelen naar backend?",
+        useBackend: "Backend gebruiken",
+        stayOffline: "Offline blijven",
       },
       playerForm: {
         rulesLoading: "Regels laden...",
