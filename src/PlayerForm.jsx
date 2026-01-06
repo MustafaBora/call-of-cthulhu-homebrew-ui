@@ -11,6 +11,7 @@ import cornerBL from "./assets/signs-3.png";
 import cornerBR from "./assets/signs-4.png";
 import LanguageSwitcher from "./LanguageSwitcher";
 import "./PlayerForm.css";
+import { useConnectivity } from "./ConnectivityProvider";
 
 // Debug mode kontrolü - All X butonlarını göstermek için true yapın
 const DEBUGMODE = false;
@@ -23,18 +24,6 @@ const DEBUGMODE = false;
 
 const RULES_CACHE_KEY = "rulesCache";
 const RULES_CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
-const DEFAULT_FETCH_TIMEOUT_MS = 4000;
-
-const fetchWithTimeout = async (url, options = {}, timeoutMs = DEFAULT_FETCH_TIMEOUT_MS) => {
-  const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), timeoutMs);
-  try {
-    const resp = await fetch(url, { ...options, signal: controller.signal, cache: "no-store" });
-    return resp;
-  } finally {
-    clearTimeout(id);
-  }
-};
 
 const FIELD_DEFS = [
   { key: "Accounting", label: "Accounting", type: "number" },
@@ -808,15 +797,21 @@ function saveOfflinePlayer(payload, mode, player) {
   const list = JSON.parse(localStorage.getItem(key) || "[]");
 
   if (mode === "create" || !player?.id) {
-    const record = { ...payload, id: Date.now() };
+    const record = { ...payload, id: Date.now(), _isOfflineCreated: true };
     const next = [...list, record];
     localStorage.setItem(key, JSON.stringify(next));
     return record;
   }
 
-  const next = list.map((p) => (p.id === player.id ? { ...payload, id: player.id } : p));
+  // Preserve _isOfflineCreated flag if it exists
+  const existing = list.find((p) => p.id === player.id);
+  const next = list.map((p) => 
+    p.id === player.id 
+      ? { ...payload, id: player.id, _isOfflineCreated: existing?._isOfflineCreated } 
+      : p
+  );
   localStorage.setItem(key, JSON.stringify(next));
-  return { ...payload, id: player.id };
+  return { ...payload, id: player.id, _isOfflineCreated: existing?._isOfflineCreated };
 }
 
 function deleteOfflinePlayer(id) {
@@ -1159,7 +1154,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
   const [rulesSpec, setRulesSpec] = useState(null);
   const [rulesLoading, setRulesLoading] = useState(true);
   const [rulesError, setRulesError] = useState("");
-  const [offlineMode, setOfflineMode] = useState(false);
+  const { offlineMode, setOfflineMode, fetchWithTimeout, enqueueRequest } = useConnectivity();
   const [form, setForm] = useState(() => getInitialForm(null, mode, player));
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -1190,6 +1185,23 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
     });
   };
 
+  const queuePlayerRequest = (method, url, payload, token, playerId) => {
+    // If player was offline-created (timestamp ID > 1000000000), always POST to backend
+    const isOfflineCreated = player?._isOfflineCreated || (playerId && playerId > 1000000000);
+    const finalMethod = (method === "PUT" && isOfflineCreated) ? "POST" : method;
+    const finalUrl = (finalMethod === "POST") ? `${API_BASE_URL}/players` : url;
+    
+    enqueueRequest({
+      method: finalMethod,
+      url: finalUrl,
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: payload ? JSON.stringify(payload) : undefined,
+    });
+  };
+
   // Load rules spec from backend on mount
   useEffect(() => {
     const loadRulesSpec = async () => {
@@ -1216,7 +1228,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
         }
 
         console.log(`[PlayerForm] Backend URL: ${API_BASE_URL}`);
-        const response = await fetchWithTimeout(`${API_BASE_URL}/players/rules`, {}, DEFAULT_FETCH_TIMEOUT_MS);
+        const response = await fetchWithTimeout(`${API_BASE_URL}/players/rules`, { method: "GET" });
         console.log(`[PlayerForm] Response status: ${response.status}`);
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}: Rules specification yüklenemedi`);
@@ -1346,16 +1358,26 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
 
       let response;
 
+      // Detect offline-created players: they should be POSTed to backend, not PUT
+      const isOfflineCreated = player?._isOfflineCreated || (player?.id && player.id > 1000000000);
+      const shouldPost = mode === "create" || isOfflineCreated;
+      
+      const url = shouldPost
+        ? `${API_BASE_URL}/players`
+        : `${API_BASE_URL}/players/${player.id}`;
+      const method = shouldPost ? "POST" : "PUT";
+
       if (!useBackend) {
         const saved = saveOfflinePlayer(payload, mode, player);
+        queuePlayerRequest(method, url, payload, token, saved.id);
         if (mode === "create") {
           onCreated && onCreated(saved, { stay: stayOnPage });
         } else {
           onUpdated && onUpdated(saved, { stay: stayOnPage });
         }
-      } else if (mode === "create") {
-        response = await fetch(`${API_BASE_URL}/players`, {
-          method: "POST",
+      } else if (shouldPost) {
+        response = await fetch(url, {
+          method,
           headers: {
             "Content-Type": "application/json",
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -1370,8 +1392,8 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
         const created = await response.json();
         onCreated && onCreated(created, { stay: stayOnPage });
       } else {
-        response = await fetch(`${API_BASE_URL}/players/${player.id}`, {
-          method: "PUT",
+        response = await fetch(url, {
+          method,
           headers: {
             "Content-Type": "application/json",
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -1392,7 +1414,32 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
       }
     } catch (err) {
       console.error(err);
-      setError(err.message || "Bir hata oluştu.");
+      if (!offlineMode) {
+        // Network failure while online: fall back to offline save + queue
+        try {
+          const token = localStorage.getItem("token");
+          const isOfflineCreated = player?._isOfflineCreated || (player?.id && player.id > 1000000000);
+          const shouldPost = mode === "create" || isOfflineCreated;
+          const url = shouldPost
+            ? `${API_BASE_URL}/players`
+            : `${API_BASE_URL}/players/${player?.id}`;
+          const method = shouldPost ? "POST" : "PUT";
+          const saved = saveOfflinePlayer({ ...form }, mode, player);
+          queuePlayerRequest(method, url, { ...form }, token, saved.id);
+          setOfflineMode(true);
+          setAlertMessage("Offline kaydedildi, bağlantı gelince senkronize edilecek.");
+          if (mode === "create") {
+            onCreated && onCreated(saved, { stay: stayOnPage });
+          } else {
+            onUpdated && onUpdated(saved, { stay: stayOnPage });
+          }
+        } catch (fallbackErr) {
+          console.error("[PlayerForm] Offline fallback failed", fallbackErr);
+          setError(err.message || "Bir hata oluştu.");
+        }
+      } else {
+        setError(err.message || "Bir hata oluştu.");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -1413,14 +1460,31 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
     try {
       const token = localStorage.getItem("token");
       const useBackend = !offlineMode;
+      const isOfflineCreated = player?._isOfflineCreated || (player?.id && player.id > 1000000000);
+      const url = `${API_BASE_URL}/players/${player.id}`;
 
       if (!useBackend) {
+        deleteOfflinePlayer(player.id);
+        // Only queue DELETE if player exists on backend
+        if (!isOfflineCreated) {
+          enqueueRequest({
+            method: "DELETE",
+            url,
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+          });
+        }
+        if (onCancel) onCancel();
+        return;
+      }
+
+      // If offline-created, just delete locally (doesn't exist on backend)
+      if (isOfflineCreated) {
         deleteOfflinePlayer(player.id);
         if (onCancel) onCancel();
         return;
       }
 
-      const response = await fetch(`${API_BASE_URL}/players/${player.id}`, {
+      const response = await fetch(url, {
         method: "DELETE",
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
@@ -1432,7 +1496,26 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
       if (onCancel) onCancel();
     } catch (err) {
       console.error(err);
-      setError(err.message || "Silme işlemi sırasında hata oluştu.");
+      try {
+        const token = localStorage.getItem("token");
+        const isOfflineCreated = player?._isOfflineCreated || (player?.id && player.id > 1000000000);
+        const url = `${API_BASE_URL}/players/${player.id}`;
+        deleteOfflinePlayer(player.id);
+        // Only queue DELETE if player exists on backend
+        if (!isOfflineCreated) {
+          enqueueRequest({
+            method: "DELETE",
+            url,
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+          });
+        }
+        setOfflineMode(true);
+        setAlertMessage("Offline silindi, bağlantı gelince silme kuyruğa alındı.");
+        if (onCancel) onCancel();
+      } catch (fallbackErr) {
+        console.error("[PlayerForm] Offline delete fallback failed", fallbackErr);
+        setError(err.message || "Silme işlemi sırasında hata oluştu.");
+      }
     }
   };
 
