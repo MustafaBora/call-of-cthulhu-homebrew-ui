@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { API_BASE_URL } from "./config";
 import LanguageSwitcher from "./LanguageSwitcher";
@@ -284,14 +284,17 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
   const [importStatus, setImportStatus] = useState("");
   const { t } = useTranslation();
   const { offlineMode, setOfflineMode, fetchWithTimeout } = useConnectivity();
+  const initialFetchRef = useRef(false);
 
   useEffect(() => {
+    if (initialFetchRef.current) return;
+    initialFetchRef.current = true;
     const fetchPlayers = async () => {
       setLoading(true);
       setError("");
 
       const loadOffline = () => {
-        console.log("[PlayersList] Offline mode'a geçiliyor");
+        console.log("[PlayersList] Changing to Offline mode");
         const stored = JSON.parse(localStorage.getItem("offlinePlayers") || "[]");
         
         // Migration: Mark offline-created players (timestamp IDs > 1000000000)
@@ -309,7 +312,7 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
       };
 
       try {
-        const token = localStorage.getItem("token");
+        // const token = localStorage.getItem("token");
         /*if (!token) {
           loadOffline();
           setLoading(false);
@@ -328,16 +331,16 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
         console.log(`[PlayersList] Response status: ${response.status}`);
         if (!response.ok) {
           loadOffline();
-          throw new Error("Oyuncu listesi alınamadı.");
+          throw new Error("Player list could not be fetched.");
         }
 
         const data = await response.json();
-        console.log("[PlayersList] Players başarıyla yüklendi:", data.length);
+        console.log("[PlayersList] Players successfully loaded:", data.length);
         setPlayers(sortByIdDesc(data));
         setOfflineMode(false);
       } catch (err) {
         console.error(err);
-        setError("Sunucuya ulaşılamadı, yerel veriler gösteriliyor.");
+        setError("Could not reach the server, showing local data.");
         loadOffline();
       } finally {
         setLoading(false);
@@ -345,7 +348,62 @@ function PlayersList({ onEditPlayer, onNewPlayer, onCharacterForm }) {
     };
 
     fetchPlayers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Re-fetch when offline mode changes (e.g., user clicks "Use Backend")
+  useEffect(() => {
+    if (!initialFetchRef.current) return; // Skip if not initialized yet
+    console.log("[PlayersList] offlineMode changed to:", offlineMode);
+    const doFetch = async () => {
+      setLoading(true);
+      setError("");
+
+      const loadOffline = () => {
+        console.log("[PlayersList] Changing to Offline mode");
+        const stored = JSON.parse(localStorage.getItem("offlinePlayers") || "[]");
+        
+        // Migration: Mark offline-created players (timestamp IDs > 1000000000)
+        const migrated = stored.map(p => {
+          if (p.id > 1000000000 && !p._isOfflineCreated) {
+            return { ...p, _isOfflineCreated: true };
+          }
+          return p;
+        });
+        
+        const next = migrated.length ? migrated : getSampleOfflinePlayers();
+        localStorage.setItem("offlinePlayers", JSON.stringify(next));
+        setPlayers(sortByIdDesc(next));
+        setOfflineMode(true);
+      };
+
+      try {
+        const response = await fetchWithTimeout(`${API_BASE_URL}/players`, {
+          method: "GET",
+        });
+
+        setLoading(false);
+        console.log(`[PlayersList] Refetch response status: ${response.status}`);
+        if (!response.ok) {
+          loadOffline();
+          throw new Error("Player list could not be fetched.");
+        }
+
+        const data = await response.json();
+        console.log("[PlayersList] Players refetch successful:", data.length);
+        setPlayers(sortByIdDesc(data));
+        setOfflineMode(false);
+      } catch (err) {
+        console.error("[PlayersList] Refetch error:", err);
+        setError("Could not reach the server, showing local data.");
+        loadOffline();
+      } finally {
+        setLoading(false);
+      }
+    };
+    doFetch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [offlineMode]);
 
   const handleImportJSON = async (event) => {
     const file = event.target.files?.[0];

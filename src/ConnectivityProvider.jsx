@@ -41,6 +41,7 @@ export const ConnectivityProvider = ({ children }) => {
   const [queue, setQueue] = useState(() => readQueue());
   const [isFlushing, setIsFlushing] = useState(false);
   const pollRef = useRef(null);
+  const initialCheckRef = useRef(false);
 
   const fetchWithTimeout = useCallback(async (url, options = {}, timeoutMs = DEFAULT_FETCH_TIMEOUT_MS) => {
     const controller = new AbortController();
@@ -135,6 +136,9 @@ export const ConnectivityProvider = ({ children }) => {
   }, [offlineMode, startPolling, stopPolling]);
 
   useEffect(() => {
+    if (initialCheckRef.current) return;
+    initialCheckRef.current = true;
+    
     const checkInitial = async () => {
       try {
         const resp = await fetchWithTimeout(`${API_BASE_URL}/players`, { method: "GET" }, 2000);

@@ -23,7 +23,6 @@ const DEBUGMODE = false;
  */
 
 const RULES_CACHE_KEY = "rulesCache";
-const RULES_CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
 
 const FIELD_DEFS = [
   { key: "Accounting", label: "Accounting", type: "number" },
@@ -1153,8 +1152,7 @@ function CustomAlert({ message, onClose }) {
 function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpdated }) {
   const [rulesSpec, setRulesSpec] = useState(null);
   const [rulesLoading, setRulesLoading] = useState(true);
-  const [rulesError, setRulesError] = useState("");
-  const { offlineMode, setOfflineMode, fetchWithTimeout, enqueueRequest } = useConnectivity();
+  const { offlineMode, setOfflineMode, enqueueRequest } = useConnectivity();
   const [form, setForm] = useState(() => getInitialForm(null, mode, player));
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -1202,62 +1200,41 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
     });
   };
 
-  // Load rules spec from backend on mount
+  // Load rules spec from localStorage (App.js loads from backend on startup)
   useEffect(() => {
-    const loadRulesSpec = async () => {
-      const fallbackSpec = createFallbackRulesSpec();
-      try {
-        setRulesLoading(true);
-        // Try cached rules first (10 min TTL)
-        const cachedRaw = localStorage.getItem(RULES_CACHE_KEY);
-        if (cachedRaw) {
-          try {
-            const cached = JSON.parse(cachedRaw);
-            const isFresh = cached?.timestamp && cached?.spec && (Date.now() - cached.timestamp < RULES_CACHE_TTL_MS);
-            if (isFresh) {
-              console.log("[PlayerForm] Using cached rules spec");
-              setRulesSpec(cached.spec);
-              setOfflineMode(false);
-              setForm(getInitialForm(cached.spec, mode, player));
-              return;
-            }
-          } catch (parseErr) {
-            console.warn("[PlayerForm] Failed to parse cached rules, clearing cache", parseErr);
-            localStorage.removeItem(RULES_CACHE_KEY);
+    const fallbackSpec = createFallbackRulesSpec();
+    try {
+      setRulesLoading(true);
+      
+      // Try cached rules first
+      const cachedRaw = localStorage.getItem(RULES_CACHE_KEY);
+      if (cachedRaw) {
+        try {
+          const cached = JSON.parse(cachedRaw);
+          if (cached?.spec) {
+            console.log("[PlayerForm] Using rules spec from cache");
+            setRulesSpec(cached.spec);
+            setForm(getInitialForm(cached.spec, mode, player));
+            setRulesLoading(false);
+            return;
           }
+        } catch (parseErr) {
+          console.warn("[PlayerForm] Failed to parse cached rules", parseErr);
+          localStorage.removeItem(RULES_CACHE_KEY);
         }
-
-        console.log(`[PlayerForm] Backend URL: ${API_BASE_URL}`);
-        const response = await fetchWithTimeout(`${API_BASE_URL}/players/rules`, { method: "GET" });
-        console.log(`[PlayerForm] Response status: ${response.status}`);
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: Rules specification yüklenemedi`);
-        }
-        const spec = await response.json();
-        console.log("[PlayerForm] Rules loaded from backend");
-
-        // Cache the fresh rules
-        localStorage.setItem(RULES_CACHE_KEY, JSON.stringify({ timestamp: Date.now(), spec }));
-
-        setRulesSpec(spec);
-        setOfflineMode(false);
-        
-        // Initialize form with loaded spec
-        setForm(getInitialForm(spec, mode, player));
-      } catch (err) {
-        console.error("[PlayerForm] Rules yükleme hatası:", err.message);
-        console.error("[PlayerForm] Full error:", err);
-        localStorage.removeItem(RULES_CACHE_KEY);
-        setOfflineMode(true);
-        setRulesError("Sunucuya ulaşılamadı, varsayılan kurallar kullanılıyor.");
-        setRulesSpec(fallbackSpec);
-        setForm(getInitialForm(fallbackSpec, mode, player));
-      } finally {
-        setRulesLoading(false);
       }
-    };
-    
-    loadRulesSpec();
+
+      // If no cache, use fallback
+      console.log("[PlayerForm] Using fallback rules spec");
+      setRulesSpec(fallbackSpec);
+      setForm(getInitialForm(fallbackSpec, mode, player));
+      setRulesLoading(false);
+    } catch (err) {
+      console.error("[PlayerForm] Rules initialization error:", err.message);
+      setRulesSpec(fallbackSpec);
+      setForm(getInitialForm(fallbackSpec, mode, player));
+      setRulesLoading(false);
+    }
   }, [mode, player]);
 
   const handleNumericChange = (name, rawValue) => {
@@ -1603,12 +1580,6 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
           {offlineMode && (
             <div className="error" style={{ margin: "0 0 1rem 0", background: "linear-gradient(135deg, #d4d0b8, #c5c1a8)", border: "2px solid #8b7d6b", boxShadow: "0 0 15px rgba(139, 125, 107, 0.2)", color: "#3e3a2f" }}>
               {t("playerForm.offlineMessage")}
-            </div>
-          )}
-
-          {rulesError && !offlineMode && (
-            <div className="error" style={{ margin: "0 0 1rem 0" }}>
-              <p><strong>{t("playerForm.rulesErrorTitle")}:</strong> {rulesError}</p>
             </div>
           )}
           
