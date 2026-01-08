@@ -93,6 +93,114 @@ const FIELD_DEFS = [
   { key: "Other3", label: "O3__________", type: "number" },
 ];
 
+// Characteristic descriptions for tooltips
+const CHARACTERISTIC_DESCRIPTIONS = {
+  "APP": "Appearance - Physical attractiveness and charm",
+  "BONUS": "Bonus damage from melee weapons based on STR and SIZ",
+  "BRV": "Bravery - Resistance to fear and psychological trauma",
+  "CON": "Constitution - Physical health and stamina",
+  "STA": "Stamina - Physical endurance and toughness",
+  "AGI": "Agility - Speed, reflexes, and coordination",
+  "EDU": "Education - Professional skills and schooling",
+  "INT": "Intelligence - Reasoning and analytical ability",
+  "LUCK": "Luck - Chance and fortune in dangerous situations",
+  "SENSE": "Sense - Intuition and gut feelings",
+  "SPOT": "Spot - Ability to notice details in your surroundings",
+  "WILL": "Willpower - Mental strength and determination",
+  "SAN": "Sanity - Mental health (0 = insane, 99 = perfectly sane)",
+  "SIZ": "Size - Physical bulk and body mass",
+  "ARMOR": "Armor - Protection from damage (0 = none)",
+  "RES": "Resilience - Resistance to magical effects",
+  "STR": "Strength - Physical power and muscular force",
+};
+
+// Map human-readable labels to canonical characteristic keys used in rulesSpec
+const CHARACTERISTIC_LABEL_TO_KEY = {
+  "Strength": "STR",
+  "Size": "SIZ",
+  "Stamina": "STA",
+  "Will": "WILL",
+  "Agility": "AGI",
+  "Education": "EDU",
+  "Luck": "LUCK",
+  "Intellect": "INT",
+  "Appearance": "APP",
+  "Bonus": "BONUS",
+  "Spot Hidden": "SPOT",
+  "Sense": "SENSE",
+  "Sanity": "SAN",
+  "Bravery": "BRV",
+  "Armor": "ARMOR",
+  "Resiliance": "RES", // Note: label spelling preserved in UI
+};
+
+// Skill descriptions for tooltips
+const SKILL_DESCRIPTIONS = {
+  "Accounting": "Managing finances, bookkeeping, and financial analysis",
+  "AnimalHandling": "Training and caring for animals",
+  "Anthropology": "Study of human cultures and societies",
+  "Appraise": "Determining the value of items and objects",
+  "Archeology": "Excavation and study of ancient artifacts",
+  "ArtCraft": "Creating art or crafting items",
+  "ArtCraft2": "Creating art or crafting items (specialized)",
+  "Artillery": "Operating large weapons and cannons",
+  "Charm": "Persuading and influencing others through charisma",
+  "Climb": "Scaling walls and climbing structures",
+  "ComputerUse": "Operating computers and computer systems",
+  "CreditRating": "Determining financial standing and resources",
+  "CthulhuMythos": "Knowledge of ancient eldritch horrors",
+  "Demolitions": "Explosives and controlled destruction",
+  "Disguise": "Changing appearance and looking like someone else",
+  "Dodge": "Avoiding attacks and incoming damage",
+  "DriveAuto": "Operating automobiles",
+  "Electronics": "Repairing and understanding electronics",
+  "ElectricalRepair": "Fixing electrical systems and wiring",
+  "FastTalk": "Deceiving with quick talking and smooth words",
+  "FightingBrawl": "Hand-to-hand combat and brawling",
+  "FightingOther": "Combat with specialized weapons",
+  "FirearmsHandgun": "Using revolvers and pistols",
+  "FirearmsOther": "Using other types of firearms",
+  "FirearmsRifleShotgun": "Using rifles and shotguns",
+  "FirstAid": "Basic medical treatment and wound care",
+  "History": "Knowledge of historical events and periods",
+  "Hypnosis": "Putting others in a hypnotic state",
+  "Intimidate": "Frightening and threatening others",
+  "Jump": "Leaping and long jumping",
+  "LanguageOther1": "Speaking a foreign language",
+  "LanguageOther2": "Speaking another foreign language",
+  "LanguageOther3": "Speaking a third foreign language",
+  "LanguageOwn": "Native language proficiency",
+  "Law": "Legal knowledge and understanding of laws",
+  "LibraryUse": "Researching in libraries and archives",
+  "Listen": "Hearing and detecting sounds",
+  "Locksmith": "Opening locks and disarming traps",
+  "MechanicalRepair": "Fixing mechanical devices and machines",
+  "Medicine": "Diagnosis and treatment of diseases",
+  "NaturalWorld": "Knowledge of nature and wildlife",
+  "Navigate": "Navigation and finding directions",
+  "Occult": "Knowledge of the supernatural and mystical",
+  "OperateHeavyMachinery": "Operating large industrial machines",
+  "Persuade": "Convincing others through logic and reason",
+  "Pilot": "Flying aircraft and helicopters",
+  "Psychoanalysis": "Understanding and analyzing the mind",
+  "Psychology": "Understanding human behavior and motivation",
+  "ReadLips": "Understanding speech by reading lips",
+  "Ride": "Riding horses and other mount animals",
+  "Science": "General scientific knowledge and research",
+  "ScienceOther": "Specialized scientific knowledge",
+  "ScienceOther2": "Another specialized scientific field",
+  "SignLanguage": "Sign language communication",
+  "Deception": "Lying and creating false impressions",
+  "SleightOfHand": "Picking pockets and sleight of hand",
+  "Status": "Social standing and reputation",
+  "Stealth": "Moving quietly and hiding",
+  "Survival": "Surviving in wilderness environments",
+  "Swim": "Swimming and underwater movement",
+  "Throw": "Throwing objects accurately",
+  "Track": "Following tracks and trails",
+  "UncommonLanguage": "Speaking an uncommon or rare language",
+};
+
 // Skills that must always remain visible in print, regardless of value
 const MUST_HAVE_SKILLS = new Set([
   "Climb",
@@ -820,6 +928,68 @@ function deleteOfflinePlayer(id) {
   localStorage.setItem(key, JSON.stringify(next));
 }
 
+// Tooltip component with hover effect
+function Tooltip({ text, children }) {
+  const [showTooltip, setShowTooltip] = useState(false);
+  
+  if (!text) return children;
+  
+  return (
+    <div style={{ position: "relative", display: "inline-block" }}>
+      {children}
+      <span
+        style={{
+          cursor: "help",
+          marginLeft: "0.25rem",
+          display: "inline-block",
+          color: "#8b7d6b",
+          fontWeight: "bold",
+          fontSize: "0.85rem",
+          verticalAlign: "text-top"
+        }}
+        onMouseEnter={() => setShowTooltip(true)}
+        onMouseLeave={() => setShowTooltip(false)}
+      >
+        ⓘ
+      </span>
+      {showTooltip && (
+        <div
+          style={{
+            position: "absolute",
+            bottom: "100%",
+            left: "0",
+            backgroundColor: "#3e3a2f",
+            color: "#f5f3e8",
+            padding: "0.5rem 0.75rem",
+            borderRadius: "0.35rem",
+            fontSize: "0.8rem",
+            whiteSpace: "nowrap",
+            zIndex: 9999,
+            marginBottom: "0.5rem",
+            border: "1px solid #8b7d6b",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
+            pointerEvents: "none",
+          }}
+        >
+          {text}
+          <div
+            style={{
+              position: "absolute",
+              top: "100%",
+              left: "0.5rem",
+              width: "0",
+              height: "0",
+              borderLeft: "4px solid transparent",
+              borderRight: "4px solid transparent",
+              borderTop: "4px solid #3e3a2f",
+            }}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
 function StatCell({ rulesSpec, label, value, onChange, onBlur, onDelta, base, cost, readOnly = false, isSmallStep = false, className = "" }) {
   const handleChange = readOnly
     ? undefined
@@ -833,13 +1003,18 @@ function StatCell({ rulesSpec, label, value, onChange, onBlur, onDelta, base, co
   const costNow = getCurrentCostPerPoint(rulesSpec, cost, numericValue);
   const costColor = getCostColor(costNow);
   const stepAmount = isSmallStep ? 1 : 5;
-  const tooltipText = `${costNow * stepAmount} XP`;
   const containerClass = ["cell", "stat-cell", className].filter(Boolean).join(" ");
+  const charKey = CHARACTERISTIC_LABEL_TO_KEY[label] || label;
+  const charDescription = CHARACTERISTIC_DESCRIPTIONS[charKey] || CHARACTERISTIC_DESCRIPTIONS[label];
 
   return (
     <div className={containerClass}>
       <div className="stat-row">
-        <div className="stat-label">{label}</div>
+        <div className="stat-label">
+          <Tooltip text={charDescription}>
+            <span>{label}</span>
+          </Tooltip>
+        </div>
         <div className="label-extra">
           {base !== undefined && <strong className="no-print">{base}</strong>}
           {!readOnly && (costNow || costNow === 0) ? (
@@ -853,7 +1028,6 @@ function StatCell({ rulesSpec, label, value, onChange, onBlur, onDelta, base, co
                 type="button"
                 className="step-button"
                 style={{ background: costColor, color: getCostTextColor(costNow) }}
-                title={tooltipText}
                 onClick={() => onDelta(-stepAmount)}
               >
                 -{stepAmount}
@@ -862,7 +1036,6 @@ function StatCell({ rulesSpec, label, value, onChange, onBlur, onDelta, base, co
                 type="button"
                 className="step-button"
                 style={{ background: costColor, color: getCostTextColor(costNow) }}
-                title={tooltipText}
                 onClick={() => onDelta(+stepAmount)}
               >
                 +{stepAmount}
@@ -1605,7 +1778,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
 
             {/* Avatar */}
             <div className="avatarCol avatar-col">
-              <div className="avatarBox avatar-box" onClick={() => document.getElementById('avatar-upload').click()} title={t("playerForm.uploadImageTooltip")}>
+              <div className="avatarBox avatar-box" onClick={() => document.getElementById('avatar-upload').click()}>
                 <img
                   src={avatarSrc}
                   alt={form.name || "avatar"}
@@ -1758,8 +1931,7 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
                 const currentCost = getCurrentCostPerPoint(rulesSpec, cost, numericValue);
                 const totalCost = isNumber && cost !== undefined ? getCostBetween(rulesSpec, backendKey, base ?? 0, numericValue) : 0;
                 const costColor = getCostColor(currentCost);
-                const tooltipText = isNumber && cost !== undefined ? `Spent: ${totalCost}` : "";
-                const deltaTooltipText = `${currentCost * 5} XP`;
+                // Removed native titles; show cost via labelExtra
 
                 const labelExtra =
                   isNumber && (cost !== undefined)
@@ -1781,9 +1953,12 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
 
                 return (
                   <div key={def.key} className={containerClass}>
-                    <div className="field-header" title={tooltipText}> 
+                    <div className="field-header"> 
                       <span className="label-text flex-1">
-                        {def.label} <strong className="no-print">{labelWithBase.split(" ").pop()}</strong>
+                          <Tooltip text={SKILL_DESCRIPTIONS[def.key]}>
+                            <span>{def.label}</span>
+                          </Tooltip>
+                          {" "}<strong className="no-print">{labelWithBase.split(" ").pop()}</strong>
                         {labelExtra && (
                           <span className="label-extra no-print" style={{ color: costColor, fontWeight: "bold" }}>{labelExtra}</span>
                         )}
@@ -1796,7 +1971,6 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
                               type="button"
                               className="step-button"
                               style={{ background: costColor, color: getCostTextColor(currentCost) }}
-                              title={deltaTooltipText}
                               onClick={() => handleDelta(def.key, -5)}
                             >
                               -5
@@ -1805,7 +1979,6 @@ function PlayerForm({ mode = "create", player = null, onCancel, onCreated, onUpd
                               type="button"
                               className="step-button"
                               style={{ background: costColor, color: getCostTextColor(currentCost) }}
-                              title={deltaTooltipText}
                               onClick={() => handleDelta(def.key, +5)}
                             >
                               +5
