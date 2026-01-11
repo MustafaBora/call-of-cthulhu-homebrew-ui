@@ -26,7 +26,7 @@ const RULES_CACHE_KEY = "rulesCache";
 
 const FIELD_DEFS = [
   { key: "Accounting", label: "Accounting", type: "number" },
-  { key: "AnimalHandling", label: "Animal Handling", type: "number" },
+  { key: "AnimalHandling", label: "Animal Handle", type: "number" },
   { key: "Anthropology", label: "Anthropology", type: "number" },
   { key: "Appraise", label: "Appraise", type: "number" },
   { key: "Archeology", label: "Archeology", type: "number" },

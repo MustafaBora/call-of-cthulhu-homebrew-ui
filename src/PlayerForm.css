@@ -786,4 +786,13 @@ input[type="number"] {
   body {
     scrollbar-width: none !important;
   }
+
+  /* Hide tooltips when printing */
+  div[style*="position: absolute"][style*="backgroundColor: #3e3a2f"] {
+    display: none !important;
+  }
+
+  span[style*="cursor: help"] {
+    display: none !important;
+  }
 }
