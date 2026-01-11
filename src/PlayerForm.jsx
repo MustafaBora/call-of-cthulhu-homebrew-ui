@@ -14,7 +14,7 @@ import "./PlayerForm.css";
 import { useConnectivity } from "./ConnectivityProvider";
 
 // Debug mode kontrolü - All X butonlarını göstermek için true yapın
-const DEBUGMODE = false;
+const DEBUGMODE = true;
 
 /**
  * Updated PlayerForm.jsx to use backend RulesSpec with multi-level penalties
@@ -37,7 +37,7 @@ const FIELD_DEFS = [
   { key: "Climb", label: "Climb", type: "number" },
   { key: "ComputerUse", label: "Computer Use", type: "number" },
   { key: "CreditRating", label: "Credit Rating", type: "number" },
-  { key: "CthulhuMythos", label: "Cthulhu Mythos", type: "number" },
+  { key: "CthulhuMythos", label: "Cthulhu Myths", type: "number" },
   { key: "Demolitions", label: "Demolitions", type: "number" },
   { key: "Disguise", label: "Disguise", type: "number" },
   { key: "Dodge", label: "Dodge", type: "number" },
@@ -46,18 +46,18 @@ const FIELD_DEFS = [
   { key: "ElectricalRepair", label: "Electrics", type: "number" },
   { key: "FastTalk", label: "Fast Talk", type: "number" },
   { key: "FightingBrawl", label: "Fighting Brawl", type: "number" },
-  { key: "FightingOther", label: "FO__________", type: "number" },
+  { key: "FightingOther", label: "FO________", type: "number" },
   { key: "FirearmsHandgun", label: "Handgun", type: "number" },
-  { key: "FirearmsOther", label: "FA-O________", type: "number" },
-  { key: "FirearmsRifleShotgun", label: "Firearms Shotgun", type: "number" },
+  { key: "FirearmsOther", label: "FA-O______", type: "number" },
+  { key: "FirearmsRifleShotgun", label: "FA Rifles", type: "number" },
   { key: "FirstAid", label: "First Aid", type: "number" },
   { key: "History", label: "History", type: "number" },
   { key: "Hypnosis", label: "Hypnosis", type: "number" },
   { key: "Intimidate", label: "Intimidate", type: "number" },
   { key: "Jump", label: "Jump", type: "number" },
-  { key: "LanguageOther1", label: "LO1_________", type: "number" },
-  { key: "LanguageOther2", label: "LO2_________", type: "number" },
-  { key: "LanguageOther3", label: "LO3_________", type: "number" },
+  { key: "LanguageOther1", label: "LO1_______", type: "number" },
+  { key: "LanguageOther2", label: "LO2_______", type: "number" },
+  { key: "LanguageOther3", label: "LO3_______", type: "number" },
   { key: "LanguageOwn", label: "Language", type: "number" },
   { key: "Law", label: "Law", type: "number" },
   { key: "LibraryUse", label: "Library Use", type: "number" },
@@ -75,22 +75,22 @@ const FIELD_DEFS = [
   { key: "Psychology", label: "Psychology", type: "number" },
   { key: "ReadLips", label: "Read Lips", type: "number" },
   { key: "Ride", label: "Ride", type: "number" },
-  { key: "Science", label: "Science_______", type: "number" },
-  { key: "ScienceOther", label: "SO __________", type: "number" },
-  { key: "ScienceOther2", label: "SO2 ________", type: "number" },
+  { key: "Science", label: "Science _____", type: "number" },
+  { key: "ScienceOther", label: "SO _______", type: "number" },
+  { key: "ScienceOther2", label: "SO2 _____", type: "number" },
   { key: "SignLanguage", label: "Sign Language", type: "number" },
   { key: "Deception", label: "Deception", type: "number" },
   { key: "SleightOfHand", label: "Sleight of Hand", type: "number" },
   { key: "Status", label: "Status", type: "number" },
   { key: "Stealth", label: "Stealth", type: "number" },
-  { key: "Survival", label: "Survival_______", type: "number" },
+  { key: "Survival", label: "Survival ____", type: "number" },
   { key: "Swim", label: "Swim", type: "number" },
   { key: "Throw", label: "Throw", type: "number" },
   { key: "Track", label: "Track", type: "number" },
   { key: "UncommonLanguage", label: "Uncommon Language", type: "number" },
-  { key: "Other1", label: "O1__________", type: "number" },
-  { key: "Other2", label: "O2__________", type: "number" },
-  { key: "Other3", label: "O3__________", type: "number" },
+  { key: "Other1", label: "O1 _______", type: "number" },
+  { key: "Other2", label: "O2 _______", type: "number" },
+  { key: "Other3", label: "O3 _______", type: "number" },
 ];
 
 // Characteristic descriptions for tooltips
